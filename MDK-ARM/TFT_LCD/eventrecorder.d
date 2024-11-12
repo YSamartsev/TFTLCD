@@ -1,0 +1,12 @@
+tft_lcd\eventrecorder.o: C:\Keil_v5\ARM\PACK\Keil\ARM_Compiler\1.6.3\Source\EventRecorder.c
+tft_lcd\eventrecorder.o: .\RTE\_TFT_LCD\RTE_Components.h
+tft_lcd\eventrecorder.o: C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include\stm32f10x.h
+tft_lcd\eventrecorder.o: ../Drivers/CMSIS/Include/core_cm3.h
+tft_lcd\eventrecorder.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+tft_lcd\eventrecorder.o: ../Drivers/CMSIS/Include/cmsis_version.h
+tft_lcd\eventrecorder.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
+tft_lcd\eventrecorder.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
+tft_lcd\eventrecorder.o: C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include\system_stm32f10x.h
+tft_lcd\eventrecorder.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+tft_lcd\eventrecorder.o: C:\Keil_v5\ARM\PACK\Keil\ARM_Compiler\1.6.3\Include\EventRecorder.h
+tft_lcd\eventrecorder.o: .\RTE\Compiler\EventRecorderConf.h

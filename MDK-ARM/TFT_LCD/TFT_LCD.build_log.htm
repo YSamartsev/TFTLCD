@@ -1,0 +1,89 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.33.0.0
+Copyright (C) 2020 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: Yuriy Samartsev, KPI, LIC=QF82M-XTX1Z-FWD2N-YIHRR-EQB6Z-J50WR
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Plus  Version: 5.33.0.0
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 7 (build 960)
+Assembler:       Armasm.exe V5.06 update 7 (build 960)
+Linker/Locator:  ArmLink.exe V5.06 update 7 (build 960)
+Library Manager: ArmAr.exe V5.06 update 7 (build 960)
+Hex Converter:   FromElf.exe V5.06 update 7 (build 960)
+CPU DLL:         SARMCM3.DLL V5.33.0.0
+Dialog DLL:      DARMSTM.DLL V1.68.0.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.8.0
+Dialog DLL:      TCM.DLL V1.48.0.0
+ 
+<h2>Project:</h2>
+D:\myWork\controlers\STM32\stm32f103\STM32103_Smart\TFT_LCD\MDK-ARM\TFT_LCD.uvprojx
+Project File Date:  11/12/2024
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'TFT_LCD'
+compiling st7789.c...
+../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h(595): warning:  #47-D: incompatible redefinition of macro "IS_SPI_BAUDRATE_PRESCALER"  (declared at line 269)
+  #define IS_SPI_BAUDRATE_PRESCALER(__PRESCALER__) (((__PRESCALER__) == SPI_BAUDRATEPRESCALER_2)   || \
+..\Drivers\BSP\Components\st7789\st7789.c(358): warning:  #186-D: pointless comparison of unsigned integer with zero
+  	if ((x < 0) || (x >= ST7789_WIDTH) ||
+..\Drivers\BSP\Components\st7789\st7789.c(359): warning:  #186-D: pointless comparison of unsigned integer with zero
+  		 (y < 0) || (y >= ST7789_HEIGHT))	return;
+..\Drivers\BSP\Components\st7789\st7789.c(377): warning:  #186-D: pointless comparison of unsigned integer with zero
+  	if ((xEnd < 0) || (xEnd >= ST7789_WIDTH) ||
+..\Drivers\BSP\Components\st7789\st7789.c(378): warning:  #186-D: pointless comparison of unsigned integer with zero
+  		 (yEnd < 0) || (yEnd >= ST7789_HEIGHT))	return;
+..\Drivers\BSP\Components\st7789\st7789.c: 5 warnings, 0 errors
+linking...
+Program Size: Code=11588 RO-data=59024 RW-data=136 ZI-data=3528  
+FromELF: creating hex file...
+"TFT_LCD\TFT_LCD.axf" - 0 Error(s), 5 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.5.7.0.pack
+                ARM.CMSIS.5.7.0
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 5.4.0
+
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.ARM_Compiler.1.6.3.pack
+                Keil.ARM_Compiler.1.6.3
+                Keil ARM Compiler extensions for ARM Compiler 5 and ARM Compiler 6
+   * Component: STDERR Variant: ITM Version: 1.2.0
+   * Component: STDIN Variant: ITM Version: 1.2.0
+   * Component: STDOUT Variant: ITM Version: 1.2.0
+
+Package Vendor: Keil
+                https://www.keil.com/pack/Keil.STM32F1xx_DFP.2.4.1.pack
+                Keil.STM32F1xx_DFP.2.4.1
+                STMicroelectronics STM32F1 Series Device Support, Drivers and Examples
+
+<h2>Collection of Component include folders:</h2>
+  .\RTE\_TFT_LCD
+  C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include
+  C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:5.4.0
+      Include file:  CMSIS\Core\Include\tz_context.h
+
+   * Component: Keil.ARM Compiler::Compiler:I/O:STDERR:ITM:1.2.0
+      Source file:   Source\retarget_io.c
+
+   * Component: Keil.ARM Compiler::Compiler:I/O:STDIN:ITM:1.2.0
+      Source file:   Source\retarget_io.c
+
+   * Component: Keil.ARM Compiler::Compiler:I/O:STDOUT:ITM:1.2.0
+      Source file:   Source\retarget_io.c
+Build Time Elapsed:  00:00:01
+</pre>
+</body>
+</html>
