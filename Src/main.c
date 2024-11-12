@@ -256,24 +256,23 @@ int main(void)
 */
 	
   /*##-1- Configure the RTC peripheral #######################################*/
-  RtcHandle.Instance = RTC;
+ //==== RtcHandle.Instance = RTC;
   
 	  /* Configure RTC prescaler and RTC data registers */
   /* RTC configured as follows:
       - Asynch Prediv  = Automatic calculation of prediv for 1 sec timebase
   */
-  RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
+  //=====RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
 
-	if (HAL_RTC_Init(&RtcHandle) != HAL_OK)
+/*====	if (HAL_RTC_Init(&RtcHandle) != HAL_OK)
   {
-    /* Initialization Error */
     Error_Handler();
-  }
+  } */
 
   /*##-2- Configure Alarm ####################################################*/
   /* Configure RTC Alarm */
   //RTC_AlarmConfig(); //Для перерівання через інтервал часу
-	RTC_SECConfig(); //Конфігурую для перивання кожну секуду по RTC_IRQHandler
+//=====	RTC_SECConfig(); //Конфігурую для перивання кожну секуду по RTC_IRQHandler
 
 
 /* -------------RTC End--------------*/
