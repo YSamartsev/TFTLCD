@@ -68,7 +68,7 @@
   * @{
   */
 
-extern SPI_HandleTypeDef ST7735_SPI_PORT;
+//==extern SPI_HandleTypeDef ST7735_SPI_PORT;
 
 /**
   * @}

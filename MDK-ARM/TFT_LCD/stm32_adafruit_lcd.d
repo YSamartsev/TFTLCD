@@ -57,4 +57,3 @@ tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font20.c
 tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font16.c
 tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font12.c
 tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font8.c
-tft_lcd\stm32_adafruit_lcd.o: ..\Drivers\BSP\Adafruit_Shield\lcd.h

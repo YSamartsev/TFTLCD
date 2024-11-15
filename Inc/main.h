@@ -22,10 +22,10 @@
 #define __MAIN_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f1xx_hal.h"
-#include "stm32f1xx_nucleo.h"
-#include "stm32_adafruit_sd.h"
-#include "stm32_adafruit_lcd.h"
+//==#include "stm32f1xx_hal.h"
+//==#include "stm32f1xx_nucleo.h"
+//==#include "stm32_adafruit_sd.h"
+//==#include "stm32_adafruit_lcd.h"
 
 #include <stdio.h>
 #include <stdlib.h>

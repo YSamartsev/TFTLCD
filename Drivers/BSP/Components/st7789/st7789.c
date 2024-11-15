@@ -87,14 +87,14 @@ static void ST7789_WriteSmallData(uint8_t data)
 	ST7789_UnSelect();
 }
 
-void LCD_WR_REG(uint8_t data)
+/*=====void LCD_WR_REG(uint8_t data)
 { 
 //   LCD_CS_CLR;     
 	 ST7789_DC_Clr();	  
 	 ST7789_WriteData(&data, sizeof(data));	
 	
 //   LCD_CS_SET;	
-}
+} */
 
 /*****************************************************************************
  * @name       :void LCD_WR_DATA(u8 data)
@@ -103,13 +103,13 @@ void LCD_WR_REG(uint8_t data)
  * @parameters :data:data value to be written
  * @retvalue   :None
 ******************************************************************************/
-void LCD_WR_DATA(uint8_t data)
+/*=====void LCD_WR_DATA(uint8_t data)
 {
 //   LCD_CS_CLR;
 	 ST7789_DC_Set();
    ST7789_WriteData(&data, sizeof(data));	
 //   LCD_CS_SET;
-}
+} */
 
 
 /**
