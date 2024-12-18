@@ -1141,8 +1141,8 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pD
   const uint16_t *pdata16bits;
   uint32_t tickstart = 0U;
 
-  /* Check that a Tx process is not already ongoing   HAL_UART_STATE_READY*/
-  if (huart->gState == 0x20)
+  /* Check that a Tx process is not already ongoing */
+  if (huart->gState == HAL_UART_STATE_READY)
   {
     if ((pData == NULL) || (Size == 0U))
     {

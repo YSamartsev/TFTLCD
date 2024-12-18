@@ -1,8 +1,9 @@
 #ifndef __ST7789_H
 #define __ST7789_H
 
-#include "fonts.h"
 #include "main.h"
+#include "fonts.h"
+#include "stm32f1xx_nucleo.h"
 
 
 //#define SPI_HandleTypeDef ST7789_SPI_PORT
@@ -194,6 +195,50 @@
  *
  */
 
+#define SPI_I2S_FLAG_RXNE               ((uint16_t)0x0001)
+#define SPI_I2S_FLAG_TXE                ((uint16_t)0x0002)
+#define I2S_FLAG_CHSIDE                 ((uint16_t)0x0004)
+#define I2S_FLAG_UDR                    ((uint16_t)0x0008)
+//#define SPI_FLAG_CRCERR                 ((uint16_t)0x0010)
+//#define SPI_FLAG_MODF                   ((uint16_t)0x0020)
+#define SPI_I2S_FLAG_OVR                ((uint16_t)0x0040)
+#define SPI_I2S_FLAG_BSY                ((uint16_t)0x0080)
+
+#define IS_SPI_I2S_CLEAR_FLAG(FLAG) (((FLAG) == SPI_FLAG_CRCERR))
+#define IS_SPI_I2S_GET_FLAG(FLAG) (((FLAG) == SPI_I2S_FLAG_BSY) || ((FLAG) == SPI_I2S_FLAG_OVR) || \
+                                   ((FLAG) == SPI_FLAG_MODF) || ((FLAG) == SPI_FLAG_CRCERR) || \
+                                   ((FLAG) == I2S_FLAG_UDR) || ((FLAG) == I2S_FLAG_CHSIDE) || \
+                                   ((FLAG) == SPI_I2S_FLAG_TXE) || ((FLAG) == SPI_I2S_FLAG_RXNE))
+
+//LCD
+typedef struct  
+{										    
+	uint16_t width;			
+	uint16_t height;			
+	uint16_t id;				  
+	uint8_t  dir;			  	
+	uint16_t	 wramcmd;		
+	uint16_t  setxcmd;		
+	uint16_t  setycmd;			
+  uint8_t   xoffset;    
+  uint8_t	 yoffset;
+}_lcd_dev; 	
+
+//LCD
+extern _lcd_dev lcddev;	
+/////////////////////////////////////ԃۧƤ׃ȸ///////////////////////////////////	 
+#define USE_HORIZONTAL  	 0 
+
+//////////////////////////////////////////////////////////////////////////////////	  
+#define LCD_W 240
+#define LCD_H 240
+
+
+
+
+
+
+
 /* Page Address Order ('0': Top to Bottom, '1': the opposite) */
 #define ST7789_MADCTL_MY  0x80
 /* Column Address Order ('0': Left to Right, '1': the opposite) */
@@ -218,8 +263,8 @@
 #define ST7789_RST_Clr() HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_RESET)
 #define ST7789_RST_Set() HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_SET)
 
-#define ST7789_DC_Clr() HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_RESET)
-#define ST7789_DC_Set() HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_SET)
+#define ST7789_DC_Clr() HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_RESET)
+#define ST7789_DC_Set() HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_SET)
 
 #define ST7789_Select() HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_RESET)
 #define ST7789_UnSelect() HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_SET)
@@ -243,6 +288,7 @@ void ST7789_InvertColors(uint8_t invert);
 
 /* Text functions. */
 void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor);
+	
 void ST7789_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor);
 
 /* Extented Graphical functions. */
@@ -256,6 +302,17 @@ void ST7789_TearEffect(uint8_t tear);
 
 /* Simple test function. */
 void ST7789_Test(void);
+
+
+void LCD_WR_REG(uint8_t data);
+void LCD_WR_DATA(uint8_t data);
+uint8_t SPI_WriteByte(SPI_HandleTypeDef* hspi, uint8_t Byte);
+void LCD_WriteReg(uint8_t LCD_Reg, uint16_t LCD_RegValue);
+void LCD_direction(uint8_t direction);
+void LCD_Clear(uint16_t Color);
+void LCD_SetWindows(uint16_t xStar, uint16_t yStar, uint16_t xEnd, uint16_t yEnd);
+void LCD_WriteRAM_Prepare(void);
+
 
 #ifndef ST7789_ROTATION
     #error You should at least choose a display rotation!

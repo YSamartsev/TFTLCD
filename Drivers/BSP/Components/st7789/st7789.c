@@ -1,16 +1,18 @@
 #include "st7789.h"
+#include "fonts.h"
 
-//#include "stm32f1xx_nucleo.h"
+extern SPI_HandleTypeDef SpiHandle;
 
-//#define SPI_HandleTypeDef ST7789_SPI_PORT
 
-//extern SPI_HandleTypeDef ST7789_SPI_PORT;
-extern SPI_HandleTypeDef hnucleo_Spi;
-//_lcd_dev lcddev;
+extern FontDef Font_7x10;
+extern FontDef Font_11x18;
+extern FontDef Font_16x26;
+extern const uint16_t saber;
+
+uint32_t bi;
 
 #ifdef USE_DMA
 #include <string.h>
-
 uint16_t DMA_MIN_SIZE = 16;
 /* If you're using DMA, then u need a "framebuffer" to store datas to be displayed.
  * If your MCU don't have enough RAM, please avoid using DMA(or set 5 to 1).
@@ -18,7 +20,7 @@ uint16_t DMA_MIN_SIZE = 16;
  * Then you can specify the framebuffer size to the full resolution below.
  */
  #define HOR_LEN 	5	//	Also mind the resolution of your screen!
-uint8_t disp_buf[ST7789_WIDTH * HOR_LEN];
+uint16_t disp_buf[ST7789_WIDTH * HOR_LEN];
 #endif
 
 /**
@@ -28,15 +30,10 @@ uint8_t disp_buf[ST7789_WIDTH * HOR_LEN];
  */
 static void ST7789_WriteCommand(uint8_t cmd)
 {
-	ST7789_Select(); //PB12->0. В плате не используется
-	ST7789_DC_Clr(); //PB1->0
-	
-//	while(1)
-//	{
-	//HAL_SPI_Transmit(&ST7789_SPI_PORT, &cmd, sizeof(cmd), HAL_MAX_DELAY);
-		HAL_SPI_Transmit(&hnucleo_Spi, &cmd, sizeof(cmd), HAL_MAX_DELAY);
-//	}
-		ST7789_UnSelect();
+	ST7789_Select();
+	ST7789_DC_Clr();
+	HAL_SPI_Transmit(&SpiHandle, &cmd, sizeof(cmd), HAL_MAX_DELAY);
+	ST7789_UnSelect();
 }
 
 /**
@@ -64,8 +61,7 @@ static void ST7789_WriteData(uint8_t *buff, size_t buff_size)
 			else
 				HAL_SPI_Transmit(&ST7789_SPI_PORT, buff, chunk_size, HAL_MAX_DELAY);
 		#else
-			//HAL_SPI_Transmit(&ST7789_SPI_PORT, buff, chunk_size, HAL_MAX_DELAY);
-		HAL_SPI_Transmit(&hnucleo_Spi, buff, chunk_size, HAL_MAX_DELAY);
+			HAL_SPI_Transmit(&SpiHandle, buff, chunk_size, HAL_MAX_DELAY);
 		#endif
 		buff += chunk_size;
 		buff_size -= chunk_size;
@@ -82,35 +78,9 @@ static void ST7789_WriteSmallData(uint8_t data)
 {
 	ST7789_Select();
 	ST7789_DC_Set();
-	//HAL_SPI_Transmit(&ST7789_SPI_PORT, &data, sizeof(data), HAL_MAX_DELAY);
-	HAL_SPI_Transmit(&hnucleo_Spi, &data, sizeof(data), HAL_MAX_DELAY);
+	HAL_SPI_Transmit(&SpiHandle, &data, sizeof(data), HAL_MAX_DELAY);
 	ST7789_UnSelect();
 }
-
-/*=====void LCD_WR_REG(uint8_t data)
-{ 
-//   LCD_CS_CLR;     
-	 ST7789_DC_Clr();	  
-	 ST7789_WriteData(&data, sizeof(data));	
-	
-//   LCD_CS_SET;	
-} */
-
-/*****************************************************************************
- * @name       :void LCD_WR_DATA(u8 data)
- * @date       :2018-08-09 
- * @function   :Write an 8-bit data to the LCD screen
- * @parameters :data:data value to be written
- * @retvalue   :None
-******************************************************************************/
-/*=====void LCD_WR_DATA(uint8_t data)
-{
-//   LCD_CS_CLR;
-	 ST7789_DC_Set();
-   ST7789_WriteData(&data, sizeof(data));	
-//   LCD_CS_SET;
-} */
-
 
 /**
  * @brief Set the rotation direction of the display
@@ -150,20 +120,20 @@ static void ST7789_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint1
 	uint16_t y_start = y0 + Y_SHIFT, y_end = y1 + Y_SHIFT;
 	
 	/* Column Address set */
-	ST7789_WriteCommand(ST7789_CASET);  //Призначення Набір стовпчиків (по X) 
+	ST7789_WriteCommand(ST7789_CASET); 
 	{
 		uint8_t data[] = {x_start >> 8, x_start & 0xFF, x_end >> 8, x_end & 0xFF};
-		ST7789_WriteData(data, sizeof(data)); //Параметр 1, 2 Крайній зліва стовпчик Х: 0x0000, Крайній справа стовпчик Х: 0x00EF
+		ST7789_WriteData(data, sizeof(data));
 	}
 
 	/* Row Address set */
-	ST7789_WriteCommand(ST7789_RASET); // Призначення Набір рядків (по Y)
+	ST7789_WriteCommand(ST7789_RASET);
 	{
 		uint8_t data[] = {y_start >> 8, y_start & 0xFF, y_end >> 8, y_end & 0xFF};
-		ST7789_WriteData(data, sizeof(data)); ////Параметр 3, 4 Крайній зліва стовпчик Y: 0x0000, Крайній справа стовпчик Y: 0x00EF
+		ST7789_WriteData(data, sizeof(data));
 	}
 	/* Write to RAM */
-	ST7789_WriteCommand(ST7789_RAMWR); //Page 198 of 317, ST7789VW_datasheet.pdf
+	ST7789_WriteCommand(ST7789_RAMWR);
 	ST7789_UnSelect();
 }
 
@@ -174,19 +144,14 @@ static void ST7789_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint1
  */
 void ST7789_Init(void)
 {
-	/* Initialize ST7735 low level bus layer -----------------------------------*/
-  LCD_IO_Init(); //Тут задається nucleo_spi
-	
 	#ifdef USE_DMA
 		memset(disp_buf, 0, sizeof(disp_buf));
 	#endif
-		HAL_Delay(10);
+	HAL_Delay(10);
+  LCD_RESET_SET();
 
-	
-	LCD_RESET_SET();
-
-    ST7789_WriteCommand(ST7789_COLMOD);		//	Set color mode
-	  ST7789_WriteSmallData(ST7789_COLOR_MODE_16bit);
+	ST7789_WriteCommand(ST7789_COLMOD);		//	Set color mode
+    ST7789_WriteSmallData(ST7789_COLOR_MODE_16bit);
   	ST7789_WriteCommand(0xB2);				//	Porch control
 	{
 		uint8_t data[] = {0x0C, 0x0C, 0x00, 0x33, 0x33};
@@ -194,7 +159,7 @@ void ST7789_Init(void)
 	}
 	ST7789_SetRotation(ST7789_ROTATION);	//	MADCTL (Display Rotation)
 	
-	// Internal LCD Voltage generator settings 
+	/* Internal LCD Voltage generator settings */
     ST7789_WriteCommand(0XB7);				//	Gate Control
     ST7789_WriteSmallData(0x35);			//	Default value
     ST7789_WriteCommand(0xBB);				//	VCOM setting
@@ -212,6 +177,7 @@ void ST7789_Init(void)
     ST7789_WriteCommand (0xD0);				//	Power control
     ST7789_WriteSmallData (0xA4);			//	Default value
     ST7789_WriteSmallData (0xA1);			//	Default value
+	/**************** Division line ****************/
 
 	ST7789_WriteCommand(0xE0);
 	{
@@ -225,98 +191,12 @@ void ST7789_Init(void)
 		ST7789_WriteData(data, sizeof(data));
 	}
     ST7789_WriteCommand (ST7789_INVON);		//	Inversion ON
-		ST7789_WriteCommand (ST7789_SLPOUT);	//	Out of sleep mode
+	ST7789_WriteCommand (ST7789_SLPOUT);	//	Out of sleep mode
   	ST7789_WriteCommand (ST7789_NORON);		//	Normal Display on
   	ST7789_WriteCommand (ST7789_DISPON);	//	Main screen turned on	
 
 	HAL_Delay(50);
-	ST7789_Fill_Color(RED);
-	HAL_Delay(100);
-	ST7789_Fill_Color(BLACK);				//	Fill with Black.
-
-
-//************* ST7789**********//	
-/*	LCD_WR_REG(0x36); 
-	LCD_WR_DATA(0x00);
-
-	LCD_WR_REG(0x3A); 
-	LCD_WR_DATA(0x05);
-
-	LCD_WR_REG(0xB2);
-	LCD_WR_DATA(0x0C);
-	LCD_WR_DATA(0x0C);
-	LCD_WR_DATA(0x00);
-	LCD_WR_DATA(0x33);
-	LCD_WR_DATA(0x33);
-
-	LCD_WR_REG(0xB7); 
-	LCD_WR_DATA(0x35);  
-
-	LCD_WR_REG(0xBB);
-	LCD_WR_DATA(0x19);
-
-	LCD_WR_REG(0xC0);
-	LCD_WR_DATA(0x2C);
-
-	LCD_WR_REG(0xC2);
-	LCD_WR_DATA(0x01);
-
-	LCD_WR_REG(0xC3);
-	LCD_WR_DATA(0x12);   
-
-	LCD_WR_REG(0xC4);
-	LCD_WR_DATA(0x20);  
-
-	LCD_WR_REG(0xC6); 
-	LCD_WR_DATA(0x0F);    
-
-	LCD_WR_REG(0xD0); 
-	LCD_WR_DATA(0xA4);
-	LCD_WR_DATA(0xA1);
-
-	LCD_WR_REG(0xE0);
-	LCD_WR_DATA(0xD0);
-	LCD_WR_DATA(0x04);
-	LCD_WR_DATA(0x0D);
-	LCD_WR_DATA(0x11);
-	LCD_WR_DATA(0x13);
-	LCD_WR_DATA(0x2B);
-	LCD_WR_DATA(0x3F);
-	LCD_WR_DATA(0x54);
-	LCD_WR_DATA(0x4C);
-	LCD_WR_DATA(0x18);
-	LCD_WR_DATA(0x0D);
-	LCD_WR_DATA(0x0B);
-	LCD_WR_DATA(0x1F);
-	LCD_WR_DATA(0x23);
-
-	LCD_WR_REG(0xE1);
-	LCD_WR_DATA(0xD0);
-	LCD_WR_DATA(0x04);
-	LCD_WR_DATA(0x0C);
-	LCD_WR_DATA(0x11);
-	LCD_WR_DATA(0x13);
-	LCD_WR_DATA(0x2C);
-	LCD_WR_DATA(0x3F);
-	LCD_WR_DATA(0x44);
-	LCD_WR_DATA(0x51);
-	LCD_WR_DATA(0x2F);
-	LCD_WR_DATA(0x1F);
-	LCD_WR_DATA(0x1F);
-	LCD_WR_DATA(0x20);
-	LCD_WR_DATA(0x23);
-
-	LCD_WR_REG(0x21); 
-
-	LCD_WR_REG(0x11); 
-	//Delay (120); 
-
-	LCD_WR_REG(0x29); 	
-  //LCD_direction(USE_HORIZONTAL);//
-*/	
-	ST7789_Fill_Color(WHITE);	
-
-
+	ST7789_Fill_Color(WHITE);				//	Fill with Black.
 }
 
 /**
@@ -326,7 +206,7 @@ void ST7789_Init(void)
  */
 void ST7789_Fill_Color(uint16_t color)
 {
-	uint16_t i;
+	uint16_t i = 0, j = 0, z = 0;
 	ST7789_SetAddressWindow(0, 0, ST7789_WIDTH - 1, ST7789_HEIGHT - 1);
 	ST7789_Select();
 
@@ -337,13 +217,17 @@ void ST7789_Fill_Color(uint16_t color)
 			ST7789_WriteData(disp_buf, sizeof(disp_buf));
 		}
 	#else
-		uint16_t j;
-		for (i = 0; i < ST7789_WIDTH; i++)
-				for (j = 0; j < ST7789_HEIGHT; j++) {
+			for (i = 0; i < ST7789_WIDTH; i++)
+			{
+				for (j = 0; j < ST7789_HEIGHT; j++) 
+				{
 					uint8_t data[] = {color >> 8, color & 0xFF};
 					ST7789_WriteData(data, sizeof(data));
+					z++;
 				}
+			}
 	#endif
+			printf("------------z = %04d\n\r", z);
 	ST7789_UnSelect();
 }
 
@@ -567,16 +451,18 @@ void ST7789_InvertColors(uint8_t invert)
  * @param bgcolor -> background color of the char
  * @return  none
  */
-void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor)
+void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t color, uint16_t bgcolor)
 {
 	uint32_t i, b, j;
 	ST7789_Select();
-	ST7789_SetAddressWindow(x, y, x + font.width - 1, y + font.height - 1);
-
-	for (i = 0; i < font.height; i++) {
-		b = font.data[(ch - 32) * font.height + i];
-		for (j = 0; j < font.width; j++) {
-			if ((b << j) & 0x8000) {
+	ST7789_SetAddressWindow(x, y, x + sfont.width - 1, y + sfont.height - 1);
+	
+	for (i = 0; i < sfont.height; i++) {
+		//b = font.data[(ch - 32) * font.height + i];
+		bi = sfont.data[(ch - 32) * sfont.height + i];
+		
+		for (j = 0; j < sfont.width; j++) {
+			if ((bi << j) & 0x8000) {
 				uint8_t data[] = {color >> 8, color & 0xFF};
 				ST7789_WriteData(data, sizeof(data));
 			}
@@ -801,12 +687,11 @@ void ST7789_TearEffect(uint8_t tear)
  * @param  none
  * @return  none
  */
-void ST7789_Test(void)
+ void ST7789_Test(void)
 {
 	ST7789_Fill_Color(WHITE);
 	HAL_Delay(1000);
-	ST7789_WriteString(10, 20, "Speed Test", Font_16x26, RED, WHITE);
-	HAL_Delay(1000);
+ST7789_WriteString(10, 10, "Font test.", Font_16x26, GBLUE, WHITE);
 	ST7789_Fill_Color(CYAN);
     HAL_Delay(500);
 	ST7789_Fill_Color(RED);
@@ -832,92 +717,45 @@ void ST7789_Test(void)
 	ST7789_Fill_Color(WHITE);
 	HAL_Delay(500);
 
+	ST7789_Fill_Color(RED);
+	//ST7789_WriteString(10, 10, "Rect./Line.", Font_11x18, YELLOW, BLACK);
+	ST7789_DrawRectangle(30, 30, 100, 100, WHITE);
+	HAL_Delay(1000);
+
+	ST7789_Fill_Color(RED);
+	//ST7789_WriteString(10, 10, "Filled Rect.", Font_11x18, YELLOW, BLACK);
+	ST7789_DrawFilledRectangle(30, 30, 50, 50, WHITE);
+	HAL_Delay(1000);
+
+	ST7789_Fill_Color(RED);
+	//ST7789_WriteString(10, 10, "Circle.", Font_11x18, YELLOW, BLACK);
+	ST7789_DrawCircle(60, 60, 25, WHITE);
+	HAL_Delay(1000);
+
+	ST7789_Fill_Color(RED);
+	//ST7789_WriteString(10, 10, "Filled Cir.", Font_11x18, YELLOW, BLACK);
+	ST7789_DrawFilledCircle(60, 60, 25, WHITE);
+	HAL_Delay(1000);
+
+	ST7789_Fill_Color(RED);
+	//ST7789_WriteString(10, 10, "Triangle", Font_11x18, YELLOW, BLACK);
+	ST7789_DrawTriangle(30, 30, 30, 70, 60, 40, WHITE);
+	HAL_Delay(1000);
+
+	ST7789_Fill_Color(RED);
+	//ST7789_WriteString(10, 10, "Filled Tri", Font_11x18, YELLOW, BLACK);
+	ST7789_DrawFilledTriangle(30, 30, 30, 70, 60, 40, WHITE);
+	HAL_Delay(1000);
+
 	ST7789_WriteString(10, 10, "Font test.", Font_16x26, GBLUE, WHITE);
 	ST7789_WriteString(10, 50, "Hello Steve!", Font_7x10, RED, WHITE);
 	ST7789_WriteString(10, 75, "Hello Steve!", Font_11x18, YELLOW, WHITE);
 	ST7789_WriteString(10, 100, "Hello Steve!", Font_16x26, MAGENTA, WHITE);
 	HAL_Delay(1000);
 
-	ST7789_Fill_Color(RED);
-	ST7789_WriteString(10, 10, "Rect./Line.", Font_11x18, YELLOW, BLACK);
-	ST7789_DrawRectangle(30, 30, 100, 100, WHITE);
-	HAL_Delay(1000);
-
-	ST7789_Fill_Color(RED);
-	ST7789_WriteString(10, 10, "Filled Rect.", Font_11x18, YELLOW, BLACK);
-	ST7789_DrawFilledRectangle(30, 30, 50, 50, WHITE);
-	HAL_Delay(1000);
-
-	ST7789_Fill_Color(RED);
-	ST7789_WriteString(10, 10, "Circle.", Font_11x18, YELLOW, BLACK);
-	ST7789_DrawCircle(60, 60, 25, WHITE);
-	HAL_Delay(1000);
-
-	ST7789_Fill_Color(RED);
-	ST7789_WriteString(10, 10, "Filled Cir.", Font_11x18, YELLOW, BLACK);
-	ST7789_DrawFilledCircle(60, 60, 25, WHITE);
-	HAL_Delay(1000);
-
-	ST7789_Fill_Color(RED);
-	ST7789_WriteString(10, 10, "Triangle", Font_11x18, YELLOW, BLACK);
-	ST7789_DrawTriangle(30, 30, 30, 70, 60, 40, WHITE);
-	HAL_Delay(1000);
-
-	ST7789_Fill_Color(RED);
-	ST7789_WriteString(10, 10, "Filled Tri", Font_11x18, YELLOW, BLACK);
-	ST7789_DrawFilledTriangle(30, 30, 30, 70, 60, 40, WHITE);
-	HAL_Delay(1000);
 
 	//	If FLASH cannot storage anymore datas, please delete codes below.
 	ST7789_Fill_Color(WHITE);
 	ST7789_DrawImage(0, 0, 128, 128, (uint16_t *)saber);
-	HAL_Delay(3000); 
+	HAL_Delay(3000);
 }
-/*****************************************************************************
- * @name       :void LCD_direction(u8 direction)
- * @date       :2018-08-09 
- * @function   :Setting the display direction of LCD screen
- * @parameters :direction:0-0 degree
-                          1-90 degree
-													2-180 degree
-													3-270 degree
- * @retvalue   :None
-******************************************************************************/ 
-/*void LCD_direction(uint8_t direction)
-{ 
-			st7735_drv.setxcmd=0x2A;
-			lcddev.setycmd=0x2B;
-			lcddev.wramcmd=0x2C;
-	switch(direction){		  
-		case 0:						 	 		
-			lcddev.width=LCD_W;
-			lcddev.height=LCD_H;	
-			lcddev.xoffset=0;
-			lcddev.yoffset=0;
-			LCD_WriteReg(0x36,0);//BGR==1,MY==0,MX==0,MV==0
-		break;
-		case 1:
-			lcddev.width=LCD_H;
-			lcddev.height=LCD_W;
-			lcddev.xoffset=0;
-			lcddev.yoffset=0;
-			LCD_WriteReg(0x36,(1<<6)|(1<<5));//BGR==1,MY==1,MX==0,MV==1
-		break;
-		case 2:						 	 		
-			lcddev.width=LCD_W;
-			lcddev.height=LCD_H;
-      lcddev.xoffset=0;
-			lcddev.yoffset=80;			
-			LCD_WriteReg(0x36,(1<<6)|(1<<7));//BGR==1,MY==0,MX==0,MV==0
-		break;
-		case 3:
-			lcddev.width=LCD_H;
-			lcddev.height=LCD_W;
-			lcddev.xoffset=80;
-			lcddev.yoffset=0;
-			LCD_WriteReg(0x36,(1<<7)|(1<<5));//BGR==1,MY==1,MX==0,MV==1
-		break;	
-		default:break;
-	}		
-}	 
-*/

@@ -23,12 +23,22 @@
 #include "main.h"
 #include <stdio.h>
 #include <string.h>
-#include "../HARDWARE/LCD/lcd.h"
-#include "../SYSTEM/delay/delay.h"
-#include "../SYSTEM/sys/sys.h"
-#include "../HARDWARE/TOUCH/touch.h"
-#include "GUI.h"
-#include "test.h"
+#include "stm32_adafruit_lcd.h"
+
+extern FontDef Font_7x10;
+extern FontDef Font_11x18;
+extern FontDef Font_16x26;
+extern const uint16_t saber;
+
+
+
+//#include "stm32f1xx_nucleo.h"
+//#include "../HARDWARE/LCD/lcd.h"
+//#include "../SYSTEM/delay/delay.h"
+//#include "../SYSTEM/sys/sys.h"
+//#include "../HARDWARE/TOUCH/touch.h"
+//#include "GUI.h"
+//#include "test.h"
 
 //#include "EventRecorder.h"
 
@@ -43,9 +53,9 @@
 
 ///* Private typedef -----------------------------------------------------------*/
 ///* RTC handler declaration */
-//==RTC_HandleTypeDef RtcHandle;
+RTC_HandleTypeDef RtcHandle;
 //==UART_HandleTypeDef huart1;
-//==SPI_HandleTypeDef SpiHandle;
+SPI_HandleTypeDef SpiHandle;
 
 ///* Buffer used for displaying Time */
 uint8_t aShowTime[50] = {0};
@@ -112,16 +122,6 @@ static void TFT_DisplayErrorMessage(uint8_t message);
 static void TFT_DisplayMenu(void);
 static void TFT_DisplayImages(void);
 
-/*
-#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-
-#define ITM_Port8(n)    (*((volatile unsigned char *)(0xE0000000+4*n)))
-#define ITM_Port16(n)   (*((volatile unsigned short*)(0xE0000000+4*n)))
-#define ITM_Port32(n)   (*((volatile unsigned long *)(0xE0000000+4*n)))
-
-#define DEMCR           (*((volatile unsigned long *)(0xE000EDFC)))
-#define TRCENA          0x01000000 
-*/
 
 /* ==========Для реалізації printf================== 
 https://www.keil.com/support/man/docs/jlink/jlink_trace_itm_viewer.asp */
@@ -157,7 +157,6 @@ int fputc(int ch, FILE *f) {
 	
 	//HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF); //Це виводить в UART PA9-Tx, PA10-Rx. Через перехідник UART-USB треба подати на Віртуальний компорт РС.
 	//return ch;
-	Test_Colors();
 } 
 
 unsigned char backspace_called;
@@ -208,6 +207,8 @@ int __backspace(FILE *f)
   * @param  None
   * @retval None
   */
+//		uint8_t in, jn;
+const uint16_t * mydata;
 int main(void)
                                                                                                                                                                                                                                                                                            {  
   /* STM32F103xB HAL library initialization:
@@ -220,12 +221,11 @@ int main(void)
        - Set NVIC Group Priority to 4
        - Low Level Initialization
      */
-  //==HAL_Init();  
+  HAL_Init();  
   
   /* Configure the system clock = 64 MHz */
-  //==SystemClock_Config();
-	
-	
+  SystemClock_Config();
+
 	/* -------------RTC Start--------------*/
 /*
 Для використання переривання RTC_IRQHandler треба в stm32f1xx_hal_msp.c: функції HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc) встановити:
@@ -272,20 +272,44 @@ int main(void)
 
 	//MX_SPI_Init(); //Не роблю, це робиться в stm32f1xx_nucleo.c
 
+/*in = 0;
+		jn = 0;
+		while(in < 100) //ST7789_WIDTH
+		{		while(jn < 100)  //ST7789_HEIGHT
+				{
+					//ST7789_WriteData(data, sizeof(data));
+					//printf("jn = %04d\n\r", jn);
+					jn++;
+				}
+				//printf("-------------------in = %04d, Last jn = %04d\n\r", in, jn);
+				jn = 0;
+				in++;
+		}
+		printf("----------------------Last in = %04d, Last jn = %04d\n\r", in, jn);
+		
+		*/
+	/* Initialize ST7735 low level bus layer -----------------------------------*/
+  LCD_IO_Init(); //Визначаються піни для RESET, DC, CS
+  // LCD SPI Config: SCK, SDA 
+ 
+ 	SPIx_MspInit(); //Конфігурація пінів для MOSI, MOSO, SCK SPIx 
+	//HAL_SPI_MspInit(&SpiHandle); //Конфігурація пінів для MOSI, MOSO, SCK SPIx
+		
+	SPIx_Init(); //Конфігурація параметрів SPI
 
-
+printf("==================Start RTC Watch===================\n\r");
 
 /* LCD chip select high */
   //LCD_CS_HIGH(); //Використовую RESET, як CS
 
 
 /* Initialize the LCD */
-	//======BSP_LCD_Init(); //Спочатку через PB11 RESET, потім керується через Регістри
+	BSP_LCD_Init(); //Спочатку через PB11 RESET, потім керується через Регістри
+
 
 	//delay_init(72);	     //ғʱԵʼۯ
-	SystemInit();																																																																																																																																													 SystemInit();//ԵʼۯRCC ʨ׃ϵͳ׷ƵΪ72MHZ
-	delay_init(72);	     
-	LCD_Init();	  
+ 
+	
 	
 
 	//==ST7789_WriteString(10, 20, "Real Time", Font_16x26, RED, WHITE);	
@@ -295,18 +319,16 @@ int main(void)
     //SDCard_Config(); 
 	while (1)
 	{	
-		main_test(); 		
-		menu_test();     
-		Test_Color();  		
-		Test_FillRec();		
-		Test_Circle(); 		
-		Test_Triangle();   
-		English_Font_test();
-		Chinese_Font_test();
-		Pic_test();			
-		Rotate_Test();   
+		printf("===========AAAAAAAAAAAAA==============\n\r");
   /* Infinite loop */
-	//ST7789_Test();
+		char *myChar = "!"; 
+
+		ST7789_WriteString(10, 20, "sdsdgfhtyuy", Font_16x26, WHITE, RED);
+		ST7789_WriteChar(30, 40, *myChar, Font_7x10, WHITE, RED);
+		ST7789_WriteChar(60, 80, *myChar, Font_11x18, WHITE, RED);
+		
+		ST7789_Test();
+		HAL_Delay(1000);
 	//RTC_TimeShow(10, 100, aShowTime);
 	}
 }
@@ -325,7 +347,7 @@ int main(void)
   * @param  None
   * @retval None
   */
-/*==void SystemClock_Config(void)
+void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
@@ -365,7 +387,7 @@ int main(void)
   {
     Error_Handler();
   }
-} */
+} 
 
 /*==static void MX_UART1_Init(void)
 {
@@ -379,7 +401,7 @@ int main(void)
   huart1.Init.Mode       = UART_MODE_TX_RX;
   if (HAL_UART_Init(&huart1) != HAL_OK)
   {
-    //==/* Initialization Error 
+    //== Initialization Error 
     Error_Handler();
   }
 } */
@@ -405,7 +427,7 @@ int main(void)
   SpiHandle.Init.Mode = SPI_MODE_MASTER;
 //#else
 //  SpiHandle.Init.Mode = SPI_MODE_SLAVE;
-//#endif /* MASTER_BOARD 
+//#endif MASTER_BOARD 
 
 //NSS (PB12) відноситься до SPI. Керується ресурсом SPI
 //Ним не можна керувати програмно
@@ -413,15 +435,15 @@ int main(void)
 
 } */
 
-/*==void LCD_RESET_SET(void)
+void LCD_RESET_SET(void)
 {
 		LCD_RST_LOW();  //ST7789_RST_Clr(); //Керується через PB11. В платі не використовується
     HAL_Delay(20);
    
 		LCD_RST_HIGH();  //ST7789_RST_Set();
-    //HAL_Delay(20);
-	  delay_ms(20);
-} */
+    HAL_Delay(10);
+	  //delay_ms(20);
+}
 
 
 
@@ -599,8 +621,8 @@ void Error_Handler(void)
   {
     /* Toggle LED2 with a period of one second */
     //BSP_LED_Toggle(LED2);
-    //HAL_Delay(1000);
-		delay_ms(1000);
+    HAL_Delay(1000);
+		
   }
 }
 

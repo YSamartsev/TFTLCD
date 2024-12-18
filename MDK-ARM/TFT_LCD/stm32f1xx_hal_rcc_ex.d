@@ -1,4 +1,4 @@
-tft_lcd\stm32f1xx_hal_rcc_ex.o: ../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c
+tft_lcd\stm32f1xx_hal_rcc_ex.o: ..\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_rcc_ex.c
 tft_lcd\stm32f1xx_hal_rcc_ex.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 tft_lcd\stm32f1xx_hal_rcc_ex.o: ../Inc/stm32f1xx_hal_conf.h
 tft_lcd\stm32f1xx_hal_rcc_ex.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h

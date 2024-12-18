@@ -33,16 +33,6 @@ tft_lcd\stm32f1xx_hal_msp.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_s
 tft_lcd\stm32f1xx_hal_msp.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 tft_lcd\stm32f1xx_hal_msp.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_smartcard.h
 tft_lcd\stm32f1xx_hal_msp.o: ..\Drivers\BSP\STM32F1xx_Nucleo\stm32f1xx_nucleo.h
-tft_lcd\stm32f1xx_hal_msp.o: ..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_sd.h
-tft_lcd\stm32f1xx_hal_msp.o: ..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_lcd.h
-tft_lcd\stm32f1xx_hal_msp.o: ..\Drivers\BSP\Adafruit_Shield\../Components/st7735/st7735.h
-tft_lcd\stm32f1xx_hal_msp.o: ..\Drivers\BSP\Adafruit_Shield\../Components/st7735/../Common/lcd.h
-tft_lcd\stm32f1xx_hal_msp.o: ..\Drivers\BSP\Components\st7789\fonts.h
-tft_lcd\stm32f1xx_hal_msp.o: ..\Drivers\BSP\Adafruit_Shield\../Components/st7735/st7735_cfg.h
-tft_lcd\stm32f1xx_hal_msp.o: ../Inc/main.h
-tft_lcd\stm32f1xx_hal_msp.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-tft_lcd\stm32f1xx_hal_msp.o: ..\Drivers\BSP\Adafruit_Shield\../Components/st7789/st7789.h
-tft_lcd\stm32f1xx_hal_msp.o: ../Inc/../../Utilities/Fonts/fonts.h
 tft_lcd\stm32f1xx_hal_msp.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 tft_lcd\stm32f1xx_hal_msp.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 tft_lcd\stm32f1xx_hal_msp.o: ..\Middlewares\Third_Party\FatFs\src\ff_gen_drv.h
@@ -50,5 +40,6 @@ tft_lcd\stm32f1xx_hal_msp.o: ..\Middlewares\Third_Party\FatFs\src\diskio.h
 tft_lcd\stm32f1xx_hal_msp.o: ..\Middlewares\Third_Party\FatFs\src\integer.h
 tft_lcd\stm32f1xx_hal_msp.o: ..\Middlewares\Third_Party\FatFs\src\ff.h
 tft_lcd\stm32f1xx_hal_msp.o: ../Inc/ffconf.h
+tft_lcd\stm32f1xx_hal_msp.o: ..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_sd.h
 tft_lcd\stm32f1xx_hal_msp.o: ..\Middlewares\Third_Party\FatFs\src\drivers\sd_diskio.h
 tft_lcd\stm32f1xx_hal_msp.o: ../Inc/fatfs_storage.h

@@ -261,7 +261,7 @@ void            BSP_LED_DeInit(Led_TypeDef Led);
 void            BSP_LED_On(Led_TypeDef Led);
 void            BSP_LED_Off(Led_TypeDef Led);
 void            BSP_LED_Toggle(Led_TypeDef Led);
-
+void            LCD_IO_Init(void);
 /**
   * @}
   */
@@ -273,11 +273,42 @@ void            BSP_LED_Toggle(Led_TypeDef Led);
 void             BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode);
 void             BSP_PB_DeInit(Button_TypeDef Button);
 uint32_t         BSP_PB_GetState(Button_TypeDef Button);
-#if defined(HAL_ADC_MODULE_ENABLED)
+
+
 uint8_t          BSP_JOY_Init(void);
 JOYState_TypeDef BSP_JOY_GetState(void);
 void             BSP_JOY_DeInit(void);
-#endif /* HAL_ADC_MODULE_ENABLED */
+
+void               SPIx_Init(void);
+void               SPIx_Write(uint8_t Value);
+void               SPIx_WriteData(uint8_t *DataIn, uint16_t DataLength);
+void               SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLegnth);
+void               SPIx_Error (void);
+void               SPIx_MspInit(void);
+
+/* SD IO functions */
+void               SD_IO_Init(void);
+void               SD_IO_CSState(uint8_t state);
+void               SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength);
+void               SD_IO_ReadData(uint8_t *DataOut, uint16_t DataLength);
+void               SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength);
+uint8_t            SD_IO_WriteByte(uint8_t Data);
+uint8_t                   SD_IO_ReadByte(void);
+
+/* LCD IO functions */
+void               LCD_IO_WriteData(uint8_t Data);
+void               LCD_IO_WriteMultipleData(uint8_t *pData, uint32_t Size);
+void               LCD_IO_WriteReg(uint8_t LCDReg);
+void               LCD_Delay(uint32_t delay);
+
+
+
+HAL_StatusTypeDef  ADCx_Init(void);
+void               ADCx_DeInit(void);
+void               ADCx_MspInit(ADC_HandleTypeDef *hadc);
+void               ADCx_MspDeInit(ADC_HandleTypeDef *hadc);
+
+
 
 
 /**

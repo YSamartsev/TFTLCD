@@ -464,23 +464,17 @@ GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
   */
 void HAL_GPIO_WritePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState)
 {
-  //Якщо треба скинути x-bit в регістрі ODR треба встановити BRx біт  в регістрі BSRR
-	//   або 
-	//встановити BRx біт в регістрі BRR
-	
-	//Якщо треба встановити x-bit в регістрі ODR треба встановити BSx біт  в регістрі BSRR
-	
-	/* Check the parameters */
+  /* Check the parameters */
   assert_param(IS_GPIO_PIN(GPIO_Pin));
   assert_param(IS_GPIO_PIN_ACTION(PinState));
 
   if (PinState != GPIO_PIN_RESET)
   {
-    GPIOx->BSRR = GPIO_Pin; //BSRR Bit Set/Reset Registr
+    GPIOx->BSRR = GPIO_Pin;
   }
   else
   {
-    GPIOx->BSRR = (uint32_t)GPIO_Pin << 16u; //BSRR Bit Set/Reset Registr
+    GPIOx->BSRR = (uint32_t)GPIO_Pin << 16u;
   }
 }
 

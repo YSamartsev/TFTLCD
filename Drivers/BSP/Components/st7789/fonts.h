@@ -3,16 +3,27 @@
 
 #include "stdint.h"
 
+typedef struct _tFont
+{    
+  const uint8_t *table;
+  uint16_t Width;
+  uint16_t Height;
+  
+} sFONT;
+
 typedef struct {
-    const uint8_t width;
-    uint8_t height;
+    uint16_t width;
+    uint16_t height;
     const uint16_t *data;
 } FontDef;
 
-//Font lib.
-extern FontDef Font_7x10;
-extern FontDef Font_11x18;
 extern FontDef Font_16x26;
+
+extern sFONT Font24;
+extern sFONT Font20;
+extern sFONT Font16;
+extern sFONT Font12;
+extern sFONT Font8;
 
 //16-bit(RGB565) Image lib.
 /*******************************************
@@ -24,7 +35,6 @@ extern FontDef Font_16x26;
  *******************************************/
 
 /* 128x128 pixel RGB565 image */
-extern const uint16_t saber[][128];
 
 /* 240x240 pixel RGB565 image 
 extern const uint16_t knky[][240];

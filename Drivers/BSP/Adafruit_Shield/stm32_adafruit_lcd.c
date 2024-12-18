@@ -79,6 +79,8 @@ EndDependencies */
 #include "stm32f1xx_hal_spi.h"
 #include "lcd.h"
 
+extern SPI_HandleTypeDef SpiHandle;
+
 /** @addtogroup BSP
   * @{
   */
@@ -131,9 +133,9 @@ LCD_DrawPropTypeDef DrawProp;
 
 //SPI_HandleTypeDef ST7789_SPI_PORT;
 
-SPI_HandleTypeDef hnucleo_Spi;
+//SPI_HandleTypeDef hnucleo_Spi;
 
-SPI_HandleTypeDef ST7735_SPI_PORT;
+//SPI_HandleTypeDef ST7735_SPI_PORT;
 
 
 /* Max size of bitmap will based on a font24 (17x24) */
@@ -176,10 +178,10 @@ uint8_t BSP_LCD_Init(void)
 
   /* LCD Init */   
   //lcd_drv->Init();
-	ST7789_Init();
-  
-  /* Clear the LCD screen */
-  BSP_LCD_Clear(LCD_COLOR_WHITE);
+	ST7789_Init(); //Конфігурація драйвера ST7789 LCD
+	HAL_Delay(500);
+	
+	ST7789_Fill_Color(RED);
   
   /* Initialize the font */
   BSP_LCD_SetFont(&LCD_DEFAULT_FONT);
@@ -282,7 +284,8 @@ void BSP_LCD_Clear(uint16_t Color)
   
   for(counter = 0; counter < 240; counter++) //T7789_WIDTH BSP_LCD_GetYSize(); counter++)
 	{
-    BSP_LCD_DrawHLine(0, counter, 240); //ST7789_HEIGHT BSP_LCD_GetXSize());
+    //BSP_LCD_DrawHLine(0, counter, 240); //ST7789_HEIGHT BSP_LCD_GetXSize());
+		ST7789_DrawLine(0, counter, 239, counter, LCD_COLOR_WHITE);
   }
   DrawProp.TextColor = color_backup; 
   BSP_LCD_SetTextColor(DrawProp.TextColor);
