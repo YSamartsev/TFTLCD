@@ -96,7 +96,7 @@ char* pDirectoryFiles[MAX_BMP_FILES];
 FATFS SD_FatFs;  /* File system object for SD card logical drive */
 char SD_Path[4]; /* SD card logical drive path */
 
-char realdata[2];
+char realdate[2]; //Це масив, а не string, тобто не закінчується \0
 char realmonth[2];
 char realyear[2];
 char realhours[2];
@@ -113,7 +113,7 @@ static void MX_SPI_Init(void);
 static void RTC_AlarmConfig(void);
 static void RTC_SECConfig(void);
 
-//===static void RTC_TimeShow(uint16_t x, uint16_t y, uint8_t* showtime);
+static void RTC_TimeShow(uint16_t x, uint16_t y, uint8_t* showtime);
 
 static void LED2_Blink(void);
 static ShieldStatus TFT_ShieldDetect(void);
@@ -237,23 +237,23 @@ int main(void)
 */
 	
   /*##-1- Configure the RTC peripheral #######################################*/
- //==== RtcHandle.Instance = RTC;
+	RtcHandle.Instance = RTC;
   
 	  /* Configure RTC prescaler and RTC data registers */
   /* RTC configured as follows:
       - Asynch Prediv  = Automatic calculation of prediv for 1 sec timebase
   */
-  //=====RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
+	RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
 
-/*====	if (HAL_RTC_Init(&RtcHandle) != HAL_OK)
+	if (HAL_RTC_Init(&RtcHandle) != HAL_OK)
   {
     Error_Handler();
-  } */
+  } 
 
   /*##-2- Configure Alarm ####################################################*/
   /* Configure RTC Alarm */
   //RTC_AlarmConfig(); //Для перерівання через інтервал часу
-//=====	RTC_SECConfig(); //Конфігурую для перивання кожну секуду по RTC_IRQHandler
+	RTC_SECConfig(); //Конфігурую для перивання кожну секуду по RTC_IRQHandler
 
 
 /* -------------RTC End--------------*/
@@ -288,12 +288,11 @@ int main(void)
 		printf("----------------------Last in = %04d, Last jn = %04d\n\r", in, jn);
 		
 		*/
-	/* Initialize ST7735 low level bus layer -----------------------------------*/
+	
   LCD_IO_Init(); //Визначаються піни для RESET, DC, CS
   // LCD SPI Config: SCK, SDA 
  
  	SPIx_MspInit(); //Конфігурація пінів для MOSI, MOSO, SCK SPIx 
-	//HAL_SPI_MspInit(&SpiHandle); //Конфігурація пінів для MOSI, MOSO, SCK SPIx
 		
 	SPIx_Init(); //Конфігурація параметрів SPI
 
@@ -312,8 +311,8 @@ printf("==================Start RTC Watch===================\n\r");
 	
 	
 
-	//==ST7789_WriteString(10, 20, "Real Time", Font_16x26, RED, WHITE);	
-	//==ST7789_WriteString(10, 50, "Timer", Font_16x26, RED, WHITE);
+	ST7789_WriteString(10, 20, "Real Time", Font_16x26, RED, WHITE);	
+	ST7789_WriteString(10, 50, "Timer", Font_16x26, RED, WHITE);
   
     /* Configure SD card */
     //SDCard_Config(); 
@@ -321,16 +320,17 @@ printf("==================Start RTC Watch===================\n\r");
 	{	
 		printf("===========AAAAAAAAAAAAA==============\n\r");
   /* Infinite loop */
+/*
 		char *myChar = "!"; 
 
-		ST7789_WriteString(10, 20, "sdsdgfhtyuy", Font_16x26, WHITE, RED);
+		ST7789_WriteString(10, 20, "123.456_sdsdgfhtyuy", Font_16x26, WHITE, RED);
 		ST7789_WriteChar(30, 40, *myChar, Font_7x10, WHITE, RED);
 		ST7789_WriteChar(60, 80, *myChar, Font_11x18, WHITE, RED);
 		
-		ST7789_Test();
-		HAL_Delay(1000);
-	//RTC_TimeShow(10, 100, aShowTime);
-	}
+		ST7789_Test(); */
+		HAL_Delay(1000); 
+		RTC_TimeShow(10, 100, aShowTime);
+	} 
 }
 
 /**
@@ -389,7 +389,7 @@ void SystemClock_Config(void)
   }
 } 
 
-/*==static void MX_UART1_Init(void)
+/*static void MX_UART1_Init(void)
 {
 	huart1.Instance        = USARTx;
 
@@ -465,18 +465,18 @@ void LCD_RESET_SET(void)
   * @param  hrtc : RTC handle
   * @retval None
   */
-/*===void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
   // Turn LED_GREEN on: Alarm generation 
   BSP_LED_On(LED_GREEN);
-} */
+} 
 
 /**
   * @brief  Configure the current time and date.
   * @param  None
   * @retval None
   */
-/*==static void RTC_AlarmConfig(void)
+static void RTC_AlarmConfig(void)
 {
   RTC_DateTypeDef  sdatestructure;
   RTC_TimeTypeDef  stimestructure;
@@ -503,13 +503,13 @@ void LCD_RESET_SET(void)
   
   if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
-     Initialization Error 
+     //Initialization Error 
     Error_Handler(); 
   }  
 
   //##-3- Configure the RTC Alarm peripheral #################################
  // Set Alarm to 02:20:30 
-     RTC Alarm Generation: Alarm on Hours, Minutes and Seconds 
+  //RTC Alarm Generation: Alarm on Hours, Minutes and Seconds 
   salarmstructure.Alarm = RTC_ALARM_A; //0U
 	salarmstructure.AlarmTime.Hours = 0x16;
   salarmstructure.AlarmTime.Minutes = 0x20;
@@ -520,9 +520,9 @@ void LCD_RESET_SET(void)
    // Initialization Error
     Error_Handler(); 
   }
-} */
+}
 
-/*===static void RTC_SECConfig(void)
+static void RTC_SECConfig(void)
 {
   RTC_DateTypeDef  sdatestructure;
   RTC_TimeTypeDef  stimestructure;
@@ -567,7 +567,7 @@ void LCD_RESET_SET(void)
     // Initialization Error 
     Error_Handler(); 
   }
-} */
+} 
 
 
 /**
@@ -575,7 +575,7 @@ void LCD_RESET_SET(void)
   * @param  showtime : pointer to buffer
   * @retval None
   */
-/*==static void RTC_TimeShow(uint16_t x, uint16_t y, uint8_t* showtime)
+static void RTC_TimeShow(uint16_t x, uint16_t y, uint8_t* showtime)
 {
   RTC_DateTypeDef sdatestructureget;
   RTC_TimeTypeDef stimestructureget;
@@ -587,31 +587,58 @@ void LCD_RESET_SET(void)
   
   printf("%02d.%02d.20%02d %02d:%02d:%02d\n\r",sdatestructureget.Date, sdatestructureget.Month, sdatestructureget.Year, stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
 	
-	sprintf(realdata, "%02d\n", sdatestructureget.Date);
+	//snprintf(realdate, sizeof realdate, "%s", &sdatestructureget.Date);
+	
+	sprintf(realdate, "%02d", sdatestructureget.Date, 2);
 	sprintf(realmonth, "%02d", sdatestructureget.Month);
 	sprintf(realyear, "%02d", sdatestructureget.Year);
 	sprintf(realhours, "%02d", stimestructureget.Hours);
 	sprintf(reatminutes, "%02d", stimestructureget.Minutes);
 	sprintf(reatseconds, "%02d", stimestructureget.Seconds);
 	
-	char *temp1 = concat_data(realdata, realmonth, realyear);
-	//printf(temp);
+	char temp1[10];
+	
+	concat_data(&temp1[0], realdate, realmonth, realyear); //соединить строки -> *temp1
+
+	printf("temp1 = %s\n\r", temp1);
 		
 	ST7789_WriteString(x, y, temp1, Font_16x26, RED, WHITE);	 //& "." & realmonth
 	free(temp1);
 
-	char *temp2 = concat_time(realhours, reatminutes, reatseconds);
+	char *temp2 = concat_time(realhours, reatminutes, reatseconds); //соединить строки -> *temp2
 	//printf(temp);
 		
 	ST7789_WriteString(x, y + 40, temp2, Font_16x26, RED, WHITE);	 //& "." & realmonth
 	free(temp2);
 
 
-	//printf((char*)showtime,"%02d:%02d:%02d",stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
+	printf((char*)showtime,"%02d:%02d:%02d",stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
 	HAL_GPIO_TogglePin(LED2_GPIO_PORT, LED2_PIN);
-} */
+} 
 
+
+void concat_data(char * mytemp, char *s1, char *s2, char *s3)
+{
+	char mypoint[1] = ".";
+	char myspace[1] = " ";
+	char mydate[2] = "20";
+	//char mytemp[10];
 	
+	memcpy(&mytemp[0], s1, 2); //"30"
+	memcpy(&mytemp[2], mypoint, 1); //"30."
+	
+	memcpy(&mytemp[3], s2, 2); //"30.09"
+	memcpy(&mytemp[5], mypoint, 1); //"30.09."
+	
+	memcpy(&mytemp[6], mydate, 2); //"30.09.20"
+	
+	memcpy(&mytemp[8], s3, 2);
+}
+char* concat_time(char *s1, char *s2, char *s3)
+{
+	strcat(s1, s2);
+}
+
 		
 //==============================================================================
 

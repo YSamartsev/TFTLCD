@@ -88,7 +88,7 @@
 /* Exported functions ------------------------------------------------------- */
 void Error_Handler(void);
 void Test_Colors(void);
-char* concat_data(char *s1, char *s2, char *s3);
+void concat_data(char * mytemp, char *s1, char *s2, char *s3);
 char* concat_time(char *s1, char *s2, char *s3);
 void LCD_RESET_SET(void);
 
