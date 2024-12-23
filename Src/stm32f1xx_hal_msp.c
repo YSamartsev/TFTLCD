@@ -210,7 +210,7 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc)
 /*Якщо необхідно переривання 	
 RTC_IRQHandler замість RTC_Alarm_IRQHandler
 то треба 	*/
-    HAL_NVIC_SetPriority(RTC_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(RTC_IRQn, 5, 5);
     HAL_NVIC_EnableIRQ(RTC_IRQn); 
 
 

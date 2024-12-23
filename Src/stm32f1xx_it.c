@@ -152,7 +152,7 @@ void RTC_IRQHandler(void)
   /* USER CODE BEGIN RTC_IRQn 0 */
 
   /* USER CODE END RTC_IRQn 0 */
-  HAL_RTCEx_RTCIRQHandler(&RtcHandle);
+  HAL_RTCEx_RTCIRQHandler(&RtcHandle); //Спрацьовує кожну секунду
   /* USER CODE BEGIN RTC_IRQn 1 */
 
   /* USER CODE END RTC_IRQn 1 */
@@ -163,6 +163,7 @@ void RTC_IRQHandler(void)
   * @brief  This function handles RTC Alarm interrupt request.
   * @param  None
   * @retval None
+Не використовую, замісь цього використовую void RTC_IRQHandler(void)
   */
 void RTC_Alarm_IRQHandler(void)
 {

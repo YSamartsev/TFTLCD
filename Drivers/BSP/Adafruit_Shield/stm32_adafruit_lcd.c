@@ -179,9 +179,9 @@ uint8_t BSP_LCD_Init(void)
   /* LCD Init */   
   //lcd_drv->Init();
 	ST7789_Init(); //Конфігурація драйвера ST7789 LCD
-	HAL_Delay(500);
+	HAL_Delay(10);
 	
-	ST7789_Fill_Color(RED);
+	//ST7789_Fill_Color(RED);
   
   /* Initialize the font */
   BSP_LCD_SetFont(&LCD_DEFAULT_FONT);

@@ -57,8 +57,10 @@ RTC_HandleTypeDef RtcHandle;
 //==UART_HandleTypeDef huart1;
 SPI_HandleTypeDef SpiHandle;
 
-///* Buffer used for displaying Time */
-uint8_t aShowTime[50] = {0};
+/* Buffer used for displaying Date */
+	uint8_t aShowDate[50] = {0};
+/* Buffer used for displaying Date */
+	uint8_t aShowTime[50] = {0};
 
 typedef enum 
 {
@@ -91,7 +93,7 @@ https://www.keil.com/support/man/docs/jlink/jlink_trace_itm_viewer.asp
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 uint8_t BlinkSpeed = 0, str[20];
-__IO uint8_t JoystickValue = 0;
+
 char* pDirectoryFiles[MAX_BMP_FILES];
 FATFS SD_FatFs;  /* File system object for SD card logical drive */
 char SD_Path[4]; /* SD card logical drive path */
@@ -113,7 +115,8 @@ static void MX_SPI_Init(void);
 static void RTC_AlarmConfig(void);
 static void RTC_SECConfig(void);
 
-static void RTC_TimeShow(uint16_t x, uint16_t y, uint8_t* showtime);
+static void RTC_DateShow(uint16_t x, uint16_t y); //, uint8_t* showdate);
+static void RTC_TimeShow(uint16_t x, uint16_t y); //, uint8_t* showtime);
 
 static void LED2_Blink(void);
 static ShieldStatus TFT_ShieldDetect(void);
@@ -208,7 +211,9 @@ int __backspace(FILE *f)
   * @retval None
   */
 //		uint8_t in, jn;
-const uint16_t * mydata;
+	const uint16_t * mydata;
+	RTC_TimeTypeDef stimestructureget; 
+  
 int main(void)
                                                                                                                                                                                                                                                                                            {  
   /* STM32F103xB HAL library initialization:
@@ -226,6 +231,8 @@ int main(void)
   /* Configure the system clock = 64 MHz */
   SystemClock_Config();
 
+	BSP_LED_Init(LED_GREEN);																																																																																																																																										 
+																																																																																																																																														 
 	/* -------------RTC Start--------------*/
 /*
 Для використання переривання RTC_IRQHandler треба в stm32f1xx_hal_msp.c: функції HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc) встановити:
@@ -255,7 +262,6 @@ int main(void)
   //RTC_AlarmConfig(); //Для перерівання через інтервал часу
 	RTC_SECConfig(); //Конфігурую для перивання кожну секуду по RTC_IRQHandler
 
-
 /* -------------RTC End--------------*/
 
 
@@ -264,30 +270,6 @@ int main(void)
      board. This is done by reading the state of IO PB.00 pin (mapped to JoyStick
      available on adafruit 1.8" TFT shield). If the state of PB.00 is high then
      the adafruit 1.8" TFT shield is available. */  
-//  if(TFT_ShieldDetect() == SHIELD_DETECTED)
-//  {
-  
-  /* LCD SPI Config */
-  //SPIx_Init();
-
-	//MX_SPI_Init(); //Не роблю, це робиться в stm32f1xx_nucleo.c
-
-/*in = 0;
-		jn = 0;
-		while(in < 100) //ST7789_WIDTH
-		{		while(jn < 100)  //ST7789_HEIGHT
-				{
-					//ST7789_WriteData(data, sizeof(data));
-					//printf("jn = %04d\n\r", jn);
-					jn++;
-				}
-				//printf("-------------------in = %04d, Last jn = %04d\n\r", in, jn);
-				jn = 0;
-				in++;
-		}
-		printf("----------------------Last in = %04d, Last jn = %04d\n\r", in, jn);
-		
-		*/
 	
   LCD_IO_Init(); //Визначаються піни для RESET, DC, CS
   // LCD SPI Config: SCK, SDA 
@@ -298,38 +280,34 @@ int main(void)
 
 printf("==================Start RTC Watch===================\n\r");
 
-/* LCD chip select high */
-  //LCD_CS_HIGH(); //Використовую RESET, як CS
-
 
 /* Initialize the LCD */
 	BSP_LCD_Init(); //Спочатку через PB11 RESET, потім керується через Регістри
 
+	ST7789_Fill_Color(WHITE);
 
-	//delay_init(72);	     //ғʱԵʼۯ
- 
-	
-	
+	ST7789_WriteString(10, 20, "Real Date:", Font_16x26, RED, WHITE);	
 
-	ST7789_WriteString(10, 20, "Real Time", Font_16x26, RED, WHITE);	
-	ST7789_WriteString(10, 50, "Timer", Font_16x26, RED, WHITE);
+	ST7789_WriteString(10, 100, "Real Time:", Font_16x26, RED, WHITE);
   
     /* Configure SD card */
     //SDCard_Config(); 
-	while (1)
-	{	
 		printf("===========AAAAAAAAAAAAA==============\n\r");
+		RTC_DateShow(10, 50); //, aShowDate);	
+while (1)
+	{	
+		 if ((stimestructureget.Hours == 0x17) && (stimestructureget.Minutes == 0x3B) &&  (stimestructureget.Seconds == 0x3B))
+		 {
+				HAL_Delay(1200);
+		    RTC_DateShow(10, 50); //, aShowDate);
+	    } 
   /* Infinite loop */
-/*
-		char *myChar = "!"; 
-
-		ST7789_WriteString(10, 20, "123.456_sdsdgfhtyuy", Font_16x26, WHITE, RED);
-		ST7789_WriteChar(30, 40, *myChar, Font_7x10, WHITE, RED);
-		ST7789_WriteChar(60, 80, *myChar, Font_11x18, WHITE, RED);
-		
-		ST7789_Test(); */
+/*		
 		HAL_Delay(1000); 
-		RTC_TimeShow(10, 100, aShowTime);
+	
+		RTC_DateShow(10, 50); //, aShowDate);		
+		RTC_TimeShow(10, 130);  //, aShowTime);
+*/
 	} 
 }
 
@@ -406,35 +384,6 @@ void SystemClock_Config(void)
   }
 } */
 
-//Це робить static void SPIx_Init(void)
-/*====static void MX_SPI_Init(void)
-{
-  //==##-1- Configure the SPI peripheral #######################################
- //==  Set the SPI parameters 
-  SpiHandle.Instance               = SPIx;
-  SpiHandle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
-  SpiHandle.Init.Direction         = SPI_DIRECTION_2LINES;
-  SpiHandle.Init.CLKPhase          = SPI_PHASE_1EDGE;
-  SpiHandle.Init.CLKPolarity       = SPI_POLARITY_LOW;
-  SpiHandle.Init.DataSize          = SPI_DATASIZE_8BIT;
-  SpiHandle.Init.FirstBit          = SPI_FIRSTBIT_MSB;
-  SpiHandle.Init.TIMode            = SPI_TIMODE_DISABLE;
-  SpiHandle.Init.CRCCalculation    = SPI_CRCCALCULATION_DISABLE;
-  SpiHandle.Init.CRCPolynomial     = 7;
-  SpiHandle.Init.NSS               = SPI_NSS_SOFT;
-
-//#ifdef MASTER_BOARD
-  SpiHandle.Init.Mode = SPI_MODE_MASTER;
-//#else
-//  SpiHandle.Init.Mode = SPI_MODE_SLAVE;
-//#endif MASTER_BOARD 
-
-//NSS (PB12) відноситься до SPI. Керується ресурсом SPI
-//Ним не можна керувати програмно
-
-
-} */
-
 void LCD_RESET_SET(void)
 {
 		LCD_RST_LOW();  //ST7789_RST_Clr(); //Керується через PB11. В платі не використовується
@@ -485,9 +434,9 @@ static void RTC_AlarmConfig(void)
   // ##-1- Configure the Date #################################################
   // Set Date: Tuesday February 18th 2014 
   sdatestructure.Year = 0x24; //0x14;
-  sdatestructure.Month = RTC_MONTH_SEPTEMBER;
-  sdatestructure.Date = 0x30;
-  sdatestructure.WeekDay = RTC_WEEKDAY_MONDAY;
+  sdatestructure.Month = RTC_MONTH_DECEMBER;
+  sdatestructure.Date = 0x20;
+  sdatestructure.WeekDay = RTC_WEEKDAY_FRIDAY;
   
   if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
@@ -497,8 +446,8 @@ static void RTC_AlarmConfig(void)
   
  // ##-2- Configure the Time #################################################
  //  Set Time: 02:20:00 
-  stimestructure.Hours = 0x16;
-  stimestructure.Minutes = 0x20;
+  stimestructure.Hours = 0x14;
+  stimestructure.Minutes = 0x45;
   stimestructure.Seconds = 0x00;
   
   if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
@@ -511,8 +460,8 @@ static void RTC_AlarmConfig(void)
  // Set Alarm to 02:20:30 
   //RTC Alarm Generation: Alarm on Hours, Minutes and Seconds 
   salarmstructure.Alarm = RTC_ALARM_A; //0U
-	salarmstructure.AlarmTime.Hours = 0x16;
-  salarmstructure.AlarmTime.Minutes = 0x20;
+	salarmstructure.AlarmTime.Hours = 0x14;
+  salarmstructure.AlarmTime.Minutes = 0x45;
   salarmstructure.AlarmTime.Seconds = 0x01; //0x30; //Встановлюю 1 сек, щоб змінювалось покази кожну секунду
 	
   if(HAL_RTC_SetAlarm_IT(&RtcHandle,&salarmstructure,RTC_FORMAT_BCD) != HAL_OK)
@@ -531,9 +480,9 @@ static void RTC_SECConfig(void)
  //##-1- Configure the Date #################################################
   // Set Date: Tuesday February 18th 2014 
   sdatestructure.Year = 0x24; //0x14;
-  sdatestructure.Month = RTC_MONTH_SEPTEMBER;
-  sdatestructure.Date = 0x30;
-  sdatestructure.WeekDay = RTC_WEEKDAY_MONDAY;
+  sdatestructure.Month = RTC_MONTH_DECEMBER;
+  sdatestructure.Date = 0x20;
+  sdatestructure.WeekDay = RTC_WEEKDAY_FRIDAY;
   
   if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
@@ -543,9 +492,9 @@ static void RTC_SECConfig(void)
   
   //##-2- Configure the Time #################################################
   // Set Time: 02:20:00 
-  stimestructure.Hours = 0x16;
-  stimestructure.Minutes = 0x20;
-  stimestructure.Seconds = 0x00;
+  stimestructure.Hours = 0x23;
+  stimestructure.Minutes = 0x59;
+  stimestructure.Seconds = 0x50;
   
   if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
@@ -556,10 +505,11 @@ static void RTC_SECConfig(void)
   //##-3- Configure the RTC Alarm peripheral #################################
   // Set Alarm to 02:20:30 
   //   RTC Alarm Generation: Alarm on Hours, Minutes and Seconds 
+	//Alarm спрацьовує Відносно HAL_RTC_SetTime
   salarmstructure.Alarm = RTC_ALARM_A; //0U
-	salarmstructure.AlarmTime.Hours = 0x16;
-  salarmstructure.AlarmTime.Minutes = 0x20;
-  salarmstructure.AlarmTime.Seconds = 0x01; //0x30; //Встановлюю 1 сек, щоб змінювалось покази кожну секунду
+	salarmstructure.AlarmTime.Hours = 0x14;
+  salarmstructure.AlarmTime.Minutes = 0x50;
+  salarmstructure.AlarmTime.Seconds = 0x01; //0x30; //В цей час спрацьовує Alarm
   
  	//HAL_RTCEx_SetSecond_IT(RTC_HandleTypeDef *hrtc);
 	if(HAL_RTCEx_SetSecond_IT(&RtcHandle) != HAL_OK)
@@ -569,77 +519,99 @@ static void RTC_SECConfig(void)
   }
 } 
 
-
-/**
-  * @brief  Display the current time.
-  * @param  showtime : pointer to buffer
-  * @retval None
-  */
-static void RTC_TimeShow(uint16_t x, uint16_t y, uint8_t* showtime)
+static void RTC_DateShow(uint16_t x, uint16_t y) //, uint8_t* showDate)
 {
   RTC_DateTypeDef sdatestructureget;
-  RTC_TimeTypeDef stimestructureget;
-  
- 
-  HAL_RTC_GetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BIN);
   
   HAL_RTC_GetDate(&RtcHandle, &sdatestructureget, RTC_FORMAT_BIN);
   
-  printf("%02d.%02d.20%02d %02d:%02d:%02d\n\r",sdatestructureget.Date, sdatestructureget.Month, sdatestructureget.Year, stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
+  //printf("%02d.%02d.20%02d %02d:%02d:%02d\n\r",sdatestructureget.Date, sdatestructureget.Month, sdatestructureget.Year, stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
 	
 	//snprintf(realdate, sizeof realdate, "%s", &sdatestructureget.Date);
 	
 	sprintf(realdate, "%02d", sdatestructureget.Date, 2);
 	sprintf(realmonth, "%02d", sdatestructureget.Month);
 	sprintf(realyear, "%02d", sdatestructureget.Year);
+		
+	char temp1[11];
+
+	concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
+	printf("date = %s\n\r", temp1);
+		
+	ST7789_WriteString(x, y, temp1, Font_16x26, RED, WHITE);	 //& "." & realmonth
+	//free(temp1);
+
+} 
+
+/**
+  * @brief  Display the current time.
+  * @param  showtime : pointer to buffer
+  * @retval None
+  */
+static void RTC_TimeShow(uint16_t x, uint16_t y) //, uint8_t* showtime)
+{
+  RTC_TimeTypeDef stimestructureget;
+ 
+  HAL_RTC_GetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BIN);
+ 
+  //printf("%02d.%02d.20%02d %02d:%02d:%02d\n\r",sdatestructureget.Date, sdatestructureget.Month, sdatestructureget.Year, stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
+	
+	//snprintf(realdate, sizeof realdate, "%s", &sdatestructureget.Date);
+	
 	sprintf(realhours, "%02d", stimestructureget.Hours);
 	sprintf(reatminutes, "%02d", stimestructureget.Minutes);
 	sprintf(reatseconds, "%02d", stimestructureget.Seconds);
 	
-	char temp1[10];
-	
-	concat_data(&temp1[0], realdate, realmonth, realyear); //соединить строки -> *temp1
-
-	printf("temp1 = %s\n\r", temp1);
-		
+	char temp1[9];
+	concat_time(temp1, realhours, reatminutes, reatseconds); //соединить строки -> *temp2
+	printf("time = %s\n\r", temp1);
+			
 	ST7789_WriteString(x, y, temp1, Font_16x26, RED, WHITE);	 //& "." & realmonth
-	free(temp1);
+	//free(temp1);
 
-	char *temp2 = concat_time(realhours, reatminutes, reatseconds); //соединить строки -> *temp2
-	//printf(temp);
-		
-	ST7789_WriteString(x, y + 40, temp2, Font_16x26, RED, WHITE);	 //& "." & realmonth
-	free(temp2);
-
-
-	printf((char*)showtime,"%02d:%02d:%02d",stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
-	HAL_GPIO_TogglePin(LED2_GPIO_PORT, LED2_PIN);
 } 
 
-
-void concat_data(char * mytemp, char *s1, char *s2, char *s3)
+void concat_date(char * myconcat, char *s1, char *s2, char *s3)
 {
 	char mypoint[1] = ".";
 	char myspace[1] = " ";
 	char mydate[2] = "20";
-	//char mytemp[10];
 	
-	memcpy(&mytemp[0], s1, 2); //"30"
-	memcpy(&mytemp[2], mypoint, 1); //"30."
+	memcpy(&myconcat[0], s1, 2); //"30"
+	memcpy(&myconcat[2], mypoint, 1); //"30."
 	
-	memcpy(&mytemp[3], s2, 2); //"30.09"
-	memcpy(&mytemp[5], mypoint, 1); //"30.09."
+	memcpy(&myconcat[3], s2, 2); //"30.09"
+	memcpy(&myconcat[5], mypoint, 1); //"30.09."
 	
-	memcpy(&mytemp[6], mydate, 2); //"30.09.20"
+	memcpy(&myconcat[6], mydate, 2); //"30.09.20"
 	
-	memcpy(&mytemp[8], s3, 2);
-}
-char* concat_time(char *s1, char *s2, char *s3)
-{
-	strcat(s1, s2);
+	memcpy(&myconcat[8], s3, 2); ////"30.09.2024"
+	myconcat[10] = 0x00;
 }
 
-		
+void concat_time(char * myconcat, char *s1, char *s2, char *s3)
+{
+	char mypoint[1] = ":";
+	char mydate[2] = "20";
+	
+	memcpy(&myconcat[0], s1, 2); //"16"
+	memcpy(&myconcat[2], mypoint, 1); //"16:"
+	
+	memcpy(&myconcat[3], s2, 2); //"16:20"
+	memcpy(&myconcat[5], mypoint, 1); //"16:20:"
+	
+	memcpy(&myconcat[6], s3, 2); ////"316:20:02"
+	myconcat[8] = 0x00;
+}	
+
+void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
+{
+	//RTC_TimeTypeDef stimestructureget; 
+	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN); //Це потрібно, щоб в main було видно stimestructureget
+	RTC_TimeShow(10, 130);  //, aShowTime);
+	HAL_GPIO_TogglePin(LED2_GPIO_PORT, LED2_PIN);
+}
+
 //==============================================================================
 
 void Error_Handler(void)

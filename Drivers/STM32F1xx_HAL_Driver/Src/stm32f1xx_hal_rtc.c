@@ -315,7 +315,7 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc)
     hrtc->Lock = HAL_UNLOCKED;
 
     /* Initialize RTC MSP */
-    HAL_RTC_MspInit(hrtc);
+    HAL_RTC_MspInit(hrtc); //Вибір типу переривання RTC
   }
 #endif /* (USE_HAL_RTC_REGISTER_CALLBACKS) */
 
