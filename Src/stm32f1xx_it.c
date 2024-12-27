@@ -30,6 +30,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* RTC handler declared in "main.c" file */
 extern RTC_HandleTypeDef RtcHandle;
+extern UART_HandleTypeDef UartHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -143,6 +144,10 @@ void SysTick_Handler(void)
 /*  file (startup_stm32f1xx.s).                                               */
 /******************************************************************************/
 
+void USARTx_IRQHandler(void)
+{
+  HAL_UART_IRQHandler(&UartHandle);
+}
 
 /**
   * @brief This function handles RTC global interrupt.

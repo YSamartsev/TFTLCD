@@ -18,6 +18,8 @@
 "tft_lcd\stm32f1xx_hal_dma.o"
 "tft_lcd\stm32f1xx_hal_adc.o"
 "tft_lcd\stm32f1xx_hal_adc_ex.o"
+"tft_lcd\stm32f1xx_hal_uart.o"
+"tft_lcd\stm32f1xx_hal_usart.o"
 "tft_lcd\system_stm32f1xx.o"
 "tft_lcd\diskio.o"
 "tft_lcd\ff.o"

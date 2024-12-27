@@ -43,20 +43,31 @@
 /* User can use this section to tailor USARTx/UARTx instance used and associated
    resources */
 /* Definition for USARTx clock resources */
-#define USARTx                           USART1
-#define USARTx_CLK_ENABLE()              __HAL_RCC_USART1_CLK_ENABLE();
+#define USARTx                           USART2
+#define USARTx_CLK_ENABLE()              __HAL_RCC_USART2_CLK_ENABLE();
 #define USARTx_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
 #define USARTx_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
 
-#define USARTx_FORCE_RESET()             __HAL_RCC_USART1_FORCE_RESET()
-#define USARTx_RELEASE_RESET()           __HAL_RCC_USART1_RELEASE_RESET()
+#define USARTx_FORCE_RESET()             __HAL_RCC_USART2_FORCE_RESET()
+#define USARTx_RELEASE_RESET()           __HAL_RCC_USART2_RELEASE_RESET()
 
 /* Definition for USARTx Pins */
-#define USARTx_TX_PIN                    GPIO_PIN_9
+#define USARTx_TX_PIN                    GPIO_PIN_2
 #define USARTx_TX_GPIO_PORT              GPIOA
-#define USARTx_RX_PIN                    GPIO_PIN_10
+#define USARTx_RX_PIN                    GPIO_PIN_3
 #define USARTx_RX_GPIO_PORT              GPIOA
 
+/* Definition for USARTx's NVIC */
+#define USARTx_IRQn                      USART2_IRQn
+#define USARTx_IRQHandler                USART2_IRQHandler
+
+/* Size of Trasmission buffer */
+#define TXBUFFERSIZE                      (COUNTOF(aTxBuffer) - 1)
+/* Size of Reception buffer */
+#define RXBUFFERSIZE                      TXBUFFERSIZE
+
+/* Exported macro ------------------------------------------------------------*/
+#define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 
 /* Definition for SPIx clock resources */
 #define SPIx                             SPI2
@@ -77,8 +88,21 @@
 #define SPIx_IRQn                        SPI2_IRQn
 #define SPIx_IRQHandler                  SPI2_IRQHandler
 
+typedef struct
+{
+	char *ATstring; //Вказівники на адреси команд AT
+	char *ATversion;
+	char	*ATbaud;
+	char *ATname;
+}commandAT;
 
-
+typedef struct
+{
+	char *ATresponse; // Вказівники на адреси відповідей на команди AT
+	char *VESIONresponse;
+	char *BAUDresponse;
+	char *NAMEresponse;
+}answerAT;
 
 /* Defines related to Clock configuration */
 /* Uncomment to enable the adaquate Clock Source */

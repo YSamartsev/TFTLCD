@@ -25,6 +25,7 @@
 #include <string.h>
 #include "stm32_adafruit_lcd.h"
 
+
 extern FontDef Font_7x10;
 extern FontDef Font_11x18;
 extern FontDef Font_16x26;
@@ -54,7 +55,9 @@ extern const uint16_t saber;
 ///* Private typedef -----------------------------------------------------------*/
 ///* RTC handler declaration */
 RTC_HandleTypeDef RtcHandle;
-//==UART_HandleTypeDef huart1;
+UART_HandleTypeDef UartHandle;
+__IO ITStatus UartReady = RESET;
+
 SPI_HandleTypeDef SpiHandle;
 
 /* Buffer used for displaying Date */
@@ -109,7 +112,7 @@ char realdatatime[20];
 ///* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 
-//==static void MX_UART1_Init(void);
+static void MX_UART2_Init(void);
 static void MX_SPI_Init(void);
 
 static void RTC_AlarmConfig(void);
@@ -154,11 +157,11 @@ int fputc(int ch, FILE *f) {
 	
 	/*	==============Якщо треба вивести в UART Працює =============	
 	//ITM_SendChar(ch); Якщо розремити, то не працює
-	HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
+	HAL_UART_Transmit(&UartHandle, (uint8_t *)&ch, 1, 0xFFFF);
 	return ch;
 	========================================================= */
 	
-	//HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF); //Це виводить в UART PA9-Tx, PA10-Rx. Через перехідник UART-USB треба подати на Віртуальний компорт РС.
+	//HAL_UART_Transmit(&UartHandle, (uint8_t *)&ch, 1, 0xFFFF); //Це виводить в UART PA9-Tx, PA10-Rx. Через перехідник UART-USB треба подати на Віртуальний компорт РС.
 	//return ch;
 } 
 
@@ -213,7 +216,16 @@ int __backspace(FILE *f)
 //		uint8_t in, jn;
 	const uint16_t * mydata;
 	RTC_TimeTypeDef stimestructureget; 
-  
+
+/* Buffer used for transmission */
+	char *aTxBuffer;
+	uint8_t aRxBuffer[20];
+
+/* Buffer used for reception */
+	commandAT myCommandAT;
+	answerAT	myAnswerAT;
+	
+
 int main(void)
                                                                                                                                                                                                                                                                                            {  
   /* STM32F103xB HAL library initialization:
@@ -231,8 +243,72 @@ int main(void)
   /* Configure the system clock = 64 MHz */
   SystemClock_Config();
 
-	BSP_LED_Init(LED_GREEN);																																																																																																																																										 
+	BSP_LED_Init(LED_GREEN);			
+	MX_UART2_Init();		
+
+	myCommandAT.ATstring = "AT";
+	myCommandAT.ATversion = "AT+VERSION";																																																																																																							
+	myCommandAT.ATname = "myHC-06";	
+	myCommandAT.ATbaud = "AT+BAUD8";
+
+	myAnswerAT.ATresponse = "OK";	
+	myAnswerAT.VESIONresponse = "OKlinvorV1.8";	
+	myAnswerAT.NAMEresponse = "OKmyHC-06";
+	myAnswerAT.BAUDresponse = "OK115200"; 
 																																																																																																																																														 
+  char *myAT_RES[1][2];
+	
+  /*##-2- Start the transmission process #####################################*/  
+  /* While the UART in reception process, user can transmit data through 
+     "aTxBuffer" buffer */
+while(1)
+{
+	
+	myAT_RES[0][0] =  myCommandAT.ATversion;
+	myAT_RES[0][1] =  myAnswerAT.VESIONresponse;
+	
+	aTxBuffer = myAT_RES[0][0];
+
+
+	char *myint1 = memchr(aTxBuffer, 0x00, 20);
+	uint8_t COUNTmycommandAT = (myint1 - aTxBuffer) / sizeof(*aTxBuffer); 
+		
+	if(HAL_UART_Transmit_IT(&UartHandle, (uint8_t*)aTxBuffer, COUNTmycommandAT)!= HAL_OK)
+  {
+    Error_Handler();
+  } 
+
+
+  /*##-3- Wait for the end of the transfer ###################################*/   
+  while (UartReady != SET)
+  {
+  }
+	//HAL_Delay(200);
+	
+  /* Reset transmission flag */
+  UartReady = RESET;
+
+/* 	aRxBuffer = myAT_RES[0][1];
+
+	char *myint2 = memchr(aRxBuffer, 0x00, 20);
+	uint8_t COUNTmyresponseAT = (myint2 - aRxBuffer) / sizeof(*aRxBuffer);  */
+	
+  /*##-4- Put UART peripheral in reception process ###########################*/  
+  if(HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, 12) != HAL_OK)
+  {
+    Error_Handler();
+  }																																																																																																																																														 
+	//Очікування прийняття відповідь від HC-06
+	/*##-5- Wait for the end of the receiving ###################################*/   
+  while (UartReady != SET)
+  {
+  } 
+  
+  /* Reset transmission flag */
+  UartReady = RESET;
+	HAL_Delay(1000);
+}	
+	
 	/* -------------RTC Start--------------*/
 /*
 Для використання переривання RTC_IRQHandler треба в stm32f1xx_hal_msp.c: функції HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc) встановити:
@@ -367,22 +443,65 @@ void SystemClock_Config(void)
   }
 } 
 
-/*static void MX_UART1_Init(void)
+/**
+  * @brief  Tx Transfer completed callback
+  * @param  UartHandle: UART handle. 
+  * @note   This example shows a simple way to report end of IT Tx transfer, and 
+  *         you can add your own implementation. 
+  * @retval None
+  */
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
-	huart1.Instance        = USARTx;
+  /* Set transmission flag: transfer complete */
+  UartReady = SET;
 
-  huart1.Init.BaudRate   = 9600;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits   = UART_STOPBITS_1;
-  huart1.Init.Parity     = UART_PARITY_ODD;
-  huart1.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
-  huart1.Init.Mode       = UART_MODE_TX_RX;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
+  
+}
+
+/**
+  * @brief  Rx Transfer completed callback
+  * @param  UartHandle: UART handle
+  * @note   This example shows a simple way to report end of DMA Rx transfer, and 
+  *         you can add your own implementation.
+  * @retval None
+  */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
+{
+  /* Set transmission flag: transfer complete */
+  UartReady = SET;
+  
+  
+}
+
+/**
+  * @brief  UART error callbacks
+  * @param  UartHandle: UART handle
+  * @note   This example shows a simple way to report transfer error, and you can
+  *         add your own implementation.
+  * @retval None
+  */
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
+{
+    Error_Handler();
+}
+
+
+static void MX_UART2_Init(void)
+{
+	UartHandle.Instance        = USARTx;
+
+  UartHandle.Init.BaudRate   = 9600;
+  UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
+  UartHandle.Init.StopBits   = UART_STOPBITS_1;
+  UartHandle.Init.Parity     = UART_PARITY_NONE;
+  UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
+  UartHandle.Init.Mode       = UART_MODE_TX_RX;
+  if (HAL_UART_Init(&UartHandle) != HAL_OK)
   {
     //== Initialization Error 
     Error_Handler();
   }
-} */
+} 
 
 void LCD_RESET_SET(void)
 {

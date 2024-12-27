@@ -210,9 +210,11 @@ typedef enum
 #define LCD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
 
 
-// Використовую PIN_11
-#define LCD_RST_PIN                              GPIO_PIN_11 
-#define LCD_RST_GPIO_PORT                        GPIOB 
+// Використовую PB PIN_11 в платі з проводочком
+// Використовую PA PIN_7 в платі без проводочка
+
+#define LCD_RST_PIN                              GPIO_PIN_7 //GPIO_PIN_11 
+#define LCD_RST_GPIO_PORT                        GPIOA //GPIOB 
 #define LCD_RST_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOA_CLK_ENABLE() //__HAL_RCC_GPIOB_CLK_ENABLE()
 #define LCD_RST_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOA_CLK_DISABLE() //__HAL_RCC_GPIOB _CLK_DISABLE()
 
