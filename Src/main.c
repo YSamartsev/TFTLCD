@@ -248,15 +248,15 @@ int main(void)
 
 	myCommandAT.ATstring = "AT";
 	myCommandAT.ATversion = "AT+VERSION";																																																																																																							
-	myCommandAT.ATname = "myHC-06";	
+	myCommandAT.ATname = "AT+NAMEmyHC-06";	
 	myCommandAT.ATbaud = "AT+BAUD8";
 
 	myAnswerAT.ATresponse = "OK";	
 	myAnswerAT.VESIONresponse = "OKlinvorV1.8";	
-	myAnswerAT.NAMEresponse = "OKmyHC-06";
+	myAnswerAT.NAMEresponse = "OKsetname";
 	myAnswerAT.BAUDresponse = "OK115200"; 
 																																																																																																																																														 
-  char *myAT_RES[1][2];
+	//char myAT_RES[2][20]; //Перший індекс - кількість рядків, другий = максимальна кількість символів
 	
   /*##-2- Start the transmission process #####################################*/  
   /* While the UART in reception process, user can transmit data through 
@@ -264,48 +264,21 @@ int main(void)
 while(1)
 {
 	
-	myAT_RES[0][0] =  myCommandAT.ATversion;
-	myAT_RES[0][1] =  myAnswerAT.VESIONresponse;
+	if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != SUCCESS)
+	{
+		Error_Handler();
+	}
 	
-	aTxBuffer = myAT_RES[0][0];
+	if (myExchange(myCommandAT.ATversion, myAnswerAT.VESIONresponse) != SUCCESS)
+	{
+		Error_Handler();
+	}
 
+	if (myExchange(myCommandAT.ATname, myAnswerAT.NAMEresponse) != SUCCESS)
+	{
+		Error_Handler();
+	}	
 
-	char *myint1 = memchr(aTxBuffer, 0x00, 20);
-	uint8_t COUNTmycommandAT = (myint1 - aTxBuffer) / sizeof(*aTxBuffer); 
-		
-	if(HAL_UART_Transmit_IT(&UartHandle, (uint8_t*)aTxBuffer, COUNTmycommandAT)!= HAL_OK)
-  {
-    Error_Handler();
-  } 
-
-
-  /*##-3- Wait for the end of the transfer ###################################*/   
-  while (UartReady != SET)
-  {
-  }
-	//HAL_Delay(200);
-	
-  /* Reset transmission flag */
-  UartReady = RESET;
-
-/* 	aRxBuffer = myAT_RES[0][1];
-
-	char *myint2 = memchr(aRxBuffer, 0x00, 20);
-	uint8_t COUNTmyresponseAT = (myint2 - aRxBuffer) / sizeof(*aRxBuffer);  */
-	
-  /*##-4- Put UART peripheral in reception process ###########################*/  
-  if(HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, 12) != HAL_OK)
-  {
-    Error_Handler();
-  }																																																																																																																																														 
-	//Очікування прийняття відповідь від HC-06
-	/*##-5- Wait for the end of the receiving ###################################*/   
-  while (UartReady != SET)
-  {
-  } 
-  
-  /* Reset transmission flag */
-  UartReady = RESET;
 	HAL_Delay(1000);
 }	
 	
@@ -729,6 +702,49 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN); //Це потрібно, щоб в main було видно stimestructureget
 	RTC_TimeShow(10, 130);  //, aShowTime);
 	HAL_GPIO_TogglePin(LED2_GPIO_PORT, LED2_PIN);
+}
+
+ErrorStatus myExchange(char *myAT, char *myRES)
+{
+		aTxBuffer = myAT;
+
+	char *myint1 = memchr(aTxBuffer, 0x00, 20);
+	uint8_t COUNTmycommandAT = (myint1 - aTxBuffer) / sizeof(*aTxBuffer); 
+		
+	if(HAL_UART_Transmit_IT(&UartHandle, (uint8_t*)aTxBuffer, COUNTmycommandAT)!= HAL_OK)
+  {
+    Error_Handler();
+  } 
+
+
+  /*##-3- Wait for the end of the transfer ###################################*/   
+  while (UartReady != SET)
+  {
+  }
+	//HAL_Delay(200);
+	
+  /* Reset transmission flag */
+  UartReady = RESET;
+
+ //	aRxBuffer = &myAT_RES[1];
+
+	char *myint2 = memchr(myRES, 0x00, 20);
+	uint8_t COUNTmyresponseAT = (myint2 - myRES) / sizeof(*aRxBuffer);  
+	
+  /*##-4- Put UART peripheral in reception process ###########################*/  
+  if(HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, COUNTmyresponseAT) != HAL_OK)
+  {
+    Error_Handler();
+  }																																																																																																																																														 
+	//Очікування прийняття відповідь від HC-06
+	/*##-5- Wait for the end of the receiving ###################################*/   
+  while (UartReady != SET)
+  {
+  } 
+  
+  /* Reset transmission flag */
+  UartReady = RESET;
+	return SUCCESS;
 }
 
 //==============================================================================

@@ -116,6 +116,7 @@ void Test_Colors(void);
 void concat_date(char * myconcat, char *s1, char *s2, char *s3);
 void concat_time(char * myconcat, char *s1, char *s2, char *s3);
 void LCD_RESET_SET(void);
+ErrorStatus myExchange(char *myAT, char *myRES);
 
 
 #endif /* __MAIN_H */
