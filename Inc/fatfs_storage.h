@@ -60,7 +60,7 @@ uint32_t Storage_OpenReadFile(uint8_t Xpoz, uint16_t Ypoz, const char *BmpName);
 uint32_t Storage_CopyFile(const char *BmpName1, const char *BmpName2);
 uint32_t Storage_GetDirectoryBitmapFiles(const char* DirName, char* Files[]);
 uint32_t Storage_CheckBitmapFile(const char *BmpName, uint32_t *FileLen);
-uint8_t  Buffercmp(uint8_t *pBuffer1, uint8_t *pBuffer2, uint16_t BufferLength);
+//uint8_t  Buffercmp(uint8_t *pBuffer1, uint8_t *pBuffer2, uint16_t BufferLength);
 
 #ifdef __cplusplus
 }

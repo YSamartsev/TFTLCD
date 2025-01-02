@@ -224,6 +224,8 @@ int __backspace(FILE *f)
 /* Buffer used for reception */
 	commandAT myCommandAT;
 	answerAT	myAnswerAT;
+	uint8_t curentTimeSecond;	
+	
 	
 
 int main(void)
@@ -261,8 +263,6 @@ int main(void)
   /*##-2- Start the transmission process #####################################*/  
   /* While the UART in reception process, user can transmit data through 
      "aTxBuffer" buffer */
-while(1)
-{
 	
 	if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != SUCCESS)
 	{
@@ -278,9 +278,6 @@ while(1)
 	{
 		Error_Handler();
 	}	
-
-	HAL_Delay(1000);
-}	
 	
 	/* -------------RTC Start--------------*/
 /*
@@ -324,11 +321,10 @@ while(1)
   // LCD SPI Config: SCK, SDA 
  
  	SPIx_MspInit(); //Конфігурація пінів для MOSI, MOSO, SCK SPIx 
-		
+
 	SPIx_Init(); //Конфігурація параметрів SPI
 
 printf("==================Start RTC Watch===================\n\r");
-
 
 /* Initialize the LCD */
 	BSP_LCD_Init(); //Спочатку через PB11 RESET, потім керується через Регістри
@@ -338,11 +334,48 @@ printf("==================Start RTC Watch===================\n\r");
 	ST7789_WriteString(10, 20, "Real Date:", Font_16x26, RED, WHITE);	
 
 	ST7789_WriteString(10, 100, "Real Time:", Font_16x26, RED, WHITE);
-  
+
+	if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != SUCCESS)
+	{
+		Error_Handler();
+	}
+	ST7789_WriteString(10, 180, myCommandAT.ATstring, Font_16x26, RED, WHITE);
+	ST7789_WriteString(10, 206, myAnswerAT.ATresponse, Font_16x26, RED, WHITE);
+	HAL_Delay(500);
+
+	if (myExchange(myCommandAT.ATversion, myAnswerAT.VESIONresponse) != SUCCESS)
+	{
+		Error_Handler();
+	}
+	/** 
+ * @brief Draw a filled Rectangle with single color
+ * @param  x&y -> coordinates of the starting point
+ * @param w&h -> width & height of the Rectangle
+ * @param color -> color of the Rectangle
+ * @return  none
+ */
+	ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); 
+	
+	ST7789_WriteString(10, 180, myCommandAT.ATversion, Font_16x26, RED, WHITE); 
+	ST7789_WriteString(10, 206, myAnswerAT.VESIONresponse, Font_16x26, RED, WHITE);
+	HAL_Delay(500);
+
+	if (myExchange(myCommandAT.ATname, myAnswerAT.NAMEresponse) != SUCCESS)
+	{
+		Error_Handler();
+	}	
+	ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); 
+	ST7789_WriteString(10, 180, myCommandAT.ATname, Font_16x26, RED, WHITE);
+	ST7789_WriteString(10, 206, myAnswerAT.NAMEresponse, Font_16x26, RED, WHITE);
+	HAL_Delay(500);
+
+	ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); 
+	
     /* Configure SD card */
     //SDCard_Config(); 
 		printf("===========AAAAAAAAAAAAA==============\n\r");
 		RTC_DateShow(10, 50); //, aShowDate);	
+		curentTimeSecond = stimestructureget.Seconds;
 while (1)
 	{	
 		 if ((stimestructureget.Hours == 0x17) && (stimestructureget.Minutes == 0x3B) &&  (stimestructureget.Seconds == 0x3B))
@@ -350,14 +383,18 @@ while (1)
 				HAL_Delay(1200);
 		    RTC_DateShow(10, 50); //, aShowDate);
 	    } 
-  /* Infinite loop */
-/*		
-		HAL_Delay(1000); 
-	
-		RTC_DateShow(10, 50); //, aShowDate);		
-		RTC_TimeShow(10, 130);  //, aShowTime);
-*/
-	} 
+		 if (stimestructureget.Seconds > curentTimeSecond)
+		{
+			ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); 
+			if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != SUCCESS)
+			{
+				Error_Handler();
+			}
+			ST7789_WriteString(10, 180, myCommandAT.ATstring, Font_16x26, RED, WHITE);
+			ST7789_WriteString(10, 206, myAnswerAT.ATresponse, Font_16x26, RED, WHITE);		
+			curentTimeSecond = stimestructureget.Seconds;			
+		}
+ 	} 
 }
 
 /**
@@ -704,7 +741,7 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 	HAL_GPIO_TogglePin(LED2_GPIO_PORT, LED2_PIN);
 }
 
-ErrorStatus myExchange(char *myAT, char *myRES)
+ErrorStatus myExchange(char *myAT, char *myRES) //Обмін командой АТ 
 {
 		aTxBuffer = myAT;
 
@@ -744,7 +781,36 @@ ErrorStatus myExchange(char *myAT, char *myRES)
   
   /* Reset transmission flag */
   UartReady = RESET;
+	//Прівняння myRES з myRES
+	
+	 /*##-6- Compare the sent and received buffers ##############################*/
+  if(Buffercmp(aRxBuffer, (uint8_t *) myRES, COUNTmyresponseAT))  //перевірка на відповідність AT команди і відповіді
+  {
+    Error_Handler();
+  }
 	return SUCCESS;
+}
+
+/**
+  * @brief  Compares two buffers.
+  * @param  pBuffer1, pBuffer2: buffers to be compared.
+  * @param  BufferLength: buffer's length
+  * @retval 0  : pBuffer1 identical to pBuffer2
+  *         >0 : pBuffer1 differs from pBuffer2
+  */
+static uint16_t Buffercmp(uint8_t * pBuffer1, uint8_t * pBuffer2, uint16_t BufferLength)
+{
+  while (BufferLength--)
+  {
+    if ((*pBuffer1) != *pBuffer2)
+    {
+      return BufferLength;
+    }
+    pBuffer1++;
+    pBuffer2++;
+  }
+
+  return 0;
 }
 
 //==============================================================================

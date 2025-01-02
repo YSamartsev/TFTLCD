@@ -167,9 +167,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>282</LineNumber>
+          <LineNumber>336</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134228218</Address>
+          <Address>134231808</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -178,14 +178,14 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>..\Src\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\TFT_LCD\../Src/main.c\282</Expression>
+          <Expression>\\TFT_LCD\../Src/main.c\336</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>277</LineNumber>
+          <LineNumber>380</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134228200</Address>
+          <Address>134232232</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -194,23 +194,23 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>..\Src\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\TFT_LCD\../Src/main.c\277</Expression>
+          <Expression>\\TFT_LCD\../Src/main.c\380</Expression>
         </Bp>
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>272</LineNumber>
+          <LineNumber>339</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134228182</Address>
+          <Address>0</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
+          <BreakIfRCount>0</BreakIfRCount>
           <Filename>..\Src\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\TFT_LCD\../Src/main.c\272</Expression>
+          <Expression></Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -227,7 +227,7 @@
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>myint2</ItemText>
+          <ItemText>myint1</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
@@ -238,8 +238,8 @@
       <MemoryWindow1>
         <Mm>
           <WinNumber>1</WinNumber>
-          <SubType>8</SubType>
-          <ItemText>0x0800291C</ItemText>
+          <SubType>0</SubType>
+          <ItemText>0x080038BC </ItemText>
           <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>
@@ -333,7 +333,7 @@
       <GroupNumber>2</GroupNumber>
       <FileNumber>2</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\Src\main.c</PathWithFileName>
@@ -645,7 +645,7 @@
 
   <Group>
     <GroupName>Drivers/BSP/STM32F1xx_Nucleo</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -653,7 +653,7 @@
       <GroupNumber>6</GroupNumber>
       <FileNumber>26</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\Drivers\BSP\STM32F1xx_Nucleo\stm32f1xx_nucleo.c</PathWithFileName>
@@ -665,7 +665,7 @@
 
   <Group>
     <GroupName>Drivers/BSP/Adafruit_Shield</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
