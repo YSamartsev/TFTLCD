@@ -370,6 +370,8 @@ printf("==================Start RTC Watch===================\n\r");
 	HAL_Delay(500);
 
 	ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); 
+	*aRxBuffer = 0x00;
+	*(aRxBuffer+1) = 0x00;
 	
     /* Configure SD card */
     //SDCard_Config(); 
@@ -383,16 +385,42 @@ while (1)
 				HAL_Delay(1200);
 		    RTC_DateShow(10, 50); //, aShowDate);
 	    } 
-		 if (stimestructureget.Seconds > curentTimeSecond)
+
+			/*	заремив для перевірки	if (stimestructureget.Seconds > curentTimeSecond)
 		{
-			ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); 
-			if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != SUCCESS)
+			ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); //стирання рядка AT
+			if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != SUCCESS) //вивід команди AT
 			{
 				Error_Handler();
 			}
 			ST7789_WriteString(10, 180, myCommandAT.ATstring, Font_16x26, RED, WHITE);
 			ST7789_WriteString(10, 206, myAnswerAT.ATresponse, Font_16x26, RED, WHITE);		
 			curentTimeSecond = stimestructureget.Seconds;			
+		} */
+		switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, 4))
+		{
+			case HAL_OK:
+				if (UartReady == SET)
+				{
+					/* Reset transmission flag */
+					//ST7789_WriteString(10, 180, aRxBuffer, Font_16x26, RED, WHITE);
+					//printf("Code = %s", aRxBuffer[0]);
+					UartReady = RESET;
+				} 
+				break;				
+			case HAL_ERROR:
+				Error_Handler();			
+			case HAL_BUSY:
+				if (UartReady == SET)
+				{
+					/* Reset transmission flag */
+					UartReady = RESET;
+				} 
+				break;
+			
+			case HAL_TIMEOUT:
+				UartReady = RESET;
+				break;
 		}
  	} 
 }
