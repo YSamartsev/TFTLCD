@@ -219,7 +219,7 @@ int __backspace(FILE *f)
 
 /* Buffer used for transmission */
 	char *aTxBuffer;
-	uint8_t aRxBuffer[20];
+uint8_t aRxBuffer[12]; //12 символів рядка дати і часую далі їх треба перетворити в формат BCD data (двійково-дестковий код)
 
 /* Buffer used for reception */
 	commandAT myCommandAT;
@@ -354,7 +354,7 @@ printf("==================Start RTC Watch===================\n\r");
  * @param color -> color of the Rectangle
  * @return  none
  */
-	ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); 
+	ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); //Заповнюю екран білим кольором
 	
 	ST7789_WriteString(10, 180, myCommandAT.ATversion, Font_16x26, RED, WHITE); 
 	ST7789_WriteString(10, 206, myAnswerAT.VESIONresponse, Font_16x26, RED, WHITE);
@@ -386,7 +386,7 @@ while (1)
 		    RTC_DateShow(10, 50); //, aShowDate);
 	    } 
 
-			/*	заремив для перевірки	if (stimestructureget.Seconds > curentTimeSecond)
+			/*	заремив для перевірки	if (stimestructureget.Seconds > curentTimeSecond) //Якщо секунда з stimestructureget.Seconds більше на 1 секуду, ніж curentTimeSecond
 		{
 			ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); //стирання рядка AT
 			if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != SUCCESS) //вивід команди AT
@@ -397,7 +397,7 @@ while (1)
 			ST7789_WriteString(10, 206, myAnswerAT.ATresponse, Font_16x26, RED, WHITE);		
 			curentTimeSecond = stimestructureget.Seconds;			
 		} */
-		switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, 4))
+		switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
 		{
 			case HAL_OK:
 				if (UartReady == SET)
@@ -405,16 +405,22 @@ while (1)
 					/* Reset transmission flag */
 					//ST7789_WriteString(10, 180, aRxBuffer, Font_16x26, RED, WHITE);
 					//printf("Code = %s", aRxBuffer[0]);
+					RTC_SECUpdate();
+					RTC_DateShow(10, 50); //, aShowDate);
 					UartReady = RESET;
+					break;
 				} 
-				break;				
+				break;
 			case HAL_ERROR:
 				Error_Handler();			
 			case HAL_BUSY:
 				if (UartReady == SET)
 				{
 					/* Reset transmission flag */
+					RTC_SECUpdate();
+					RTC_DateShow(10, 50); //, aShowDate);
 					UartReady = RESET;
+					break;
 				} 
 				break;
 			
@@ -492,8 +498,6 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
   /* Set transmission flag: transfer complete */
   UartReady = SET;
-
-  
 }
 
 /**
@@ -507,8 +511,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
   /* Set transmission flag: transfer complete */
   UartReady = SET;
-  
-  
 }
 
 /**
@@ -589,11 +591,11 @@ static void RTC_AlarmConfig(void)
   RTC_AlarmTypeDef salarmstructure;
  
   // ##-1- Configure the Date #################################################
-  // Set Date: Tuesday February 18th 2014 
-  sdatestructure.Year = 0x24; //0x14;
-  sdatestructure.Month = RTC_MONTH_DECEMBER;
-  sdatestructure.Date = 0x20;
-  sdatestructure.WeekDay = RTC_WEEKDAY_FRIDAY;
+  // Set Date: 25.01.20.02 2х10+5
+  sdatestructure.Year = 0x25; //2х10+5
+  sdatestructure.Month = 0x01; //RTC_MONTH_JANUARY; //01 = 0x10+1
+  sdatestructure.Date = 0x07; //0x10+7
+  sdatestructure.WeekDay = 0x02; //RTC_WEEKDAY_TUESDAY; 02=0x10+2
   
   if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
@@ -602,10 +604,10 @@ static void RTC_AlarmConfig(void)
   } 
   
  // ##-2- Configure the Time #################################################
- //  Set Time: 02:20:00 
-  stimestructure.Hours = 0x14;
-  stimestructure.Minutes = 0x45;
-  stimestructure.Seconds = 0x00;
+ //  Set Time: 14:45:01 
+  stimestructure.Hours = 0x14; //1x10+4 14 годин
+  stimestructure.Minutes = 0x45; //4x10+5 45 хвилин
+  stimestructure.Seconds = 0x01; //0x10+1 1 секунда
   
   if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
@@ -614,7 +616,7 @@ static void RTC_AlarmConfig(void)
   }  
 
   //##-3- Configure the RTC Alarm peripheral #################################
- // Set Alarm to 02:20:30 
+ // Set Alarm to 14:45:01 
   //RTC Alarm Generation: Alarm on Hours, Minutes and Seconds 
   salarmstructure.Alarm = RTC_ALARM_A; //0U
 	salarmstructure.AlarmTime.Hours = 0x14;
@@ -635,11 +637,11 @@ static void RTC_SECConfig(void)
   RTC_AlarmTypeDef salarmstructure;
  
  //##-1- Configure the Date #################################################
-  // Set Date: Tuesday February 18th 2014 
-  sdatestructure.Year = 0x24; //0x14;
-  sdatestructure.Month = RTC_MONTH_DECEMBER;
-  sdatestructure.Date = 0x20;
-  sdatestructure.WeekDay = RTC_WEEKDAY_FRIDAY;
+  // Set Date: 25.
+  sdatestructure.Year = 0x25; //0x14;
+  sdatestructure.Month = 0x01; //RTC_MONTH_JANUARY; //01 = 0x10+01
+  sdatestructure.Date = 0x07; //0x10+7
+  sdatestructure.WeekDay = 0x02; //RTC_WEEKDAY_TUESDAY; 02 = 0x10+02
   
   if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
@@ -648,9 +650,9 @@ static void RTC_SECConfig(void)
   } 
   
   //##-2- Configure the Time #################################################
-  // Set Time: 02:20:00 
-  stimestructure.Hours = 0x23;
-  stimestructure.Minutes = 0x59;
+  // Set Time: 23:59:50 година.хвилина.секунда 
+  stimestructure.Hours = 0x13;
+  stimestructure.Minutes = 0x29;
   stimestructure.Seconds = 0x50;
   
   if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
@@ -675,6 +677,67 @@ static void RTC_SECConfig(void)
     Error_Handler(); 
   }
 } 
+
+uint8_t RTC_Data_Update(uint8_t index) //Оновити дату і час
+{
+	//Нові дата і час знаходяться в массиві uint8_t aRxBuffer[12] = 30 37 30 31 32 35 31 32 32 38 30 31
+	//їх треба перетворити в 	BCD (двійково-дестковий) код
+	uint8_t mydata[2];
+	mydata[0] = (aRxBuffer[index] & 0x0F) << 4;
+	mydata[1] = aRxBuffer[index + 1] & 0x0F;
+
+	return (uint8_t) (mydata[0] + mydata[1]);
+}
+
+static void RTC_SECUpdate(void)
+{
+  RTC_DateTypeDef  sdatestructure;
+  RTC_TimeTypeDef  stimestructure;
+  RTC_AlarmTypeDef salarmstructure;
+ 
+ //##-1- Configure the Date #################################################
+  // Set Date: 25.
+  
+	sdatestructure.Date = RTC_Data_Update(0); //0x10+7
+	sdatestructure.Month = RTC_Data_Update(2); //RTC_MONTH_JANUARY; //01 = 0x10+01
+	sdatestructure.Year = RTC_Data_Update(4); //0x25; //0x14;
+  //sdatestructure.WeekDay = RTC_Data_Update(6); //RTC_WEEKDAY_TUESDAY; 02 = 0x10+02
+  
+  if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
+  {
+    // Initialization Error //
+    Error_Handler(); 
+  } 
+  
+  //##-2- Configure the Time #################################################
+  // Set Time: 23:59:50 година.хвилина.секунда 
+  stimestructure.Hours = RTC_Data_Update(6);
+  stimestructure.Minutes = RTC_Data_Update(8);
+  stimestructure.Seconds = RTC_Data_Update(10);
+  
+  if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
+  {
+    // Initialization Error 
+    Error_Handler(); 
+  }  
+/*
+  //##-3- Configure the RTC Alarm peripheral #################################
+  // Set Alarm to 02:20:30 
+  //   RTC Alarm Generation: Alarm on Hours, Minutes and Seconds 
+	//Alarm спрацьовує Відносно HAL_RTC_SetTime
+  salarmstructure.Alarm = RTC_ALARM_A; //0U
+	salarmstructure.AlarmTime.Hours = 0x14;
+  salarmstructure.AlarmTime.Minutes = 0x50;
+  salarmstructure.AlarmTime.Seconds = 0x01; //0x30; //В цей час спрацьовує Alarm
+  
+ 	//HAL_RTCEx_SetSecond_IT(RTC_HandleTypeDef *hrtc);
+	if(HAL_RTCEx_SetSecond_IT(&RtcHandle) != HAL_OK)
+  {
+    // Initialization Error 
+    Error_Handler(); 
+  } */
+}
+
 
 static void RTC_DateShow(uint16_t x, uint16_t y) //, uint8_t* showDate)
 {
