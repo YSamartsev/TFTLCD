@@ -26,6 +26,7 @@
 #include "stm32_adafruit_lcd.h"
 
 
+
 extern FontDef Font_7x10;
 extern FontDef Font_11x18;
 extern FontDef Font_16x26;
@@ -215,20 +216,22 @@ int __backspace(FILE *f)
   */
 //		uint8_t in, jn;
 	const uint16_t * mydata;
-	RTC_TimeTypeDef stimestructureget; 
+	RTC_TimeTypeDef stimestructureget; //Зробив публічною структурою Година, Хвилина, Секунда, щоб визначати час 24:59
+	
 
 /* Buffer used for transmission */
 	char *aTxBuffer;
-uint8_t aRxBuffer[12]; //12 символів рядка дати і часую далі їх треба перетворити в формат BCD data (двійково-дестковий код)
+	uint8_t aRxBuffer[12]; //12 символів рядка дати і часую далі їх треба перетворити в формат BCD data (двійково-дестковий код)
 
 /* Buffer used for reception */
 	commandAT myCommandAT;
 	answerAT	myAnswerAT;
 	uint8_t curentTimeSecond;	
-	
+	ShieldStatus Bluetooth_present;
 	
 
 int main(void)
+	//Початкова дата встановлюеться в  RTC_AlarmConfig
                                                                                                                                                                                                                                                                                            {  
   /* STM32F103xB HAL library initialization:
        - Configure the Flash prefetch
@@ -257,27 +260,31 @@ int main(void)
 	myAnswerAT.VESIONresponse = "OKlinvorV1.8";	
 	myAnswerAT.NAMEresponse = "OKsetname";
 	myAnswerAT.BAUDresponse = "OK115200"; 
-																																																																																																																																														 
+	myAnswerAT.BLUETOOTH_shield = "BL present";
+		
+	Bluetooth_present = SHIELD_DETECTED;	
+	
 	//char myAT_RES[2][20]; //Перший індекс - кількість рядків, другий = максимальна кількість символів
 	
   /*##-2- Start the transmission process #####################################*/  
   /* While the UART in reception process, user can transmit data through 
      "aTxBuffer" buffer */
 	
-	if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != SUCCESS)
+	if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != HAL_OK)
 	{
-		Error_Handler();
+		Bluetooth_present = SHIELD_NOT_DETECTED;
 	}
 	
 	if (myExchange(myCommandAT.ATversion, myAnswerAT.VESIONresponse) != SUCCESS)
 	{
-		Error_Handler();
+		Bluetooth_present = SHIELD_NOT_DETECTED;
 	}
 
 	if (myExchange(myCommandAT.ATname, myAnswerAT.NAMEresponse) != SUCCESS)
 	{
-		Error_Handler();
+		Bluetooth_present = SHIELD_NOT_DETECTED;
 	}	
+
 	
 	/* -------------RTC Start--------------*/
 /*
@@ -303,11 +310,6 @@ int main(void)
     Error_Handler();
   } 
 
-  /*##-2- Configure Alarm ####################################################*/
-  /* Configure RTC Alarm */
-  //RTC_AlarmConfig(); //Для перерівання через інтервал часу
-	RTC_SECConfig(); //Конфігурую для перивання кожну секуду по RTC_IRQHandler
-
 /* -------------RTC End--------------*/
 
 
@@ -331,104 +333,123 @@ printf("==================Start RTC Watch===================\n\r");
 
 	ST7789_Fill_Color(WHITE);
 
-	ST7789_WriteString(10, 20, "Real Date:", Font_16x26, RED, WHITE);	
-
-	ST7789_WriteString(10, 100, "Real Time:", Font_16x26, RED, WHITE);
-
-	if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != SUCCESS)
+	if (Bluetooth_present == SHIELD_DETECTED)
 	{
-		Error_Handler();
-	}
-	ST7789_WriteString(10, 180, myCommandAT.ATstring, Font_16x26, RED, WHITE);
-	ST7789_WriteString(10, 206, myAnswerAT.ATresponse, Font_16x26, RED, WHITE);
-	HAL_Delay(500);
+		if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != HAL_OK)
+		{
+			Error_Handler();
+		}
+		ST7789_WriteString(10, 180, myCommandAT.ATstring, Font_16x26, RED, WHITE);
+		ST7789_WriteString(10, 206, myAnswerAT.ATresponse, Font_16x26, RED, WHITE);
+		HAL_Delay(500);
 
-	if (myExchange(myCommandAT.ATversion, myAnswerAT.VESIONresponse) != SUCCESS)
-	{
-		Error_Handler();
-	}
-	/** 
- * @brief Draw a filled Rectangle with single color
- * @param  x&y -> coordinates of the starting point
- * @param w&h -> width & height of the Rectangle
- * @param color -> color of the Rectangle
- * @return  none
- */
-	ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); //Заповнюю екран білим кольором
+		if (myExchange(myCommandAT.ATversion, myAnswerAT.VESIONresponse) != SUCCESS)
+		{
+			Error_Handler();
+		}
+		ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); //Заповнюю екран білим кольором
 	
-	ST7789_WriteString(10, 180, myCommandAT.ATversion, Font_16x26, RED, WHITE); 
-	ST7789_WriteString(10, 206, myAnswerAT.VESIONresponse, Font_16x26, RED, WHITE);
-	HAL_Delay(500);
+		ST7789_WriteString(10, 180, myCommandAT.ATversion, Font_16x26, RED, WHITE); 
+		ST7789_WriteString(10, 206, myAnswerAT.VESIONresponse, Font_16x26, RED, WHITE);
+		HAL_Delay(500);
 
-	if (myExchange(myCommandAT.ATname, myAnswerAT.NAMEresponse) != SUCCESS)
+		if (myExchange(myCommandAT.ATname, myAnswerAT.NAMEresponse) != SUCCESS)
+		{
+			Error_Handler();
+		}	
+		ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); 
+		ST7789_WriteString(10, 180, myCommandAT.ATname, Font_16x26, RED, WHITE);
+		ST7789_WriteString(10, 206, myAnswerAT.NAMEresponse, Font_16x26, RED, WHITE);
+		HAL_Delay(500);
+		ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE);
+		myAnswerAT.BLUETOOTH_shield = "BL present";
+		ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, RED, WHITE);
+	}else
 	{
-		Error_Handler();
-	}	
-	ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); 
-	ST7789_WriteString(10, 180, myCommandAT.ATname, Font_16x26, RED, WHITE);
-	ST7789_WriteString(10, 206, myAnswerAT.NAMEresponse, Font_16x26, RED, WHITE);
-	HAL_Delay(500);
-
-	ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); 
+		myAnswerAT.BLUETOOTH_shield = "BL not present";
+		ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, RED, WHITE);
+	}
+ 
 	*aRxBuffer = 0x00;
 	*(aRxBuffer+1) = 0x00;
 	
     /* Configure SD card */
     //SDCard_Config(); 
 		printf("===========AAAAAAAAAAAAA==============\n\r");
-		RTC_DateShow(10, 50); //, aShowDate);	
+
+		ST7789_WriteString(10, 20, "Real Date:", Font_16x26, RED, WHITE);	
+		ST7789_WriteString(10, 100, "Real Time:", Font_16x26, RED, WHITE);
+	
+	  /* Configure RTC Alarm */
+		RTC_AlarmConfig(); //Для переривання через інтервал часу 
+		RTC_DateShow(10, 50); //Показати дату, Дата читаэться з 	RtcHandle.DateToUpdate
+		RTC_TimeShow(10, 130);  //Показати час
 		curentTimeSecond = stimestructureget.Seconds;
-while (1)
+		RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
+
+	while (1)
 	{	
 		 if ((stimestructureget.Hours == 0x17) && (stimestructureget.Minutes == 0x3B) &&  (stimestructureget.Seconds == 0x3B))
 		 {
-				HAL_Delay(1200);
-		    RTC_DateShow(10, 50); //, aShowDate);
-	    } 
+			 //Для цього зробив структуру stimestructureget публычною
+			  HAL_Delay(1200);
+				RTC_DateShow(10, 50); //показати дату після 24:00;
+	   } 
 
-			/*	заремив для перевірки	if (stimestructureget.Seconds > curentTimeSecond) //Якщо секунда з stimestructureget.Seconds більше на 1 секуду, ніж curentTimeSecond
-		{
-			ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); //стирання рядка AT
-			if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != SUCCESS) //вивід команди AT
+/*HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
+https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
+Ця функція використовується, коли у потоці байт може бути переривання(простой). Тоді виникае IDLE і можна перевірити
+кількість прийнятих байт і або продовжити приймання або зупинити прийом.
+Перриваняя виникае коли досягнуто Size, або виникла IDLE. Це можна перевірити в HAL_UARTEx_RxEventCallback
+*/
+			//switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
+			//switch (HAL_UARTEx_ReceiveToIdle(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer), (uint16_t*) &UartHandle.RxXferSize, 9000))
+
+/*			if (HAL_UARTEx_ReceiveToIdle_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer)) == HAL_OK)
 			{
-				Error_Handler();
-			}
-			ST7789_WriteString(10, 180, myCommandAT.ATstring, Font_16x26, RED, WHITE);
-			ST7789_WriteString(10, 206, myAnswerAT.ATresponse, Font_16x26, RED, WHITE);		
-			curentTimeSecond = stimestructureget.Seconds;			
-		} */
-		switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
-		{
-			case HAL_OK:
+				//printf("Code = %s", aRxBuffer[0]);
 				if (UartReady == SET)
 				{
-					/* Reset transmission flag */
+					RTC_SECUpdate(); //Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
+					RTC_DateShow(10, 50); //Показати дату з stimestructureget
+					RTC_TimeShow(10, 130); //Показати час з stimestructureget
+					UartReady = RESET;
+				}
+			} */
+			
+			switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
+			{
+				case HAL_OK:
+					if (UartReady == SET)
+					{
+					//Ця функція заповнює регістри UART і переводить його в режим переривання. Без очікування Timeout
 					//ST7789_WriteString(10, 180, aRxBuffer, Font_16x26, RED, WHITE);
 					//printf("Code = %s", aRxBuffer[0]);
-					RTC_SECUpdate();
-					RTC_DateShow(10, 50); //, aShowDate);
-					UartReady = RESET;
+						RTC_SECUpdate();
+						RTC_DateShow(10, 50); //, aShowDate);
+						RTC_TimeShow(10, 130); //Показати час з stimestructureget
+						UartReady = RESET;
+						break;
+					} 
 					break;
-				} 
-				break;
-			case HAL_ERROR:
-				Error_Handler();			
-			case HAL_BUSY:
-				if (UartReady == SET)
-				{
-					/* Reset transmission flag */
-					RTC_SECUpdate();
-					RTC_DateShow(10, 50); //, aShowDate);
-					UartReady = RESET;
+				case HAL_ERROR:
+					Error_Handler();			
+				case HAL_BUSY:
+					if (UartReady == SET)
+					{
+						// Reset transmission flag 
+						RTC_SECUpdate();
+						RTC_DateShow(10, 50); //, aShowDate);
+						RTC_TimeShow(10, 130); //Показати час з stimestructureget
+						//UartReady = RESET;
+						break;
+					} 
 					break;
-				} 
-				break;
-			
-			case HAL_TIMEOUT:
-				UartReady = RESET;
-				break;
-		}
- 	} 
+				case HAL_TIMEOUT:
+					//UartReady = RESET; //Ця подія в цій функції ніколи не настає
+					break;
+			} 
+	}
 }
 
 /**
@@ -689,6 +710,7 @@ uint8_t RTC_Data_Update(uint8_t index) //Оновити дату і час
 	return (uint8_t) (mydata[0] + mydata[1]);
 }
 
+//Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
 static void RTC_SECUpdate(void)
 {
   RTC_DateTypeDef  sdatestructure;
@@ -703,7 +725,7 @@ static void RTC_SECUpdate(void)
 	sdatestructure.Year = RTC_Data_Update(4); //0x25; //0x14;
   //sdatestructure.WeekDay = RTC_Data_Update(6); //RTC_WEEKDAY_TUESDAY; 02 = 0x10+02
   
-  if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
+  if(HAL_RTC_SetDate(&RtcHandle, &sdatestructure,RTC_FORMAT_BCD) != HAL_OK) //Запис Дати з sdatestructure в RtcHandle
   {
     // Initialization Error //
     Error_Handler(); 
@@ -715,31 +737,15 @@ static void RTC_SECUpdate(void)
   stimestructure.Minutes = RTC_Data_Update(8);
   stimestructure.Seconds = RTC_Data_Update(10);
   
-  if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
+  if(HAL_RTC_SetTime(&RtcHandle, &stimestructure,RTC_FORMAT_BCD) != HAL_OK) //Запис Часу з sdatestructure в RtcHandle
   {
     // Initialization Error 
     Error_Handler(); 
   }  
-/*
-  //##-3- Configure the RTC Alarm peripheral #################################
-  // Set Alarm to 02:20:30 
-  //   RTC Alarm Generation: Alarm on Hours, Minutes and Seconds 
-	//Alarm спрацьовує Відносно HAL_RTC_SetTime
-  salarmstructure.Alarm = RTC_ALARM_A; //0U
-	salarmstructure.AlarmTime.Hours = 0x14;
-  salarmstructure.AlarmTime.Minutes = 0x50;
-  salarmstructure.AlarmTime.Seconds = 0x01; //0x30; //В цей час спрацьовує Alarm
-  
- 	//HAL_RTCEx_SetSecond_IT(RTC_HandleTypeDef *hrtc);
-	if(HAL_RTCEx_SetSecond_IT(&RtcHandle) != HAL_OK)
-  {
-    // Initialization Error 
-    Error_Handler(); 
-  } */
 }
 
 
-static void RTC_DateShow(uint16_t x, uint16_t y) //, uint8_t* showDate)
+static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Дати в точці х,у дисплея
 {
   RTC_DateTypeDef sdatestructureget;
   
@@ -767,12 +773,13 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //, uint8_t* showDate)
   * @brief  Display the current time.
   * @param  showtime : pointer to buffer
   * @retval None
-  */
-static void RTC_TimeShow(uint16_t x, uint16_t y) //, uint8_t* showtime)
+	Відображення часу в точці х,у дисплея
+	*/
+static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати початкової точки рядка дисплея 
 {
-  RTC_TimeTypeDef stimestructureget;
+  //stimestructureget; //Структура Година, Хвилина, Секунда
  
-  HAL_RTC_GetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BIN);
+  HAL_RTC_GetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BIN); //З лічильника CNTH_CNTL RTC формується структура stimestructureget
  
   //printf("%02d.%02d.20%02d %02d:%02d:%02d\n\r",sdatestructureget.Date, sdatestructureget.Month, sdatestructureget.Year, stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
 	
@@ -830,11 +837,33 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN); //Це потрібно, щоб в main було видно stimestructureget
 	RTC_TimeShow(10, 130);  //, aShowTime);
 	HAL_GPIO_TogglePin(LED2_GPIO_PORT, LED2_PIN);
+
+	
+	//Перевірка на підключення bluetooth
+
+	//Перевожу UART в режим готовності і перевіряю командою AT
+	//UART_EndRxTransfer(&UartHandle);
+
+/*	if	(myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != HAL_OK)
+		{
+			Bluetooth_present = SHIELD_NOT_DETECTED;
+			myAnswerAT.BLUETOOTH_shield = "BL not present";
+			ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE);
+			ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, RED, WHITE);
+		}else
+		{
+			Bluetooth_present = SHIELD_DETECTED;
+			//HAL_GPIO_TogglePin(LED2_GPIO_PORT, LED2_PIN);
+			myAnswerAT.BLUETOOTH_shield = "BL present";
+			ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE);
+			ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, RED, WHITE);
+		} */
+		
 }
 
-ErrorStatus myExchange(char *myAT, char *myRES) //Обмін командой АТ 
+HAL_StatusTypeDef myExchange(char *myAT, char *myRES) //Обмін командой АТ 
 {
-		aTxBuffer = myAT;
+	aTxBuffer = myAT;
 
 	char *myint1 = memchr(aTxBuffer, 0x00, 20);
 	uint8_t COUNTmycommandAT = (myint1 - aTxBuffer) / sizeof(*aTxBuffer); 
@@ -843,43 +872,45 @@ ErrorStatus myExchange(char *myAT, char *myRES) //Обмін командой А
   {
     Error_Handler();
   } 
-
-
   /*##-3- Wait for the end of the transfer ###################################*/   
   while (UartReady != SET)
   {
   }
-	//HAL_Delay(200);
-	
-  /* Reset transmission flag */
   UartReady = RESET;
 
- //	aRxBuffer = &myAT_RES[1];
+	//Перехожу на прийом відповіді на команду AT
 
 	char *myint2 = memchr(myRES, 0x00, 20);
-	uint8_t COUNTmyresponseAT = (myint2 - myRES) / sizeof(*aRxBuffer);  
+	uint16_t COUNTmyresponseAT = (myint2 - myRES) / sizeof(*aRxBuffer);  
 	
   /*##-4- Put UART peripheral in reception process ###########################*/  
-  if(HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, COUNTmyresponseAT) != HAL_OK)
-  {
-    Error_Handler();
-  }																																																																																																																																														 
-	//Очікування прийняття відповідь від HC-06
-	/*##-5- Wait for the end of the receiving ###################################*/   
-  while (UartReady != SET)
-  {
-  } 
-  
-  /* Reset transmission flag */
-  UartReady = RESET;
-	//Прівняння myRES з myRES
+	UartHandle.RxXferSize = 12;
+	//HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+  //switch (HAL_UARTEx_ReceiveToIdle(&UartHandle, (uint8_t *)aRxBuffer, COUNTmyresponseAT, (uint16_t*) &UartHandle.RxXferSize , 2000))
+	//HAL_UARTEx_ReceiveToIdle_IT(&UartHandle, (uint8_t *)aRxBuffer, COUNTmyresponseAT);
+
+	switch (HAL_UARTEx_ReceiveToIdle(&UartHandle, (uint8_t *)aRxBuffer, COUNTmyresponseAT, (uint16_t*) &UartHandle.RxXferSize , 2000))
+	{
+				case HAL_OK:
+				if(Buffercmp(aRxBuffer, (uint8_t *) myRES, COUNTmyresponseAT))  //перевірка на відповідність AT команди і відповіді
+				{
+					return HAL_ERROR;
+					break;
+				}
+				return HAL_OK;
+				break;
+			case HAL_ERROR:
+				Error_Handler();
+				break;			
+			case HAL_BUSY:
+				return HAL_BUSY;
+				break;
+			case HAL_TIMEOUT:
+				return HAL_TIMEOUT;
+				break;
+		}
 	
-	 /*##-6- Compare the sent and received buffers ##############################*/
-  if(Buffercmp(aRxBuffer, (uint8_t *) myRES, COUNTmyresponseAT))  //перевірка на відповідність AT команди і відповіді
-  {
-    Error_Handler();
-  }
-	return SUCCESS;
+		
 }
 
 /**

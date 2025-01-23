@@ -168,7 +168,7 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>aTxBuffer</ItemText>
+          <ItemText>stimestructureget</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
@@ -178,12 +178,12 @@
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>sizeof(aRxBuffer)</ItemText>
+          <ItemText>RtcHandle</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>sdatestructure</ItemText>
+          <ItemText>hrtc</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
@@ -208,7 +208,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>1</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>

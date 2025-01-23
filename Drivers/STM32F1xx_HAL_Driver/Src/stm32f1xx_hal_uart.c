@@ -2564,7 +2564,8 @@ void HAL_UART_IRQHandler(UART_HandleTypeDef *huart)
         HAL_UARTEx_RxEventCallback(huart, nb_rx_data);
 #endif /* USE_HAL_UART_REGISTER_CALLBACKS */
       }
-      return;
+      HAL_UART_RxCpltCallback(huart);
+			return; // HAL_OK;
     }
   }
 
@@ -3332,7 +3333,7 @@ static void UART_EndTxTransfer(UART_HandleTypeDef *huart)
   * @param  huart UART handle.
   * @retval None
   */
-static void UART_EndRxTransfer(UART_HandleTypeDef *huart)
+void UART_EndRxTransfer(UART_HandleTypeDef *huart)
 {
   /* Disable RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts */
   ATOMIC_CLEAR_BIT(huart->Instance->CR1, (USART_CR1_RXNEIE | USART_CR1_PEIE));
