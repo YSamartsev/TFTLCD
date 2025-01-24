@@ -843,7 +843,6 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 
 	//Перевожу UART в режим готовності і перевіряю командою AT
 	//UART_EndRxTransfer(&UartHandle);
-
 /*	if	(myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != HAL_OK)
 		{
 			Bluetooth_present = SHIELD_NOT_DETECTED;
