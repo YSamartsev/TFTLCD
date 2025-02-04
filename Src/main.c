@@ -24,6 +24,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "stm32_adafruit_lcd.h"
+#include "math.h"
+#include "stdlib.h"
 
 
 
@@ -221,13 +223,15 @@ int __backspace(FILE *f)
 
 /* Buffer used for transmission */
 	char *aTxBuffer;
-	uint8_t aRxBuffer[12]; //12 символів рядка дати і часую далі їх треба перетворити в формат BCD data (двійково-дестковий код)
-
+	uint8_t aRxBuffer[14]; //12 символів рядка дати і часую далі їх треба перетворити в формат BCD data (двійково-дестковий код)
+	uint8_t mycrc;
 /* Buffer used for reception */
 	commandAT myCommandAT;
 	answerAT	myAnswerAT;
 	uint8_t curentTimeSecond;	
 	ShieldStatus Bluetooth_present;
+	
+	uint8_t myTemp;
 	
 
 int main(void)
@@ -243,12 +247,13 @@ int main(void)
        - Set NVIC Group Priority to 4
        - Low Level Initialization
      */
-  HAL_Init();  
+  HAL_Init();  //Тут встановлюється пріорітет і група пріорітетів
   
   /* Configure the system clock = 64 MHz */
   SystemClock_Config();
 
 	BSP_LED_Init(LED_GREEN);			
+	
 	MX_UART2_Init();		
 
 	myCommandAT.ATstring = "AT";
@@ -417,33 +422,40 @@ https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 				}
 			} */
 			
-			switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
-			{
+			//switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
+			switch (HAL_UARTEx_ReceiveToIdle(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer), (uint16_t*) &UartHandle.RxXferSize , 2000)) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
+				{ //При цій функції буде виникати sizeof(aRxBuffer) раз переривання. Відбувається помилка
 				case HAL_OK:
-					if (UartReady == SET)
-					{
+					mycrc = calcModulo256(aRxBuffer, UartHandle.RxXferSize);
+					myTemp = (aRxBuffer[12] & 0x0f) * 16 + (aRxBuffer[13] & 0x0f);
+					//if (UartReady == SET)
+					//{
 					//Ця функція заповнює регістри UART і переводить його в режим переривання. Без очікування Timeout
 					//ST7789_WriteString(10, 180, aRxBuffer, Font_16x26, RED, WHITE);
 					//printf("Code = %s", aRxBuffer[0]);
+					if(mycrc == myTemp)
+					{
 						RTC_SECUpdate();
 						RTC_DateShow(10, 50); //, aShowDate);
 						RTC_TimeShow(10, 130); //Показати час з stimestructureget
-						UartReady = RESET;
+						//UartReady = RESET;
+					}
 						break;
-					} 
+					//} 
 					break;
 				case HAL_ERROR:
-					Error_Handler();			
+						
+					break;
 				case HAL_BUSY:
-					if (UartReady == SET)
+					/*if (UartReady == SET)
 					{
 						// Reset transmission flag 
 						RTC_SECUpdate();
 						RTC_DateShow(10, 50); //, aShowDate);
 						RTC_TimeShow(10, 130); //Показати час з stimestructureget
-						//UartReady = RESET;
+						UartReady = RESET;
 						break;
-					} 
+					} */
 					break;
 				case HAL_TIMEOUT:
 					//UartReady = RESET; //Ця подія в цій функції ніколи не настає
@@ -543,7 +555,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
   */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
 {
-    Error_Handler();
+  return;  
+	Error_Handler();
 }
 
 
@@ -933,6 +946,18 @@ static uint16_t Buffercmp(uint8_t * pBuffer1, uint8_t * pBuffer2, uint16_t Buffe
 
   return 0;
 }
+
+static uint8_t calcModulo256(uint8_t *aRxBuffer, uint16_t BufferLength)
+    {
+      int crc = 0; //48 49 48 50 48 51 48 52 48 53 48 55
+			uint8_t mymod = 0;
+			char *mycrc;
+      for (int i = 0; i < BufferLength - 2; i++) {
+				crc += (uint16_t) *(aRxBuffer + i);
+      } //598 (0x0256)
+      mymod = crc - (uint16_t) (crc / 256) * 256; // 598 - 2*256 = 597- 512 = 86 (0x056)
+			return mymod;
+    }
 
 //==============================================================================
 

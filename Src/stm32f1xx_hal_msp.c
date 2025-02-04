@@ -121,7 +121,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
 	/*##-3- Configure the NVIC for UART ########################################*/
   /* NVIC for USART */
-  HAL_NVIC_SetPriority(USARTx_IRQn, 0, 1);
+  HAL_NVIC_SetPriority(USARTx_IRQn, 2, 2);
   HAL_NVIC_EnableIRQ(USARTx_IRQn);
 }
 
@@ -219,7 +219,7 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc)
 /*Якщо необхідно переривання 	
 RTC_IRQHandler замість RTC_Alarm_IRQHandler
 то треба 	*/
-    HAL_NVIC_SetPriority(RTC_IRQn, 5, 5);
+    HAL_NVIC_SetPriority(RTC_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(RTC_IRQn); 
 
 
@@ -320,6 +320,29 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
   /* USER CODE END SPI2_MspDeInit 1 */
   }
 
+}
+
+HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
+{
+  /* Configure the SysTick to have interrupt in 1ms time basis*/
+  if (HAL_SYSTICK_Config(SystemCoreClock / (1000U / uwTickFreq)) > 0U)
+  {
+    return HAL_ERROR;
+  }
+
+  /* Configure the SysTick IRQ priority */
+  if (TickPriority < (1UL << __NVIC_PRIO_BITS))
+  {
+    HAL_NVIC_SetPriority(SysTick_IRQn, TickPriority, 0U);
+    uwTickPrio = TickPriority;
+  }
+  else
+  {
+    return HAL_ERROR;
+  }
+
+  /* Return function status */
+  return HAL_OK;
 }
 
 /* USER CODE BEGIN 1 */

@@ -121,6 +121,7 @@ HAL_StatusTypeDef myExchange(char *myAT, char *myRES);
 static uint16_t Buffercmp(uint8_t * pBuffer1, uint8_t * pBuffer2, uint16_t BufferLength);
 uint8_t RTC_Data_Update(uint8_t index);
 static void RTC_SECUpdate(void);
+static uint8_t calcModulo256(uint8_t *aRxBuffer, uint16_t BufferLength);
 
 #endif /* __MAIN_H */
 

@@ -256,6 +256,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
+extern uint8_t myTemp;
 
 /** @addtogroup STM32F1xx_HAL_Driver
   * @{
@@ -1360,6 +1361,8 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
     /* Set Reception type to Standard reception */
     huart->ReceptionType = HAL_UART_RECEPTION_STANDARD;
 
+										myTemp = 0;
+		
     return (UART_Start_Receive_IT(huart, pData, Size));
   }
   else
@@ -2354,6 +2357,7 @@ void HAL_UART_IRQHandler(UART_HandleTypeDef *huart)
   uint32_t cr3its     = READ_REG(huart->Instance->CR3);
   uint32_t errorflags = 0x00U;
   uint32_t dmarequest = 0x00U;
+	
 
   /* If no error occurs */
   errorflags = (isrflags & (uint32_t)(USART_SR_PE | USART_SR_FE | USART_SR_ORE | USART_SR_NE));
@@ -2362,7 +2366,10 @@ void HAL_UART_IRQHandler(UART_HandleTypeDef *huart)
     /* UART in mode Receiver -------------------------------------------------*/
     if (((isrflags & USART_SR_RXNE) != RESET) && ((cr1its & USART_CR1_RXNEIE) != RESET))
     {
-      UART_Receive_IT(huart);
+ 
+						myTemp++;
+
+			UART_Receive_IT(huart);
       return;
     }
   }
@@ -2393,7 +2400,7 @@ void HAL_UART_IRQHandler(UART_HandleTypeDef *huart)
     if (((isrflags & USART_SR_ORE) != RESET) && (((cr1its & USART_CR1_RXNEIE) != RESET)
                                                  || ((cr3its & USART_CR3_EIE) != RESET)))
     {
-      huart->ErrorCode |= HAL_UART_ERROR_ORE;
+        huart->ErrorCode |= HAL_UART_ERROR_ORE;
     }
 
     /* Call UART Error Call back function if need be --------------------------*/
@@ -3596,8 +3603,8 @@ static HAL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef *huart)
 {
   uint8_t  *pdata8bits;
   uint16_t *pdata16bits;
-
-  /* Check that a Rx process is ongoing */
+	
+	/* Check that a Rx process is ongoing */
   if (huart->RxState == HAL_UART_STATE_BUSY_RX)
   {
     if ((huart->Init.WordLength == UART_WORDLENGTH_9B) && (huart->Init.Parity == UART_PARITY_NONE))
