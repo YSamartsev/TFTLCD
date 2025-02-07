@@ -128,6 +128,8 @@ static uint16_t ArrayRGB[320] = {0};
   * @param  None
   * @retval None
   */
+SPI_HandleTypeDef ST7735_SPI_PORT;
+
 void st7735_Init(void)
 {    
   uint8_t data = 0;
@@ -667,7 +669,7 @@ static void ST7735_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint
         }
     }
 }
-void ST7735_Init()
+/*void ST7735_Init()
 {
   ST7735_GPIO_Init();
   TFT_CS_L();
@@ -676,7 +678,7 @@ void ST7735_Init()
     ST7735_ExecuteCommandList(init_cmds2);
     ST7735_ExecuteCommandList(init_cmds3);
     TFT_CS_H();
-}
+} */
 void ST7735_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
 {
     if((x >= _width) || (y >= _height))

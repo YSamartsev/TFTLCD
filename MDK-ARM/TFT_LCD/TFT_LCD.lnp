@@ -28,6 +28,7 @@
 "tft_lcd\stm32_adafruit_lcd.o"
 "tft_lcd\fonts.o"
 "tft_lcd\st7789.o"
+"tft_lcd\st7735.o"
 "tft_lcd\retarget_io.o"
 --library_type=microlib --strict --scatter "TFT_LCD\TFT_LCD.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols

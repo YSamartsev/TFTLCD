@@ -86,7 +86,6 @@ https://www.keil.com/support/man/docs/jlink/jlink_trace_itm_viewer.asp
 #define TRCENA 0x01000000
 =================================================*/
 
-
 #define SD_CARD_NOT_FORMATTED                    0
 #define SD_CARD_FILE_NOT_SUPPORTED               1
 #define SD_CARD_OPEN_FAIL                        2
@@ -233,7 +232,6 @@ int __backspace(FILE *f)
 	
 	uint8_t myTemp;
 	
-
 int main(void)
 	//Початкова дата встановлюеться в  RTC_AlarmConfig
                                                                                                                                                                                                                                                                                            {  
@@ -334,9 +332,25 @@ int main(void)
 printf("==================Start RTC Watch===================\n\r");
 
 /* Initialize the LCD */
-	BSP_LCD_Init(); //Спочатку через PB11 RESET, потім керується через Регістри
+	BSP_LCD_Init(); //Спочатку через PA7 RESET, потім керується через Регістри
 
-	ST7789_Fill_Color(WHITE);
+	ST7735_FillScreen(RED);
+
+/*while (1)
+{
+	char *myChar = "A";
+	//ST7735_WriteChar(10, 20, *myChar, Font_16x26, WHITE, RED);
+	//ST7735_FillScreen(RED);
+	// Display on TFT Images existing on SD card 
+	// Display on TFT Images existing on SD card 
+  //TFT_DisplayImages();
+	HAL_Delay(500);
+	//ST7735_FillScreen(ST7735_WHITE);
+	//HAL_Delay(500);
+} */
+
+
+
 
 	if (Bluetooth_present == SHIELD_DETECTED)
 	{

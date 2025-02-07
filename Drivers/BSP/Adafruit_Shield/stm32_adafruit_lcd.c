@@ -80,6 +80,7 @@ EndDependencies */
 #include "lcd.h"
 
 extern SPI_HandleTypeDef SpiHandle;
+extern LCD_DrvTypeDef   st7735_drv;
 
 /** @addtogroup BSP
   * @{
@@ -173,23 +174,36 @@ uint8_t BSP_LCD_Init(void)
   DrawProp.BackColor = 0xFFFF;
   DrawProp.pFont     = &Font24;
   DrawProp.TextColor = 0x0000;
-  
+
+#ifdef TFT_LCD_7735	
+	lcd_drv = &st7735_drv;
+  //lcd_drv = &st7789_drv;
+  /* LCD Init */   
+  lcd_drv->Init();
+
+	
+#elif defined (TFT_LCD_7789)
+	
   //lcd_drv = &st7735_drv;
 
   /* LCD Init */   
   //lcd_drv->Init();
 	ST7789_Init(); //Конфігурація драйвера ST7789 LCD
+#endif
 	HAL_Delay(10);
 	
 	//ST7789_Fill_Color(RED);
   
   /* Initialize the font */
   BSP_LCD_SetFont(&LCD_DEFAULT_FONT);
-  
+
+
   ret = LCD_OK;
   
   return ret;
+	
 }
+
 
 /**
   * @brief  Gets the LCD X size.

@@ -110,6 +110,9 @@ typedef struct
 /*#define RTC_CLOCK_SOURCE_LSI*/
 #define RTC_CLOCK_SOURCE_LSE
 
+//#define TFT_LCD_7735
+#define TFT_LCD_7789
+
 /* Exported functions ------------------------------------------------------- */
 void Error_Handler(void);
 void Test_Colors(void);

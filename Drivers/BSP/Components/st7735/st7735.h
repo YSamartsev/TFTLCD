@@ -46,6 +46,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "../Common/lcd.h"
+#include "fonts.h"
 
 /** @addtogroup BSP
   * @{
@@ -74,8 +75,8 @@
 /** 
   * @brief  ST7735 Size  
   */  
-#define  ST7735_LCD_PIXEL_WIDTH    ((uint16_t)240)
-#define  ST7735_LCD_PIXEL_HEIGHT   ((uint16_t)240)
+#define  ST7735_LCD_PIXEL_WIDTH    ((uint16_t)128)
+#define  ST7735_LCD_PIXEL_HEIGHT   ((uint16_t)128)
 
 /** 
   * @brief  ST7735 Registers  
@@ -177,6 +178,8 @@ void     st7735_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, u
 void     st7735_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
 void     st7735_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
 
+void ST7735_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor);
+
 uint16_t st7735_GetLcdPixelWidth(void);
 uint16_t st7735_GetLcdPixelHeight(void);
 void     st7735_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);
@@ -221,9 +224,9 @@ void     LCD_Delay(uint32_t delay);
 #endif //ST7735_1_8_DEFAULT_ORIENTATION
 // WaveShare ST7735S-based 1.8" display, default orientation
 #ifdef ST7735S_1_8_DEFAULT_ORIENTATION
-#define ST7735_IS_160X128     1
+#define ST7735_IS_120X128     1
 #define ST7735_WIDTH        128
-#define ST7735_HEIGHT       160
+#define ST7735_HEIGHT       128
 #define ST7735_XSTART       2
 #define ST7735_YSTART       1
 #define ST7735_DATA_ROTATION  (ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_RGB)
@@ -240,7 +243,7 @@ void     LCD_Delay(uint32_t delay);
 #endif //ST7735_1_44_DEFAULT_ORIENTATION
 // mini 160x80 display (it's unlikely you want the default orientation)
 #ifdef ST7735_MINI_DEFAULT_ORIENTATION
-#define ST7735_IS_160X80    1
+#define ST7735_IS_128X80    1
 #define ST7735_XSTART       26
 #define ST7735_YSTART       1
 #define ST7735_WIDTH        80
