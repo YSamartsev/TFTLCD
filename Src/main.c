@@ -223,7 +223,7 @@ int __backspace(FILE *f)
 
 /* Buffer used for transmission */
 	char *aTxBuffer;
-	uint8_t aRxBuffer[14]; //12 символів рядка дати і часую далі їх треба перетворити в формат BCD data (двійково-дестковий код)
+	char aRxBuffer[14]; //12 символів рядка дати і часую далі їх треба перетворити в формат BCD data (двійково-дестковий код)
 	uint8_t mycrc;
 /* Buffer used for reception */
 	commandAT myCommandAT;
@@ -231,7 +231,7 @@ int __backspace(FILE *f)
 	uint8_t curentTimeSecond;	
 	ShieldStatus Bluetooth_present;
 	
-	uint8_t myTemp;
+	char myTemp[2];
 	
 
 int main(void)
@@ -332,6 +332,14 @@ int main(void)
 	SPIx_Init(); //Конфігурація параметрів SPI
 
 printf("==================Start RTC Watch===================\n\r");
+/*
+	char * myDel = "1002251254185f";
+	char mycrc2 = calcModulo256(myDel, 12); //mycrc це byte. aRxBuffer[12] і aRxBuffer[13] це ASCII коди
+	//Перетворення символа в байт	
+	//printf("mycrc2 = %x\d\r", mycrc2); //https://metanit.com/c/tutorial/2.4.php
+	sprintf(&myTemp[0], "%x", (mycrc2 & 0xf0)>>4);
+	sprintf(&myTemp[1], "%x",  mycrc2 & 0x0f);
+*/
 
 /* Initialize the LCD */
 	BSP_LCD_Init(); //Спочатку через PB11 RESET, потім керується через Регістри
@@ -426,20 +434,27 @@ https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 			switch (HAL_UARTEx_ReceiveToIdle(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer), (uint16_t*) &UartHandle.RxXferSize , 2000)) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
 				{ //При цій функції буде виникати sizeof(aRxBuffer) раз переривання. Відбувається помилка
 				case HAL_OK:
-					mycrc = calcModulo256(aRxBuffer, UartHandle.RxXferSize);
-					myTemp = (aRxBuffer[12] & 0x0f) * 16 + (aRxBuffer[13] & 0x0f);
+				mycrc = calcModulo256(aRxBuffer, UartHandle.RxXferSize - 2); //mycrc це byte. aRxBuffer[12] і aRxBuffer[13] це ASCII коди
+				//Перетворення символа в байт	
+				sprintf(&myTemp[0], "%x", (mycrc & 0xf0)>>4);					
+				sprintf(&myTemp[1], "%x",  mycrc & 0x0f);
+				
+
+				
+				//myTemp = (aRxBuffer[12] & 0x0f) * 16 + (aRxBuffer[13] & 0x0f);
 					//if (UartReady == SET)
 					//{
 					//Ця функція заповнює регістри UART і переводить його в режим переривання. Без очікування Timeout
 					//ST7789_WriteString(10, 180, aRxBuffer, Font_16x26, RED, WHITE);
 					//printf("Code = %s", aRxBuffer[0]);
-					if(mycrc == myTemp)
+					if(Buffercmp((uint8_t *) &aRxBuffer[12], (uint8_t*) &myTemp, 2) == 0) 
+					//if(mycrc == myTemp)
 					{
 						RTC_SECUpdate();
 						RTC_DateShow(10, 50); //, aShowDate);
 						RTC_TimeShow(10, 130); //Показати час з stimestructureget
 						//UartReady = RESET;
-					}
+					} 
 						break;
 					//} 
 					break;
@@ -904,7 +919,7 @@ HAL_StatusTypeDef myExchange(char *myAT, char *myRES) //Обмін команд�
 	switch (HAL_UARTEx_ReceiveToIdle(&UartHandle, (uint8_t *)aRxBuffer, COUNTmyresponseAT, (uint16_t*) &UartHandle.RxXferSize , 2000))
 	{
 				case HAL_OK:
-				if(Buffercmp(aRxBuffer, (uint8_t *) myRES, COUNTmyresponseAT))  //перевірка на відповідність AT команди і відповіді
+				if(Buffercmp((uint8_t *) aRxBuffer, (uint8_t *) myRES, COUNTmyresponseAT))  //перевірка на відповідність AT команди і відповіді
 				{
 					return HAL_ERROR;
 					break;
@@ -932,7 +947,7 @@ HAL_StatusTypeDef myExchange(char *myAT, char *myRES) //Обмін команд�
   * @retval 0  : pBuffer1 identical to pBuffer2
   *         >0 : pBuffer1 differs from pBuffer2
   */
-static uint16_t Buffercmp(uint8_t * pBuffer1, uint8_t * pBuffer2, uint16_t BufferLength)
+static int Buffercmp(uint8_t * pBuffer1, uint8_t * pBuffer2, uint16_t BufferLength)
 {
   while (BufferLength--)
   {
@@ -947,15 +962,15 @@ static uint16_t Buffercmp(uint8_t * pBuffer1, uint8_t * pBuffer2, uint16_t Buffe
   return 0;
 }
 
-static uint8_t calcModulo256(uint8_t *aRxBuffer, uint16_t BufferLength)
+static char calcModulo256(char *myString, uint16_t BufferLength)
     {
       int crc = 0; //48 49 48 50 48 51 48 52 48 53 48 55
 			uint8_t mymod = 0;
 			char *mycrc;
-      for (int i = 0; i < BufferLength - 2; i++) {
-				crc += (uint16_t) *(aRxBuffer + i);
+      for (int i = 0; i < BufferLength; i++) {
+				crc += (uint16_t) *(myString + i);
       } //598 (0x0256)
-      mymod = crc - (uint16_t) (crc / 256) * 256; // 598 - 2*256 = 597- 512 = 86 (0x056)
+      mymod = crc - (uint16_t) (crc % 256) * 256; // 598 - 2*256 = 597- 512 = 86 (0x056)
 			return mymod;
     }
 
