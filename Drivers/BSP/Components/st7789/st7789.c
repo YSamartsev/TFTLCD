@@ -28,13 +28,13 @@ uint16_t disp_buf[ST7789_WIDTH * HOR_LEN];
  * @param cmd -> command to write
  * @return none
  */
-static void ST7789_WriteCommand(uint8_t cmd)
+/*static void LCD_SendCommand(uint8_t cmd)
 {
-	ST7789_Select();
-	ST7789_DC_Clr();
+	LCD_Select();
+	LCD_DC_Clr();
 	HAL_SPI_Transmit(&SpiHandle, &cmd, sizeof(cmd), HAL_MAX_DELAY);
-	ST7789_UnSelect();
-}
+	LCD_UnSelect();
+} */
 
 /**
  * @brief Write data to ST7789 controller
@@ -42,10 +42,10 @@ static void ST7789_WriteCommand(uint8_t cmd)
  * @param buff_size -> size of the data buffer
  * @return none
  */
-static void ST7789_WriteData(uint8_t *buff, size_t buff_size)
+/*static void LCD_SendData(uint8_t *buff, size_t buff_size)
 {
-	ST7789_Select();
-	ST7789_DC_Set();
+	LCD_Select();
+	LCD_DC_Set();
 
 	// split data in small chunks because HAL can't send more than 64K at once
 
@@ -67,20 +67,21 @@ static void ST7789_WriteData(uint8_t *buff, size_t buff_size)
 		buff_size -= chunk_size;
 	}
 
-	ST7789_UnSelect();
-}
+	LCD_UnSelect();
+} */
+
 /**
  * @brief Write data to ST7789 controller, simplify for 8bit data.
  * data -> data to write
  * @return none
  */
-static void ST7789_WriteSmallData(uint8_t data)
+/* static void LCD_SendSmallData(uint8_t data)
 {
-	ST7789_Select();
-	ST7789_DC_Set();
+	LCD_Select();
+	LCD_DC_Set();
 	HAL_SPI_Transmit(&SpiHandle, &data, sizeof(data), HAL_MAX_DELAY);
-	ST7789_UnSelect();
-}
+	LCD_UnSelect();
+} */
 
 /**
  * @brief Set the rotation direction of the display
@@ -89,19 +90,19 @@ static void ST7789_WriteSmallData(uint8_t data)
  */
 void ST7789_SetRotation(uint8_t m)
 {
-	ST7789_WriteCommand(ST7789_MADCTL);	// MADCTL
+	LCD_SendCommand(ST7789_MADCTL);	// MADCTL
 	switch (m) {
 	case 0:
-		ST7789_WriteSmallData(ST7789_MADCTL_MX | ST7789_MADCTL_MY | ST7789_MADCTL_RGB);
+		LCD_SendSmallData(ST7789_MADCTL_MX | ST7789_MADCTL_MY | ST7789_MADCTL_RGB);
 		break;
 	case 1:
-		ST7789_WriteSmallData(ST7789_MADCTL_MY | ST7789_MADCTL_MV | ST7789_MADCTL_RGB);
+		LCD_SendSmallData(ST7789_MADCTL_MY | ST7789_MADCTL_MV | ST7789_MADCTL_RGB);
 		break;
 	case 2:
-		ST7789_WriteSmallData(ST7789_MADCTL_RGB);
+		LCD_SendSmallData(ST7789_MADCTL_RGB);
 		break;
 	case 3:
-		ST7789_WriteSmallData(ST7789_MADCTL_MX | ST7789_MADCTL_MV | ST7789_MADCTL_RGB);
+		LCD_SendSmallData(ST7789_MADCTL_MX | ST7789_MADCTL_MV | ST7789_MADCTL_RGB);
 		break;
 	default:
 		break;
@@ -115,26 +116,26 @@ void ST7789_SetRotation(uint8_t m)
  */
 static void ST7789_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {
-	ST7789_Select();
+	LCD_Select();
 	uint16_t x_start = x0 + X_SHIFT, x_end = x1 + X_SHIFT;
 	uint16_t y_start = y0 + Y_SHIFT, y_end = y1 + Y_SHIFT;
 	
 	/* Column Address set */
-	ST7789_WriteCommand(ST7789_CASET); 
+	LCD_SendCommand(ST7789_CASET); 
 	{
 		uint8_t data[] = {x_start >> 8, x_start & 0xFF, x_end >> 8, x_end & 0xFF};
-		ST7789_WriteData(data, sizeof(data));
+		LCD_SendData(data, sizeof(data));
 	}
 
 	/* Row Address set */
-	ST7789_WriteCommand(ST7789_RASET);
+	LCD_SendCommand(ST7789_RASET);
 	{
 		uint8_t data[] = {y_start >> 8, y_start & 0xFF, y_end >> 8, y_end & 0xFF};
-		ST7789_WriteData(data, sizeof(data));
+		LCD_SendData(data, sizeof(data));
 	}
 	/* Write to RAM */
-	ST7789_WriteCommand(ST7789_RAMWR);
-	ST7789_UnSelect();
+	LCD_SendCommand(ST7789_RAMWR);
+	LCD_UnSelect();
 }
 
 /**
@@ -150,50 +151,54 @@ void ST7789_Init(void)
 	HAL_Delay(10);
   LCD_RESET_SET();
 
-	ST7789_WriteCommand(ST7789_COLMOD);		//	Set color mode
-    ST7789_WriteSmallData(ST7789_COLOR_MODE_16bit);
-  	ST7789_WriteCommand(0xB2);				//	Porch control
+//while(1)
+//{	
+	LCD_SendCommand(ST7789_COLMOD);		//	Set color mode
+//}
+	
+    LCD_SendSmallData(ST7789_COLOR_MODE_16bit);
+  	LCD_SendCommand(0xB2);				//	Porch control
 	{
 		uint8_t data[] = {0x0C, 0x0C, 0x00, 0x33, 0x33};
-		ST7789_WriteData(data, sizeof(data));
+		LCD_SendData(data, sizeof(data));
 	}
 	ST7789_SetRotation(ST7789_ROTATION);	//	MADCTL (Display Rotation)
 	
 	/* Internal LCD Voltage generator settings */
-    ST7789_WriteCommand(0XB7);				//	Gate Control
-    ST7789_WriteSmallData(0x35);			//	Default value
-    ST7789_WriteCommand(0xBB);				//	VCOM setting
-    ST7789_WriteSmallData(0x19);			//	0.725v (default 0.75v for 0x20)
-    ST7789_WriteCommand(0xC0);				//	LCMCTRL	
-    ST7789_WriteSmallData (0x2C);			//	Default value
-    ST7789_WriteCommand (0xC2);				//	VDV and VRH command Enable
-    ST7789_WriteSmallData (0x01);			//	Default value
-    ST7789_WriteCommand (0xC3);				//	VRH set
-    ST7789_WriteSmallData (0x12);			//	+-4.45v (defalut +-4.1v for 0x0B)
-    ST7789_WriteCommand (0xC4);				//	VDV set
-    ST7789_WriteSmallData (0x20);			//	Default value
-    ST7789_WriteCommand (0xC6);				//	Frame rate control in normal mode
-    ST7789_WriteSmallData (0x0F);			//	Default value (60HZ)
-    ST7789_WriteCommand (0xD0);				//	Power control
-    ST7789_WriteSmallData (0xA4);			//	Default value
-    ST7789_WriteSmallData (0xA1);			//	Default value
+    LCD_SendCommand(0XB7);				//	Gate Control
+    LCD_SendSmallData(0x35);			//	Default value
+    LCD_SendCommand(0xBB);				//	VCOM setting
+    LCD_SendSmallData(0x19);			//	0.725v (default 0.75v for 0x20)
+    LCD_SendCommand(0xC0);				//	LCMCTRL	
+    LCD_SendSmallData (0x2C);			//	Default value
+    LCD_SendCommand (0xC2);				//	VDV and VRH command Enable
+    LCD_SendSmallData (0x01);			//	Default value
+    LCD_SendCommand (0xC3);				//	VRH set
+    LCD_SendSmallData (0x12);			//	+-4.45v (defalut +-4.1v for 0x0B)
+    LCD_SendCommand (0xC4);				//	VDV set
+    LCD_SendSmallData (0x20);			//	Default value
+    LCD_SendCommand (0xC6);				//	Frame rate control in normal mode
+    LCD_SendSmallData (0x0F);			//	Default value (60HZ)
+    LCD_SendCommand (0xD0);				//	Power control
+    LCD_SendSmallData (0xA4);			//	Default value
+    LCD_SendSmallData (0xA1);			//	Default value
 	/**************** Division line ****************/
 
-	ST7789_WriteCommand(0xE0);
+	LCD_SendCommand(0xE0);
 	{
 		uint8_t data[] = {0xD0, 0x04, 0x0D, 0x11, 0x13, 0x2B, 0x3F, 0x54, 0x4C, 0x18, 0x0D, 0x0B, 0x1F, 0x23};
-		ST7789_WriteData(data, sizeof(data));
+		LCD_SendData(data, sizeof(data));
 	}
 
-    ST7789_WriteCommand(0xE1);
+    LCD_SendCommand(0xE1);
 	{
 		uint8_t data[] = {0xD0, 0x04, 0x0C, 0x11, 0x13, 0x2C, 0x3F, 0x44, 0x51, 0x2F, 0x1F, 0x1F, 0x20, 0x23};
-		ST7789_WriteData(data, sizeof(data));
+		LCD_SendData(data, sizeof(data));
 	}
-  ST7789_WriteCommand (ST7789_INVON);		//	Inversion ON
-	ST7789_WriteCommand (ST7789_SLPOUT);	//	Out of sleep mode
-  ST7789_WriteCommand (ST7789_NORON);		//	Normal Display on
-  ST7789_WriteCommand (ST7789_DISPON);	//	Main screen turned on	
+  LCD_SendCommand (ST7789_INVON);		//	Inversion ON
+	LCD_SendCommand (ST7789_SLPOUT);	//	Out of sleep mode
+  LCD_SendCommand (ST7789_NORON);		//	Normal Display on
+  LCD_SendCommand (ST7789_DISPON);	//	Main screen turned on	
 
 }
 
@@ -206,13 +211,13 @@ void ST7789_Fill_Color(uint16_t color)
 {
 	uint16_t i = 0, j = 0, z = 0;
 	ST7789_SetAddressWindow(0, 0, ST7789_WIDTH - 1, ST7789_HEIGHT - 1);
-	ST7789_Select();
+	LCD_Select();
 
 	#ifdef USE_DMA
 		for (i = 0; i < ST7789_HEIGHT / HOR_LEN; i++)
 		{
 			memset(disp_buf, color, sizeof(disp_buf));
-			ST7789_WriteData(disp_buf, sizeof(disp_buf));
+			LCD_SendData(disp_buf, sizeof(disp_buf));
 		}
 	#else
 			for (i = 0; i < ST7789_WIDTH; i++)
@@ -220,13 +225,13 @@ void ST7789_Fill_Color(uint16_t color)
 				for (j = 0; j < ST7789_HEIGHT; j++) 
 				{
 					uint8_t data[] = {color >> 8, color & 0xFF};
-					ST7789_WriteData(data, sizeof(data));
+					LCD_SendData(data, sizeof(data));
 					z++;
 				}
 			}
 	#endif
 			printf("------------z = %04d\n\r", z);
-	ST7789_UnSelect();
+	LCD_UnSelect();
 }
 
 /**
@@ -242,9 +247,9 @@ void ST7789_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
 	
 	ST7789_SetAddressWindow(x, y, x, y);
 	uint8_t data[] = {color >> 8, color & 0xFF};
-	ST7789_Select();
-	ST7789_WriteData(data, sizeof(data));
-	ST7789_UnSelect();
+	LCD_Select();
+	LCD_SendData(data, sizeof(data));
+	LCD_UnSelect();
 }
 
 /**
@@ -258,15 +263,15 @@ void ST7789_Fill(uint16_t xSta, uint16_t ySta, uint16_t xEnd, uint16_t yEnd, uin
 {
 	if ((xEnd < 0) || (xEnd >= ST7789_WIDTH) ||
 		 (yEnd < 0) || (yEnd >= ST7789_HEIGHT))	return;
-	ST7789_Select();
+	LCD_Select();
 	uint16_t i, j;
 	ST7789_SetAddressWindow(xSta, ySta, xEnd, yEnd);
 	for (i = ySta; i <= yEnd; i++)
 		for (j = xSta; j <= xEnd; j++) {
 			uint8_t data[] = {color >> 8, color & 0xFF};
-			ST7789_WriteData(data, sizeof(data));
+			LCD_SendData(data, sizeof(data));
 		}
-	ST7789_UnSelect();
+	LCD_UnSelect();
 }
 
 /**
@@ -279,9 +284,9 @@ void ST7789_DrawPixel_4px(uint16_t x, uint16_t y, uint16_t color)
 {
 	if ((x <= 0) || (x > ST7789_WIDTH) ||
 		 (y <= 0) || (y > ST7789_HEIGHT))	return;
-	ST7789_Select();
+	LCD_Select();
 	ST7789_Fill(x - 1, y - 1, x + 1, y + 1, color);
-	ST7789_UnSelect();
+	LCD_UnSelect();
 }
 
 /**
@@ -354,12 +359,12 @@ void ST7789_DrawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1,
  */
 void ST7789_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)
 {
-	ST7789_Select();
+	LCD_Select();
 	ST7789_DrawLine(x1, y1, x2, y1, color);
 	ST7789_DrawLine(x1, y1, x1, y2, color);
 	ST7789_DrawLine(x1, y2, x2, y2, color);
 	ST7789_DrawLine(x2, y1, x2, y2, color);
-	ST7789_UnSelect();
+	LCD_UnSelect();
 }
 
 /** 
@@ -377,7 +382,7 @@ void ST7789_DrawCircle(uint16_t x0, uint16_t y0, uint8_t r, uint16_t color)
 	int16_t x = 0;
 	int16_t y = r;
 
-	ST7789_Select();
+	LCD_Select();
 	ST7789_DrawPixel(x0, y0 + r, color);
 	ST7789_DrawPixel(x0, y0 - r, color);
 	ST7789_DrawPixel(x0 + r, y0, color);
@@ -403,7 +408,7 @@ void ST7789_DrawCircle(uint16_t x0, uint16_t y0, uint8_t r, uint16_t color)
 		ST7789_DrawPixel(x0 + y, y0 - x, color);
 		ST7789_DrawPixel(x0 - y, y0 - x, color);
 	}
-	ST7789_UnSelect();
+	LCD_UnSelect();
 }
 
 /**
@@ -422,10 +427,10 @@ void ST7789_DrawImage(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint
 	if ((y + h - 1) >= ST7789_HEIGHT)
 		return;
 
-	ST7789_Select();
+	LCD_Select();
 	ST7789_SetAddressWindow(x, y, x + w - 1, y + h - 1);
-	ST7789_WriteData((uint8_t *)data, sizeof(uint16_t) * w * h);
-	ST7789_UnSelect();
+	LCD_SendData((uint8_t *)data, sizeof(uint16_t) * w * h);
+	LCD_UnSelect();
 }
 
 /**
@@ -435,9 +440,9 @@ void ST7789_DrawImage(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint
  */
 void ST7789_InvertColors(uint8_t invert)
 {
-	ST7789_Select();
-	ST7789_WriteCommand(invert ? 0x21 /* INVON */ : 0x20 /* INVOFF */);
-	ST7789_UnSelect();
+	LCD_Select();
+	LCD_SendCommand(invert ? 0x21 /* INVON */ : 0x20 /* INVOFF */);
+	LCD_UnSelect();
 }
 
 /** 
@@ -452,7 +457,7 @@ void ST7789_InvertColors(uint8_t invert)
 void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t color, uint16_t bgcolor)
 {
 	uint32_t i, b, j;
-	ST7789_Select();
+	LCD_Select();
 	ST7789_SetAddressWindow(x, y, x + sfont.width - 1, y + sfont.height - 1);
 	
 	for (i = 0; i < sfont.height; i++) {
@@ -462,15 +467,15 @@ void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t c
 		for (j = 0; j < sfont.width; j++) {
 			if ((bi << j) & 0x8000) {
 				uint8_t data[] = {color >> 8, color & 0xFF};
-				ST7789_WriteData(data, sizeof(data));
+				LCD_SendData(data, sizeof(data));
 			}
 			else {
 				uint8_t data[] = {bgcolor >> 8, bgcolor & 0xFF};
-				ST7789_WriteData(data, sizeof(data));
+				LCD_SendData(data, sizeof(data));
 			}
 		}
 	}
-	ST7789_UnSelect();
+	LCD_UnSelect();
 }
 
 /** 
@@ -484,7 +489,7 @@ void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t c
  */
 void ST7789_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor)
 {
-	ST7789_Select();
+	LCD_Select();
 	while (*str) {
 		if (x + font.width >= ST7789_WIDTH) {
 			x = 0;
@@ -503,7 +508,7 @@ void ST7789_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, u
 		x += font.width;
 		str++;
 	}
-	ST7789_UnSelect();
+	LCD_UnSelect();
 }
 
 /** 
@@ -515,7 +520,7 @@ void ST7789_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, u
  */
 void ST7789_DrawFilledRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color)
 {
-	ST7789_Select();
+	LCD_Select();
 	uint8_t i;
 
 	/* Check input parameters */
@@ -538,7 +543,7 @@ void ST7789_DrawFilledRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, 
 		/* Draw lines */
 		ST7789_DrawLine(x, y + i, x + w, y + i, color);
 	}
-	ST7789_UnSelect();
+	LCD_UnSelect();
 }
 
 /** 
@@ -549,12 +554,12 @@ void ST7789_DrawFilledRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, 
  */
 void ST7789_DrawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color)
 {
-	ST7789_Select();
+	LCD_Select();
 	/* Draw lines */
 	ST7789_DrawLine(x1, y1, x2, y2, color);
 	ST7789_DrawLine(x2, y2, x3, y3, color);
 	ST7789_DrawLine(x3, y3, x1, y1, color);
-	ST7789_UnSelect();
+	LCD_UnSelect();
 }
 
 /** 
@@ -565,7 +570,7 @@ void ST7789_DrawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uin
  */
 void ST7789_DrawFilledTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color)
 {
-	ST7789_Select();
+	LCD_Select();
 	int16_t deltax = 0, deltay = 0, x = 0, y = 0, xinc1 = 0, xinc2 = 0,
 			yinc1 = 0, yinc2 = 0, den = 0, num = 0, numadd = 0, numpixels = 0,
 			curpixel = 0;
@@ -622,7 +627,7 @@ void ST7789_DrawFilledTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y
 		x += xinc2;
 		y += yinc2;
 	}
-	ST7789_UnSelect();
+	LCD_UnSelect();
 }
 
 /** 
@@ -634,7 +639,7 @@ void ST7789_DrawFilledTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y
  */
 void ST7789_DrawFilledCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
 {
-	ST7789_Select();
+	LCD_Select();
 	int16_t f = 1 - r;
 	int16_t ddF_x = 1;
 	int16_t ddF_y = -2 * r;
@@ -663,7 +668,7 @@ void ST7789_DrawFilledCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
 		ST7789_DrawLine(x0 + y, y0 + x, x0 - y, y0 + x, color);
 		ST7789_DrawLine(x0 + y, y0 - x, x0 - y, y0 - x, color);
 	}
-	ST7789_UnSelect();
+	LCD_UnSelect();
 }
 
 
@@ -674,9 +679,9 @@ void ST7789_DrawFilledCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
  */
 void ST7789_TearEffect(uint8_t tear)
 {
-	ST7789_Select();
-	ST7789_WriteCommand(tear ? 0x35 /* TEON */ : 0x34 /* TEOFF */);
-	ST7789_UnSelect();
+	LCD_Select();
+	LCD_SendCommand(tear ? 0x35 /* TEON */ : 0x34 /* TEOFF */);
+	LCD_UnSelect();
 }
 
 
@@ -689,7 +694,7 @@ void ST7789_TearEffect(uint8_t tear)
 {
 	ST7789_Fill_Color(WHITE);
 	HAL_Delay(100);
-ST7789_WriteString(10, 10, "Font test.", Font_16x26, GBLUE, WHITE);
+	ST7789_WriteString(10, 10, "Font test.", Font_16x26, RED, WHITE);
 	ST7789_Fill_Color(CYAN);
     HAL_Delay(100);
 	ST7789_Fill_Color(RED);

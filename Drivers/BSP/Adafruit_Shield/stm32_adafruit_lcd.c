@@ -69,7 +69,7 @@
 EndDependencies */
     
 /* Includes ------------------------------------------------------------------*/
-#include "stm32_adafruit_lcd.h"
+#include "../Drivers/BSP/Adafruit_Shield/stm32_adafruit_lcd.h"
 #include "../../Utilities/Fonts/fonts.h"
 #include "../../Utilities/Fonts/font24.c"
 #include "../../Utilities/Fonts/font20.c"
@@ -136,8 +136,6 @@ LCD_DrawPropTypeDef DrawProp;
 
 //SPI_HandleTypeDef hnucleo_Spi;
 
-//SPI_HandleTypeDef ST7735_SPI_PORT;
-
 
 /* Max size of bitmap will based on a font24 (17x24) */
 static uint8_t bitmap[MAX_HEIGHT_FONT*MAX_WIDTH_FONT*2+OFFSET_BITMAP] = {0};
@@ -176,20 +174,20 @@ uint8_t BSP_LCD_Init(void)
   DrawProp.TextColor = 0x0000;
 
 #ifdef TFT_LCD_7735	
+	
 	lcd_drv = &st7735_drv;
   //lcd_drv = &st7789_drv;
   /* LCD Init */   
   lcd_drv->Init();
-
+	//ST7735_Init(); //Конфігурація драйвера ST7789 LCD
 	
+	ST7735_FillScreen(RED);
 #elif defined (TFT_LCD_7789)
-	
-  //lcd_drv = &st7735_drv;
 
-  /* LCD Init */   
-  //lcd_drv->Init();
 	ST7789_Init(); //Конфігурація драйвера ST7789 LCD
+	ST7789_Fill_Color(WHITE);
 #endif
+
 	HAL_Delay(10);
 	
 	//ST7789_Fill_Color(RED);

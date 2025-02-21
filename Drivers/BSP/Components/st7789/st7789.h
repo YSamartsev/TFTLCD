@@ -259,16 +259,6 @@ extern _lcd_dev lcddev;
 #define ST7789_COLOR_MODE_16bit 0x55    //  RGB565 (16bit)
 #define ST7789_COLOR_MODE_18bit 0x66    //  RGB666 (18bit)
 
-/* Basic operations */
-#define ST7789_RST_Clr() HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_RESET)
-#define ST7789_RST_Set() HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_SET)
-
-#define ST7789_DC_Clr() HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_RESET)
-#define ST7789_DC_Set() HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_SET)
-
-#define ST7789_Select() HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_RESET)
-#define ST7789_UnSelect() HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_SET)
-
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 
 /* Basic functions. */

@@ -41,6 +41,8 @@
 #include "stdlib.h"
 #include "st7735_cfg.h"
 
+//SPI_HandleTypeDef ST7735_SPI_PORT;
+extern SPI_HandleTypeDef SpiHandle;
 
 /** @addtogroup BSP
   * @{
@@ -68,7 +70,7 @@
   * @{
   */
 
-//==extern SPI_HandleTypeDef ST7735_SPI_PORT;
+//==extern SPI_HandleTypeDef SpiHandle;
 
 /**
   * @}
@@ -85,7 +87,6 @@
 /** @defgroup ST7735_Private_Variables
   * @{
   */ 
-
 
 LCD_DrvTypeDef   st7735_drv = 
 {
@@ -128,24 +129,26 @@ static uint16_t ArrayRGB[320] = {0};
   * @param  None
   * @retval None
   */
-SPI_HandleTypeDef ST7735_SPI_PORT;
 
 void st7735_Init(void)
 {    
   uint8_t data = 0;
   
   /* Initialize ST7735 low level bus layer: RST, DC, SDA, SCK,  -----------------------------------*/
-  LCD_IO_Init(); 
+  //LCD_IO_Init(); Це вже зроблено в main
   /* Out of sleep mode, 0 args, no delay */
+	HAL_Delay(10);
+  LCD_RESET_SET();
+	
   st7735_WriteReg(LCD_REG_17, 0x00); 
   /* Frame rate ctrl - normal mode, 3 args:Rate = fosc/(1x2+40) * (LINE+2C+2D)*/
   LCD_IO_WriteReg(LCD_REG_177);
   data = 0x01;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   data = 0x2C;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   data = 0x2D;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   /* Frame rate control - idle mode, 3 args:Rate = fosc/(1x2+40) * (LINE+2C+2D) */    
   st7735_WriteReg(LCD_REG_178, 0x01);
   st7735_WriteReg(LCD_REG_178, 0x2C);
@@ -183,19 +186,19 @@ void st7735_Init(void)
   /* Column addr set, 4 args, no delay: XSTART = 0, XEND = 127 */
   LCD_IO_WriteReg(LCD_REG_42);
   data = 0x00;
-  LCD_IO_WriteMultipleData(&data, 1);
-  LCD_IO_WriteMultipleData(&data, 1);
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   data = 0x7F;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   /* Row addr set, 4 args, no delay: YSTART = 0, YEND = 159 */
   LCD_IO_WriteReg(LCD_REG_43);
   data = 0x00;
-  LCD_IO_WriteMultipleData(&data, 1);
-  LCD_IO_WriteMultipleData(&data, 1);
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   data = 0x9F;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   /* Magical unicorn dust, 16 args, no delay */
   st7735_WriteReg(LCD_REG_224, 0x02); 
   st7735_WriteReg(LCD_REG_224, 0x1c);  
@@ -252,7 +255,7 @@ void st7735_DisplayOn(void)
   LCD_Delay(10);
   LCD_IO_WriteReg(LCD_REG_54);
   data = 0xC0;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
 }
 
 /**
@@ -269,7 +272,7 @@ void st7735_DisplayOff(void)
   LCD_Delay(10);
   LCD_IO_WriteReg(LCD_REG_54);
   data = 0xC0;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
 }
 
 /**
@@ -283,14 +286,14 @@ void st7735_SetCursor(uint16_t Xpos, uint16_t Ypos)
   uint8_t data = 0;
   LCD_IO_WriteReg(LCD_REG_42);
   data = (Xpos) >> 8;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   data = (Xpos) & 0xFF;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   LCD_IO_WriteReg(LCD_REG_43); 
   data = (Ypos) >> 8;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   data = (Ypos) & 0xFF;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   LCD_IO_WriteReg(LCD_REG_44);
 }
 
@@ -313,9 +316,9 @@ void st7735_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
   st7735_SetCursor(Xpos, Ypos);
   
   data = RGBCode >> 8;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   data = RGBCode;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
 }  
 
 
@@ -328,7 +331,7 @@ void st7735_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
 void st7735_WriteReg(uint8_t LCDReg, uint8_t LCDRegValue)
 {
   LCD_IO_WriteReg(LCDReg);
-  LCD_IO_WriteMultipleData(&LCDRegValue, 1);
+  LCD_SendMultipleData(&LCDRegValue, 1);
 }
 
 /**
@@ -345,23 +348,23 @@ void st7735_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint1
   /* Column addr set, 4 args, no delay: XSTART = Xpos, XEND = (Xpos + Width - 1) */
   LCD_IO_WriteReg(LCD_REG_42);
   data = (Xpos) >> 8;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   data = (Xpos) & 0xFF;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   data = (Xpos + Width - 1) >> 8;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   data = (Xpos + Width - 1) & 0xFF;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   /* Row addr set, 4 args, no delay: YSTART = Ypos, YEND = (Ypos + Height - 1) */
   LCD_IO_WriteReg(LCD_REG_43);
   data = (Ypos) >> 8;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   data = (Ypos) & 0xFF;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   data = (Ypos + Height - 1) >> 8;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
   data = (Ypos + Height - 1) & 0xFF;
-  LCD_IO_WriteMultipleData(&data, 1);
+  LCD_SendMultipleData(&data, 1);
 }
 
 /**
@@ -385,7 +388,7 @@ void st7735_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t L
   {
     ArrayRGB[counter] = RGBCode;
   }
-  LCD_IO_WriteMultipleData((uint8_t*)&ArrayRGB[0], Length * 2);
+  LCD_SendMultipleData((uint8_t*)&ArrayRGB[0], Length * 2);
 }
 
 /**
@@ -452,7 +455,7 @@ void st7735_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp)
   /* Set Cursor */
   st7735_SetCursor(Xpos, Ypos);  
  
-  LCD_IO_WriteMultipleData((uint8_t*)pbmp, size*2);
+  LCD_SendMultipleData((uint8_t*)pbmp, size*2);
  
   /* Set GRAM write direction and BGR = 0 */
   /* Memory access control: MY = 1, MX = 1, MV = 0, ML = 0 */
@@ -564,8 +567,8 @@ static void ST7735_WriteData(uint8_t* buff, size_t buff_size);
 static void ST7735_ExecuteCommandList(const uint8_t *addr);
 static void ST7735_SetAddressWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1);
 static void ST7735_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor);
-static void ST7735_GPIO_Init(void)
-{
+static void ST7735_GPIO_Init(void); 
+//{
 //  GPIO_InitTypeDef GPIO_InitStruct = {0};
 //
 //  /* GPIO Ports Clock Enable */
@@ -580,7 +583,8 @@ static void ST7735_GPIO_Init(void)
 //  GPIO_InitStruct.Pull = GPIO_NOPULL;
 //  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 //  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-}
+//}
+
 static void ST7735_Reset()
 {
   TFT_RES_L();
@@ -591,20 +595,20 @@ static void ST7735_WriteCommand(uint8_t cmd)
 {
   TFT_DC_C();
 #ifdef USE_SPI_DMA
-  HAL_SPI_Transmit_DMA(&ST7735_SPI_PORT, &cmd, sizeof(cmd));
-  //while(hspi1.State == HAL_SPI_STATE_BUSY_TX);
+  HAL_SPI_Transmit_DMA(&SpiHandle, &cmd, sizeof(cmd));
+  //while(SpiHandle.State == HAL_SPI_STATE_BUSY_TX);
 #else
-  HAL_SPI_Transmit(&ST7735_SPI_PORT, &cmd, sizeof(cmd), HAL_MAX_DELAY);
+  HAL_SPI_Transmit(&SpiHandle, &cmd, sizeof(cmd), HAL_MAX_DELAY);
 #endif
 }
 static void ST7735_WriteData(uint8_t* buff, size_t buff_size)
 {
   TFT_DC_D();
 #ifdef USE_SPI_DMA
-  HAL_SPI_Transmit_DMA(&ST7735_SPI_PORT, buff, buff_size);
-  while(hspi1.State == HAL_SPI_STATE_BUSY_TX);
+  HAL_SPI_Transmit_DMA(&SpiHandle, buff, buff_size);
+  while(SpiHandle.State == HAL_SPI_STATE_BUSY_TX);
 #else
-  HAL_SPI_Transmit(&ST7735_SPI_PORT, buff, buff_size, HAL_MAX_DELAY);
+  HAL_SPI_Transmit(&SpiHandle, buff, buff_size, HAL_MAX_DELAY);
 #endif
 }
 static void ST7735_ExecuteCommandList(const uint8_t *addr)
@@ -730,10 +734,10 @@ void ST7735_FillRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16
         for(x = w; x > 0; x--)
         {
 #ifdef USE_SPI_DMA
-          HAL_SPI_Transmit_DMA(&ST7735_SPI_PORT, data, sizeof(data));
-          //while(hspi1.State == HAL_SPI_STATE_BUSY_TX);
+          HAL_SPI_Transmit_DMA(&SpiHandle, data, sizeof(data));
+          //while(SpiHandle.State == HAL_SPI_STATE_BUSY_TX);
 #else
-          HAL_SPI_Transmit(&ST7735_SPI_PORT, data, sizeof(data), HAL_MAX_DELAY);
+          HAL_SPI_Transmit(&SpiHandle, data, sizeof(data), HAL_MAX_DELAY);
 #endif
         }
     }

@@ -123,7 +123,7 @@ static void RTC_SECConfig(void);
 static void RTC_DateShow(uint16_t x, uint16_t y); //, uint8_t* showdate);
 static void RTC_TimeShow(uint16_t x, uint16_t y); //, uint8_t* showtime);
 
-static void LED2_Blink(void);
+static void LED0_Blink(void);
 static ShieldStatus TFT_ShieldDetect(void);
 static void SDCard_Config(void);
 static void TFT_DisplayErrorMessage(uint8_t message);
@@ -234,7 +234,7 @@ int __backspace(FILE *f)
 	
 int main(void)
 	//Початкова дата встановлюеться в  RTC_AlarmConfig
-                                                                                                                                                                                                                                                                                           {  
+                                                                                                                                                                                                                                                                                         {  
   /* STM32F103xB HAL library initialization:
        - Configure the Flash prefetch
        - Systick timer is configured by default as source of time base, but user 
@@ -245,7 +245,7 @@ int main(void)
        - Set NVIC Group Priority to 4
        - Low Level Initialization
      */
-  HAL_Init();  //Тут встановлюється пріорітет і група пріорітетів
+     HAL_Init();  //Тут встановлюється пріорітет і група пріорітетів
   
   /* Configure the system clock = 64 MHz */
   SystemClock_Config();
@@ -333,26 +333,29 @@ printf("==================Start RTC Watch===================\n\r");
 
 /* Initialize the LCD */
 	BSP_LCD_Init(); //Спочатку через PA7 RESET, потім керується через Регістри
+	
+	
+ #ifdef TFT_LCD_7735	 
+	while (1)
+	{
 
-	ST7735_FillScreen(RED);
+		st7735_DisplayOff();
+		//ST7735_FillScreen(RED);
+		   //char *myChar = "A";
+		   //ST7735_WriteChar(10, 20, *myChar, Font_16x26, WHITE, RED);
+		//ST7735_FillScreen(RED);
+		st7735_DisplayOn();
+			//Display on TFT Images existing on SD card 
+			//Display on TFT Images existing on SD card 
+			//TFT_DisplayImages();
+		HAL_Delay(500);
+		//st7735_DisplayOn();
+		//T7735_FillScreen(ST7735_WHITE);
+		//HAL_Delay(500);
+} 
+#endif 
 
-/*while (1)
-{
-	char *myChar = "A";
-	//ST7735_WriteChar(10, 20, *myChar, Font_16x26, WHITE, RED);
-	//ST7735_FillScreen(RED);
-	// Display on TFT Images existing on SD card 
-	// Display on TFT Images existing on SD card 
-  //TFT_DisplayImages();
-	HAL_Delay(500);
-	//ST7735_FillScreen(ST7735_WHITE);
-	//HAL_Delay(500);
-} */
-
-
-
-
-	if (Bluetooth_present == SHIELD_DETECTED)
+if (Bluetooth_present == SHIELD_DETECTED)
 	{
 		if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != HAL_OK)
 		{
@@ -866,7 +869,7 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 	//RTC_TimeTypeDef stimestructureget; 
 	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN); //Це потрібно, щоб в main було видно stimestructureget
 	RTC_TimeShow(10, 130);  //, aShowTime);
-	HAL_GPIO_TogglePin(LED2_GPIO_PORT, LED2_PIN);
+	HAL_GPIO_TogglePin(LED0_GPIO_PORT, LED0_PIN);
 
 	
 	//Перевірка на підключення bluetooth
@@ -882,7 +885,7 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 		}else
 		{
 			Bluetooth_present = SHIELD_DETECTED;
-			//HAL_GPIO_TogglePin(LED2_GPIO_PORT, LED2_PIN);
+			//HAL_GPIO_TogglePin(LED0_GPIO_PORT, LED0_PIN);
 			myAnswerAT.BLUETOOTH_shield = "BL present";
 			ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE);
 			ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, RED, WHITE);
