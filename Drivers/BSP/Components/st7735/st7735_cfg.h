@@ -16,6 +16,7 @@
 #ifndef ST7735_RES_Pin
 #define ST7735_RES_Pin      GPIO_PIN_7
 #endif
+
 #ifndef ST7735_RES_GPIO_Port
 #define ST7735_RES_GPIO_Port  GPIOA
 #endif
@@ -24,14 +25,16 @@
 #ifndef ST7735_DC_Pin
 #define ST7735_DC_Pin       GPIO_PIN_1
 #endif
+
 #ifndef ST7735_DC_GPIO_Port
 #define ST7735_DC_GPIO_Port   GPIOB
 #endif
 
 //Port and pin connected signal 'CS' (chip select) ST7735 display Не використовую
 #ifndef ST7735_CS_Pin
-#define ST7735_CS_Pin       GPIO_PIN_14
+#define ST7735_CS_Pin       GPIO_PIN_12
 #endif
+
 #ifndef ST7735_CS_GPIO_Port
 #define ST7735_CS_GPIO_Port   GPIOB
 #endif
@@ -40,8 +43,10 @@
 #ifndef ST7735_BL_Pin
 #define ST7735_BL_Pin     GPIO_PIN_15
 #endif
+
 #ifndef ST7735_BL_GPIO_Port
 #define ST7735_BL_GPIO_Port   GPIOB
 #endif
+
 #endif /* ST7735_CFG_H_ */
 

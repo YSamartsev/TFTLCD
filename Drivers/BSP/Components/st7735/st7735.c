@@ -138,11 +138,141 @@ void st7735_Init(void)
   //LCD_IO_Init(); Це вже зроблено в main
   /* Out of sleep mode, 0 args, no delay */
 	HAL_Delay(10);
-  LCD_RESET_SET();
+  LCD_RESET_SET(); //Скинути і встановити
+
+LCD_SendCommand(ST7735_SWRESET); 
+HAL_Delay(150);
+LCD_SendCommand(ST7735_SLPOUT); 
+HAL_Delay(500);
+LCD_SendCommand(ST7735_FRMCTR1);
+data = 0x01;
+LCD_SendData(&data, 1);
+data = 0x2C;
+LCD_SendData(&data, 1);
+data = 0x2D;	
+LCD_SendData(&data, 1);
+
+LCD_SendCommand(ST7735_FRMCTR2);
+data = 0x01;	
+LCD_SendData(&data, 1);
+data = 0x2C; 
+LCD_SendData(&data, 1);
+data = 0x2D;
+LCD_SendData(&data, 1);
+
+LCD_SendCommand(ST7735_FRMCTR3);
+data = 0x01;
+LCD_SendData(&data, 1);
+data = 0x2C;
+LCD_SendData(&data, 1);
+data = 0x2D;
+LCD_SendData(&data, 1);
+data = 0x01;
+LCD_SendData(&data, 1);
+data = 0x2C;
+LCD_SendData(&data, 1);
+data = 0x2D;
+LCD_SendData(&data, 1);
+LCD_SendCommand(ST7735_INVCTR);
+data = 0x07;
+LCD_SendData(&data, 1);
+
+LCD_SendCommand(ST7735_PWCTR1);
+uint8_t data1[] = {0xA2, 0x02, 0x84};
+LCD_SendData(data1, 3);
+/* ST7735_SendData(0xA2);
+ST7735_SendData(0x02);
+ST7735_SendData(0x84); */
+
+LCD_SendCommand(ST7735_PWCTR2);
+data = 0xC5;
+LCD_SendData(&data, 1);
+
+LCD_SendCommand(ST7735_PWCTR3);
+{
+	uint8_t data1[] = {0x0A, 0x00};
+	LCD_SendData(data1, sizeof(data));
+}
+/*ST7735_SendData(0x0A);
+ST7735_SendData(0x00); */
+
+LCD_SendCommand(ST7735_PWCTR4);
+{
+	uint8_t data1[] = {0x8A, 0x2A};
+	LCD_SendData(data1, sizeof(data));
+}
+/*ST7735_SendData(0x8A);
+ST7735_SendData(0x2A); */
+
+LCD_SendCommand(ST7735_PWCTR5);
+{
+	uint8_t data1[] = {0x8A, 0xEE};
+	LCD_SendData(data1, sizeof(data));
+}
+	/*LCD_SendData(0xEE); */
+
+LCD_SendCommand(ST7735_VMCTR1);
+data = 0x0E;
+LCD_SendData(&data, 1);
+
+LCD_SendCommand(ST7735_INVOFF);
+LCD_SendCommand(ST7735_MADCTL);
+data = 0xC0;
+LCD_SendData(&data, 1);
+
+LCD_SendCommand(ST7735_COLMOD);
+data = 0x05;
+LCD_SendData(&data, 1);
+
+LCD_SendCommand(ST7735_GMCTRP1);
+{
+	uint8_t data1[] = {0x02, 0x1c, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2d, 0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10};
+	LCD_SendData(data1, sizeof(data));
+}
+/*ST7735_SendData(0x02);
+ST7735_SendData(0x1c);
+ST7735_SendData(0x07);
+ST7735_SendData(0x12);
+ST7735_SendData(0x37);
+ST7735_SendData(0x32);
+ST7735_SendData(0x29);
+ST7735_SendData(0x2d);
+ST7735_SendData(0x29);
+ST7735_SendData(0x25);
+ST7735_SendData(0x2B);
+ST7735_SendData(0x39); 
+ST7735_SendData(0x00);
+ST7735_SendData(0x01);
+ST7735_SendData(0x03);
+ST7735_SendData(0x10); */
+
+LCD_SendCommand(ST7735_GMCTRN1);
+{
+	uint8_t data1[] = {0x03, 0x1d, 0x07, 0x06, 0x2E, 0x2C, 0x29, 0x2D, 0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10};
+	LCD_SendData(data1, sizeof(data));
+}	
+
+LCD_SendCommand(ST7735_NORON);
+HAL_Delay(10);
+
+LCD_SendCommand(ST7735_DISPON);
+HAL_Delay(100);
+LCD_CS_HIGH();
+}
+
+void st7735_Init_old(void)
+{    
+  uint8_t data = 0;
+  
+  /* Initialize ST7735 low level bus layer: RST, DC, SDA, SCK,  -----------------------------------*/
+  //LCD_IO_Init(); Це вже зроблено в main
+  /* Out of sleep mode, 0 args, no delay */
+	HAL_Delay(10);
+  LCD_RESET_SET(); //Скинути і встановити
 	
   st7735_WriteReg(LCD_REG_17, 0x00); 
   /* Frame rate ctrl - normal mode, 3 args:Rate = fosc/(1x2+40) * (LINE+2C+2D)*/
-  LCD_IO_WriteReg(LCD_REG_177);
+  LCD_SendCommand(LCD_REG_177);
   data = 0x01;
   LCD_SendMultipleData(&data, 1);
   data = 0x2C;
@@ -180,11 +310,11 @@ void st7735_Init(void)
   /* Power control, 1 arg, no delay */
   st7735_WriteReg(LCD_REG_197, 0x0E);
   /* Don't invert display, no args, no delay */
-  LCD_IO_WriteReg(LCD_REG_32);
+  LCD_SendCommand(LCD_REG_32);
   /* Set color mode, 1 arg, no delay: 16-bit color */
   st7735_WriteReg(LCD_REG_58, 0x05);
   /* Column addr set, 4 args, no delay: XSTART = 0, XEND = 127 */
-  LCD_IO_WriteReg(LCD_REG_42);
+  LCD_SendCommand(LCD_REG_42);
   data = 0x00;
   LCD_SendMultipleData(&data, 1);
   LCD_SendMultipleData(&data, 1);
@@ -192,7 +322,7 @@ void st7735_Init(void)
   data = 0x7F;
   LCD_SendMultipleData(&data, 1);
   /* Row addr set, 4 args, no delay: YSTART = 0, YEND = 159 */
-  LCD_IO_WriteReg(LCD_REG_43);
+  LCD_SendCommand(LCD_REG_43);
   data = 0x00;
   LCD_SendMultipleData(&data, 1);
   LCD_SendMultipleData(&data, 1);
@@ -249,11 +379,11 @@ void st7735_Init(void)
 void st7735_DisplayOn(void)
 {
   uint8_t data = 0;
-  LCD_IO_WriteReg(LCD_REG_19);
+  LCD_SendCommand(LCD_REG_19);
   LCD_Delay(10);
-  LCD_IO_WriteReg(LCD_REG_41);
+  LCD_SendCommand(LCD_REG_41);
   LCD_Delay(10);
-  LCD_IO_WriteReg(LCD_REG_54);
+  LCD_SendCommand(LCD_REG_54);
   data = 0xC0;
   LCD_SendMultipleData(&data, 1);
 }
@@ -266,11 +396,11 @@ void st7735_DisplayOn(void)
 void st7735_DisplayOff(void)
 {
   uint8_t data = 0;
-  LCD_IO_WriteReg(LCD_REG_19);
+  LCD_SendCommand(LCD_REG_19);
   LCD_Delay(10);
-  LCD_IO_WriteReg(LCD_REG_40);
+  LCD_SendCommand(LCD_REG_40);
   LCD_Delay(10);
-  LCD_IO_WriteReg(LCD_REG_54);
+  LCD_SendCommand(LCD_REG_54);
   data = 0xC0;
   LCD_SendMultipleData(&data, 1);
 }
@@ -284,17 +414,17 @@ void st7735_DisplayOff(void)
 void st7735_SetCursor(uint16_t Xpos, uint16_t Ypos)
 {
   uint8_t data = 0;
-  LCD_IO_WriteReg(LCD_REG_42);
+  LCD_SendCommand(LCD_REG_42);
   data = (Xpos) >> 8;
   LCD_SendMultipleData(&data, 1);
   data = (Xpos) & 0xFF;
   LCD_SendMultipleData(&data, 1);
-  LCD_IO_WriteReg(LCD_REG_43); 
+  LCD_SendCommand(LCD_REG_43); 
   data = (Ypos) >> 8;
   LCD_SendMultipleData(&data, 1);
   data = (Ypos) & 0xFF;
   LCD_SendMultipleData(&data, 1);
-  LCD_IO_WriteReg(LCD_REG_44);
+  LCD_SendCommand(LCD_REG_44);
 }
 
 /**
@@ -330,7 +460,7 @@ void st7735_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
   */
 void st7735_WriteReg(uint8_t LCDReg, uint8_t LCDRegValue)
 {
-  LCD_IO_WriteReg(LCDReg);
+  LCD_SendCommand(LCDReg);
   LCD_SendMultipleData(&LCDRegValue, 1);
 }
 
@@ -346,7 +476,7 @@ void st7735_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint1
 {
   uint8_t data = 0;
   /* Column addr set, 4 args, no delay: XSTART = Xpos, XEND = (Xpos + Width - 1) */
-  LCD_IO_WriteReg(LCD_REG_42);
+  LCD_SendCommand(LCD_REG_42);
   data = (Xpos) >> 8;
   LCD_SendMultipleData(&data, 1);
   data = (Xpos) & 0xFF;
@@ -356,7 +486,7 @@ void st7735_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint1
   data = (Xpos + Width - 1) & 0xFF;
   LCD_SendMultipleData(&data, 1);
   /* Row addr set, 4 args, no delay: YSTART = Ypos, YEND = (Ypos + Height - 1) */
-  LCD_IO_WriteReg(LCD_REG_43);
+  LCD_SendCommand(LCD_REG_43);
   data = (Ypos) >> 8;
   LCD_SendMultipleData(&data, 1);
   data = (Ypos) & 0xFF;
@@ -468,10 +598,10 @@ void st7735_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp)
 
 #define TFT_BL_H()  HAL_GPIO_WritePin(ST7735_BL_GPIO_Port, ST7735_BL_Pin, GPIO_PIN_SET)
 #define TFT_BL_L()  HAL_GPIO_WritePin(ST7735_BL_GPIO_Port, ST7735_BL_Pin, GPIO_PIN_RESET)
-#define TFT_CS_H()  HAL_GPIO_WritePin(ST7735_CS_GPIO_Port, ST7735_CS_Pin, GPIO_PIN_SET)
-#define TFT_CS_L()  HAL_GPIO_WritePin(ST7735_CS_GPIO_Port, ST7735_CS_Pin, GPIO_PIN_RESET)
-#define TFT_DC_D()  HAL_GPIO_WritePin(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_SET)
-#define TFT_DC_C()  HAL_GPIO_WritePin(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_RESET)
+//#define LCD_CS_HIGH()  HAL_GPIO_WritePin(ST7735_CS_GPIO_Port, ST7735_CS_Pin, GPIO_PIN_SET)
+//#define LCD_CS_LOW()  HAL_GPIO_WritePin(ST7735_CS_GPIO_Port, ST7735_CS_Pin, GPIO_PIN_RESET)
+#define LCD_DC_H()  HAL_GPIO_WritePin(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_SET)
+#define LCD_DC_C()  HAL_GPIO_WritePin(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_RESET)
 #define TFT_RES_H() HAL_GPIO_WritePin(ST7735_RES_GPIO_Port, ST7735_RES_Pin, GPIO_PIN_SET)
 #define TFT_RES_L() HAL_GPIO_WritePin(ST7735_RES_GPIO_Port, ST7735_RES_Pin, GPIO_PIN_RESET)
 #define ST7735_COLOR565(r, g, b) (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | ((b & 0xF8) >> 3))
@@ -585,15 +715,9 @@ static void ST7735_GPIO_Init(void);
 //  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 //}
 
-static void ST7735_Reset()
-{
-  TFT_RES_L();
-  HAL_Delay(20);
-  TFT_RES_H();
-}
 static void ST7735_WriteCommand(uint8_t cmd)
 {
-  TFT_DC_C();
+  LCD_DC_LOW();
 #ifdef USE_SPI_DMA
   HAL_SPI_Transmit_DMA(&SpiHandle, &cmd, sizeof(cmd));
   //while(SpiHandle.State == HAL_SPI_STATE_BUSY_TX);
@@ -603,7 +727,7 @@ static void ST7735_WriteCommand(uint8_t cmd)
 }
 static void ST7735_WriteData(uint8_t* buff, size_t buff_size)
 {
-  TFT_DC_D();
+  LCD_DC_HIGH();
 #ifdef USE_SPI_DMA
   HAL_SPI_Transmit_DMA(&SpiHandle, buff, buff_size);
   while(SpiHandle.State == HAL_SPI_STATE_BUSY_TX);
@@ -676,26 +800,26 @@ static void ST7735_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint
 /*void ST7735_Init()
 {
   ST7735_GPIO_Init();
-  TFT_CS_L();
+  LCD_CS_LOW();
     ST7735_Reset();
     ST7735_ExecuteCommandList(init_cmds1);
     ST7735_ExecuteCommandList(init_cmds2);
     ST7735_ExecuteCommandList(init_cmds3);
-    TFT_CS_H();
+    LCD_CS_HIGH();
 } */
 void ST7735_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
 {
     if((x >= _width) || (y >= _height))
         return;
-    TFT_CS_L();
+    LCD_CS_LOW();
     ST7735_SetAddressWindow(x, y, x+1, y+1);
     uint8_t data[] = { color >> 8, color & 0xFF };
     ST7735_WriteData(data, sizeof(data));
-    TFT_CS_H();
+    LCD_CS_HIGH();
 }
 void ST7735_DrawString(uint16_t x, uint16_t y, const char* str, FontDef font, uint16_t color, uint16_t bgcolor)
 {
-  TFT_CS_L();
+  LCD_CS_LOW();
     while(*str)
     {
         if(x + font.width >= _width)
@@ -717,7 +841,7 @@ void ST7735_DrawString(uint16_t x, uint16_t y, const char* str, FontDef font, ui
         x += font.width;
         str++;
     }
-    TFT_CS_H();
+    LCD_CS_HIGH();
 }
 void ST7735_FillRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color)
 {
@@ -725,10 +849,14 @@ void ST7735_FillRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16
     if((x >= _width) || (y >= _height)) return;
     if((x + w - 1) >= _width) w = _width - x;
     if((y + h - 1) >= _height) h = _height - y;
-    TFT_CS_L();
-    ST7735_SetAddressWindow(x, y, x+w-1, y+h-1);
+    
+		LCD_CS_LOW();
+		
+	ST7735_SetAddressWindow(x, y, x+w-1, y+h-1);
     uint8_t data[] = { color >> 8, color & 0xFF };
-    TFT_DC_D();
+    //LCD_DC_Set();
+		LCD_DC_H();
+
     for(y = h; y > 0; y--)
     {
         for(x = w; x > 0; x--)
@@ -741,28 +869,32 @@ void ST7735_FillRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16
 #endif
         }
     }
-    TFT_CS_H();
+   
+		LCD_CS_HIGH();
 }
+
 void ST7735_FillScreen(uint16_t color)
 {
     ST7735_FillRectangle(0, 0, _width, _height, color);
 }
+
 void ST7735_DrawImage(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t* data)
 {
     if((x >= _width) || (y >= _height)) return;
     if((x + w - 1) >= _width) return;
     if((y + h - 1) >= _height) return;
-    TFT_CS_L();
+    LCD_CS_LOW();
     ST7735_SetAddressWindow(x, y, x+w-1, y+h-1);
     ST7735_WriteData((uint8_t*)data, sizeof(uint16_t)*w*h);
-    TFT_CS_H();
+    LCD_CS_HIGH();
 }
+
 void ST7735_DrawTouchGFX(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t* data)
 {
     if((x >= _width) || (y >= _height)) return;
     if((x + w - 1) >= _width) return;
     if((y + h - 1) >= _height) return;
-    TFT_CS_L();
+    LCD_CS_LOW();
     ST7735_SetAddressWindow(x, y, x+w-1, y+h-1);
     uint32_t size = w * h;
     uint8_t colorBytes[size][2];
@@ -772,24 +904,28 @@ void ST7735_DrawTouchGFX(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const u
     colorBytes[i][1] = *data & 0x00FF;
     data++;
   }
-    TFT_DC_D();
+    LCD_DC_HIGH();
   ST7735_WriteData((uint8_t*) &colorBytes, size * 2);
-    TFT_CS_H();
+    LCD_CS_HIGH();
 }
+
 void ST7735_InvertColors(bool invert)
 {
-  TFT_CS_L();
+  LCD_CS_LOW();
     ST7735_WriteCommand(invert ? ST7735_INVON : ST7735_INVOFF);
-    TFT_CS_H();
+    LCD_CS_HIGH();
 }
+
 void ST7735_Backlight_On(void)
 {
   TFT_BL_H();
 }
+
 void ST7735_Backlight_Off(void)
 {
   TFT_BL_L();
 }
+
 /***************************************************************************************
 ** Function name:           drawCircle
 ** Description:             Draw a circle outline
@@ -825,6 +961,7 @@ void ST7735_DrawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
     ST7735_DrawPixel(x0 + r, y0 - x, color);
   }
 }
+
 /***************************************************************************************
 ** Function name:           drawCircleHelper
 ** Description:             Support function for circle drawing
@@ -868,6 +1005,7 @@ void ST7735_DrawCircleHelper( int16_t x0, int16_t y0, int16_t r, uint8_t cornern
     }
   }
 }
+
 /***************************************************************************************
 ** Function name:           fillCircle
 ** Description:             draw a filled circle
@@ -912,6 +1050,7 @@ void ST7735_FillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornerna
     }
   }
 }
+
 /***************************************************************************************
 ** Function name:           drawEllipse
 ** Description:             Draw a ellipse outline
@@ -953,6 +1092,7 @@ void ST7735_DrawEllipse(int16_t x0, int16_t y0, int16_t rx, int16_t ry, uint16_t
   s += rx2 * ((4 * y) + 6);
   }
 }
+
 /***************************************************************************************
 ** Function name:           fillEllipse
 ** Description:             draw a filled ellipse
@@ -990,6 +1130,7 @@ void ST7735_FillEllipse(int16_t x0, int16_t y0, int16_t rx, int16_t ry, uint16_t
     s += rx2 * ((4 * y) + 6);
   }
 }
+
 /***************************************************************************************
 ** Function name:           drawRect
 ** Description:             Draw a rectangle outline
@@ -1020,6 +1161,7 @@ void ST7735_DrawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r,
   ST7735_DrawCircleHelper(x + w - r - 1, y + r    , r, 2, color);
   ST7735_DrawCircleHelper(x + w - r - 1, y + h - r - 1, r, 4, color);
 }
+
 /***************************************************************************************
 ** Function name:           fillRoundRect
 ** Description:             Draw a rounded corner filled rectangle
@@ -1033,6 +1175,7 @@ void ST7735_FillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r,
   ST7735_FillCircleHelper(x + w - r - 1, y + r, r, 1, h - r - r - 1, color);
   ST7735_FillCircleHelper(x + r    , y + r, r, 2, h - r - r - 1, color);
 }
+
 /***************************************************************************************
 ** Function name:           drawTriangle
 ** Description:             Draw a triangle outline using 3 arbitrary points
@@ -1044,6 +1187,7 @@ void ST7735_DrawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t
   ST7735_DrawLine(x1, y1, x2, y2, color);
   ST7735_DrawLine(x2, y2, x0, y0, color);
 }
+
 /***************************************************************************************
 ** Function name:           fillTriangle
 ** Description:             Draw a filled triangle using 3 arbitrary points
@@ -1115,6 +1259,7 @@ void ST7735_FillTriangle( int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_
     ST7735_DrawFastHLine(a, y, b - a + 1, color);
   }
 }
+
 /***************************************************************************************
 ** Function name:           drawLine
 ** Description:             draw a line between 2 arbitrary points
@@ -1164,6 +1309,7 @@ void ST7735_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t co
     }
   }
 }
+
 /***************************************************************************************
 ** Function name:           drawFastVLine
 ** Description:             draw a vertical line
@@ -1186,6 +1332,7 @@ void ST7735_DrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
   if ((x + w - 1) >= _width)  w = _width - x;
   ST7735_DrawLine(x, y, x + w - 1, y, color);
 }
+
 /***************************************************************************************
 ** Function name:           setRotation
 ** Description:             rotate the screen orientation m = 0-3
@@ -1193,7 +1340,7 @@ void ST7735_DrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 void ST7735_SetRotation(uint8_t m)
 {
   _value_rotation = m % 4;
-  TFT_CS_L();
+  LCD_CS_LOW();
   ST7735_WriteCommand(ST7735_MADCTL);
   switch (_value_rotation)
   {
@@ -1238,16 +1385,19 @@ void ST7735_SetRotation(uint8_t m)
     }
       break;
   }
-  TFT_CS_H();
+  LCD_CS_HIGH();
 }
+
 uint8_t ST7735_GetRotation(void)
 {
   return _value_rotation;
 }
+
 int16_t ST7735_GetHeight(void)
 {
   return _height;
 }
+
 int16_t ST7735_GetWidth(void)
 {
   return _width;

@@ -180,12 +180,14 @@ uint8_t BSP_LCD_Init(void)
   /* LCD Init */   
   lcd_drv->Init();
 	//ST7735_Init(); //Конфігурація драйвера ST7789 LCD
-	
-	ST7735_FillScreen(RED);
+	//ST7735_FillScreen(WHITE);
+	BSP_Fill_Color(WHITE);
+
 #elif defined (TFT_LCD_7789)
 
 	ST7789_Init(); //Конфігурація драйвера ST7789 LCD
 	ST7789_Fill_Color(WHITE);
+	ST7789_Test();
 #endif
 
 	HAL_Delay(10);
@@ -1076,6 +1078,94 @@ static void SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint1
     lcd_drv->SetDisplayWindow(Xpos, Ypos, Width, Height);
   }  
 }
+
+
+/**
+ * @brief Fill the DisplayWindow with single color
+ * @param color -> color to Fill with
+ * @return none
+ */
+void BSP_Fill_Color(uint16_t color)
+{
+	uint16_t i = 0, j = 0, z = 0;
+#ifdef TFT_LCD_7789
+	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
+#elif defined (TFT_LCD_7735)
+	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
+#endif
+	LCD_SetAddressWindow(0, 0, LCD_WIDTH - 1, LCD_HEIGHT - 1);
+	printf("--LCD_WIDTH = %04d  LCD_HEIGHT = %04d\n\r", LCD_WIDTH, LCD_HEIGHT);
+	LCD_CS_LOW();
+
+	#ifdef USE_DMA
+		for (i = 0; i < ST7789_HEIGHT / HOR_LEN; i++)
+		{
+			memset(disp_buf, color, sizeof(disp_buf));
+			LCD_SendData(disp_buf, sizeof(disp_buf));
+		}
+	#else
+			for (i = 0; i < LCD_WIDTH; i++)
+			{
+				for (j = 0; j < LCD_HEIGHT; j++) 
+				{
+					uint8_t data[] = {color >> 8, color & 0xFF};
+					LCD_SendData(data, sizeof(data));
+					z++;
+				}
+			}
+	#endif
+			printf("------------z = %04d\n\r", z);
+	LCD_CS_HIGH();
+}
+
+static void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
+{
+	LCD_CS_LOW();
+	uint16_t x_start = x0 + X_SHIFT, x_end = x1 + X_SHIFT;
+	uint16_t y_start = y0 + Y_SHIFT, y_end = y1 + Y_SHIFT;
+
+#ifdef TFT_LCD_7789	
+	/* Column Address set */
+	LCD_SendCommand(ST7789_CASET); 
+	{
+		uint8_t data[] = {x_start >> 8, x_start & 0xFF, x_end >> 8, x_end & 0xFF};
+		LCD_SendData(data, sizeof(data));
+	}
+
+	/* Row Address set */
+	LCD_SendCommand(ST7789_RASET);
+	{
+		uint8_t data[] = {y_start >> 8, y_start & 0xFF, y_end >> 8, y_end & 0xFF};
+		LCD_SendData(data, sizeof(data));
+	}
+	/* Write to RAM */
+	LCD_SendCommand(ST7789_RAMWR);
+#elif defined TFT_LCD_7735
+		/* Column Address set */
+	LCD_SendCommand(ST7735_CASET); 
+	{
+		uint8_t data[] = {x_start >> 8, x_start & 0xFF, x_end >> 8, x_end & 0xFF};
+		LCD_SendData(data, sizeof(data));
+	}
+
+	/* Row Address set */
+	LCD_SendCommand(ST7735_RASET);
+	{
+		uint8_t data[] = {y_start >> 8, y_start & 0xFF, y_end >> 8, y_end & 0xFF};
+		LCD_SendData(data, sizeof(data));
+	}
+	/* Write to RAM */
+	LCD_SendCommand(ST7735_RAMWR);
+	
+#endif	
+	
+	LCD_CS_HIGH();
+}
+
+
+
 
 /**
   * @}

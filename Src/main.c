@@ -334,21 +334,22 @@ printf("==================Start RTC Watch===================\n\r");
 /* Initialize the LCD */
 	BSP_LCD_Init(); //Спочатку через PA7 RESET, потім керується через Регістри
 	
-	
+		
  #ifdef TFT_LCD_7735	 
 	while (1)
 	{
 
-		st7735_DisplayOff();
-		//ST7735_FillScreen(RED);
+		//st7735_DisplayOff();
+		ST7735_FillScreen(RED);
 		   //char *myChar = "A";
 		   //ST7735_WriteChar(10, 20, *myChar, Font_16x26, WHITE, RED);
 		//ST7735_FillScreen(RED);
-		st7735_DisplayOn();
+		//st7735_DisplayOn();
+		ST7735_FillScreen(BLUE);
 			//Display on TFT Images existing on SD card 
 			//Display on TFT Images existing on SD card 
 			//TFT_DisplayImages();
-		HAL_Delay(500);
+		HAL_Delay(10);
 		//st7735_DisplayOn();
 		//T7735_FillScreen(ST7735_WHITE);
 		//HAL_Delay(500);

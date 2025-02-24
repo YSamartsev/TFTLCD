@@ -164,6 +164,8 @@
 /** @defgroup ADAFRUIT_SPI_LCD_Exported_Functions
   * @{
   */ 
+void st7735_Init_old(void);
+	
 void     st7735_Init(void);
 uint16_t st7735_ReadID(void);
 

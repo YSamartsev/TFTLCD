@@ -135,10 +135,10 @@ static ADC_ChannelConfTypeDef sConfig;
  */
 void LCD_SendCommand(uint8_t cmd)
 {
-	LCD_Select();
-	LCD_DC_Clr();
+	LCD_CS_LOW();
+	LCD_DC_LOW();
 	HAL_SPI_Transmit(&SpiHandle, &cmd, sizeof(cmd), HAL_MAX_DELAY);
-	LCD_UnSelect();
+	LCD_CS_HIGH();
 }
 
 /**
@@ -149,8 +149,8 @@ void LCD_SendCommand(uint8_t cmd)
  */
 void LCD_SendData(uint8_t *buff, size_t buff_size)
 {
-	LCD_Select();
-	LCD_DC_Set();
+	LCD_CS_LOW();
+	LCD_DC_HIGH();
 
 	// split data in small chunks because HAL can't send more than 64K at once
 
@@ -172,7 +172,7 @@ void LCD_SendData(uint8_t *buff, size_t buff_size)
 		buff_size -= chunk_size;
 	}
 
-	LCD_UnSelect();
+	LCD_CS_HIGH();
 }
 /**
  * @brief Write data to ST7789 controller, simplify for 8bit data.
@@ -181,10 +181,10 @@ void LCD_SendData(uint8_t *buff, size_t buff_size)
  */
 void LCD_SendSmallData(uint8_t data)
 {
-	LCD_Select();
+	LCD_CS_LOW();
 	LCD_DC_Set();
 	HAL_SPI_Transmit(&SpiHandle, &data, sizeof(data), HAL_MAX_DELAY);
-	LCD_UnSelect();
+	LCD_CS_HIGH();
 }
 
 

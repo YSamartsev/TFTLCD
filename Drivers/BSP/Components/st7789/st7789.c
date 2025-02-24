@@ -31,7 +31,7 @@ uint16_t disp_buf[ST7789_WIDTH * HOR_LEN];
 /*static void LCD_SendCommand(uint8_t cmd)
 {
 	LCD_Select();
-	LCD_DC_Clr();
+	LCD_DC_ReSet();
 	HAL_SPI_Transmit(&SpiHandle, &cmd, sizeof(cmd), HAL_MAX_DELAY);
 	LCD_UnSelect();
 } */
