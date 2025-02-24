@@ -9,7 +9,7 @@ extern FontDef Font_11x18;
 extern FontDef Font_16x26;
 extern const uint16_t saber;
 
-uint32_t bi;
+extern uint32_t bi;
 
 #ifdef USE_DMA
 #include <string.h>

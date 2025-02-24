@@ -82,6 +82,13 @@ EndDependencies */
 extern SPI_HandleTypeDef SpiHandle;
 extern LCD_DrvTypeDef   st7735_drv;
 
+extern FontDef Font_7x10;
+extern FontDef Font_11x18;
+extern FontDef Font_16x26;
+extern const uint16_t saber;
+
+uint32_t bi;
+
 /** @addtogroup BSP
   * @{
   */
@@ -181,15 +188,14 @@ uint8_t BSP_LCD_Init(void)
   lcd_drv->Init();
 	//ST7735_Init(); //Конфігурація драйвера ST7789 LCD
 	//ST7735_FillScreen(WHITE);
-	BSP_Fill_Color(WHITE);
+	LCD_Fill_Color(WHITE);
 
 #elif defined (TFT_LCD_7789)
 
 	ST7789_Init(); //Конфігурація драйвера ST7789 LCD
-	ST7789_Fill_Color(WHITE);
-	ST7789_Test();
+	LCD_Fill_Color(WHITE);
 #endif
-
+	LCD_Test();
 	HAL_Delay(10);
 	
 	//ST7789_Fill_Color(RED);
@@ -1085,7 +1091,7 @@ static void SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint1
  * @param color -> color to Fill with
  * @return none
  */
-void BSP_Fill_Color(uint16_t color)
+void LCD_Fill_Color(uint16_t color)
 {
 	uint16_t i = 0, j = 0, z = 0;
 #ifdef TFT_LCD_7789
@@ -1164,6 +1170,137 @@ static void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t
 	LCD_CS_HIGH();
 }
 
+void LCD_Test(void)
+{
+	LCD_Fill_Color(WHITE);
+		HAL_Delay(100);
+	LCD_WriteString(10, 10, "Font test.", Font_16x26, RED, WHITE);
+	LCD_Fill_Color(CYAN);
+		HAL_Delay(100);
+	LCD_Fill_Color(RED);
+    HAL_Delay(100);
+	LCD_Fill_Color(BLUE);
+    HAL_Delay(100);
+	LCD_Fill_Color(GREEN);
+    HAL_Delay(100);
+	LCD_Fill_Color(YELLOW);
+    HAL_Delay(100);
+	ST7789_Fill_Color(BROWN);
+    HAL_Delay(100);
+	LCD_Fill_Color(DARKBLUE);
+    HAL_Delay(100);
+	LCD_Fill_Color(MAGENTA);
+    HAL_Delay(100);
+	LCD_Fill_Color(LIGHTGREEN);
+    HAL_Delay(100);
+	LCD_Fill_Color(LGRAY);
+    HAL_Delay(100);
+	LCD_Fill_Color(LBBLUE);
+    HAL_Delay(100);
+	LCD_Fill_Color(WHITE);
+		HAL_Delay(100);
+
+	LCD_Fill_Color(RED);
+	LCD_WriteString(10, 10, "Rect./Line.", Font_11x18, YELLOW, BLACK);
+/*
+	LCD_DrawRectangle(30, 30, 100, 100, WHITE);
+		HAL_Delay(100);
+
+	LCD_Fill_Color(RED);
+	//ST7789_WriteString(10, 10, "Filled Rect.", Font_11x18, YELLOW, BLACK);
+	LCD_DrawFilledRectangle(30, 30, 50, 50, WHITE);
+		HAL_Delay(100);
+
+	LCD_Fill_Color(RED);
+	//ST7789_WriteString(10, 10, "Circle.", Font_11x18, YELLOW, BLACK);
+	LCD_DrawCircle(60, 60, 25, WHITE);
+		HAL_Delay(100);
+
+	LCD_Fill_Color(RED);
+	LCD_WriteString(10, 10, "Filled Cir.", Font_11x18, YELLOW, BLACK);
+	LCD_DrawFilledCircle(60, 60, 25, WHITE);
+		HAL_Delay(100);
+
+	LCD_Fill_Color(RED);
+	//ST7789_WriteString(10, 10, "Triangle", Font_11x18, YELLOW, BLACK);
+	LCD_DrawTriangle(30, 30, 30, 70, 60, 40, WHITE);
+		HAL_Delay(100);
+
+	LCD_Fill_Color(RED);
+	//ST7789_WriteString(10, 10, "Filled Tri", Font_11x18, YELLOW, BLACK);
+	LCD_DrawFilledTriangle(30, 30, 30, 70, 60, 40, WHITE);
+		HAL_Delay(100);
+
+	LCD_WriteString(10, 10, "Font test.", Font_16x26, GBLUE, WHITE);
+	LCD_WriteString(10, 50, "Hello Steve!", Font_7x10, RED, WHITE);
+	LCD_WriteString(10, 75, "Hello Steve!", Font_11x18, YELLOW, WHITE);
+*/	
+	LCD_WriteString(10, 100, "Hello Steve!", Font_16x26, MAGENTA, WHITE);
+		HAL_Delay(100);
+
+
+	//	If FLASH cannot storage anymore datas, please delete codes below.
+	LCD_Fill_Color(WHITE);
+	//LCD_DrawImage(0, 0, 128, 128, (uint16_t *)saber);
+		HAL_Delay(100);
+}
+
+void LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor)
+{
+	LCD_CS_LOW();
+#ifdef TFT_LCD_7789
+	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
+#elif defined (TFT_LCD_7735)
+	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
+#endif
+	
+	
+	while (*str) {
+		if (x + font.width >= LCD_WIDTH) {
+			x = 0;
+			y += font.height;
+			if (y + font.height >= LCD_HEIGHT) {
+				break;
+			}
+
+			if (*str == ' ') {
+				// skip spaces in the beginning of the new line
+				str++;
+				continue;
+			}
+		}
+		LCD_WriteChar(x, y, *str, font, color, bgcolor);
+		x += font.width;
+		str++;
+	}
+	LCD_CS_HIGH();
+}
+
+void LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t color, uint16_t bgcolor)
+{
+	uint32_t i, b, j;
+	LCD_CS_LOW();
+	LCD_SetAddressWindow(x, y, x + sfont.width - 1, y + sfont.height - 1);
+	
+	for (i = 0; i < sfont.height; i++) {
+		//b = font.data[(ch - 32) * font.height + i];
+		bi = sfont.data[(ch - 32) * sfont.height + i];
+		
+		for (j = 0; j < sfont.width; j++) {
+			if ((bi << j) & 0x8000) {
+				uint8_t data[] = {color >> 8, color & 0xFF};
+				LCD_SendData(data, sizeof(data));
+			}
+			else {
+				uint8_t data[] = {bgcolor >> 8, bgcolor & 0xFF};
+				LCD_SendData(data, sizeof(data));
+			}
+		}
+	}
+	LCD_CS_HIGH();
+}
 
 
 

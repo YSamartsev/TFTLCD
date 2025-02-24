@@ -163,104 +163,7 @@
           <Name>-U1439121E5418303030303032 -O2254 -SF10000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("ARM CoreSight SW-DP (ARM Core") -D00(1BA01477) -L00(0) -TO131091 -TC72000000 -TT10000000 -TP21 -TDS8023 -TDT0 -TDC1F -TIE1 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_128.FLM -FS08000000 -FL020000 -FP0($$Device:STM32F103C8$Flash\STM32F10x_128.FLM)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>184</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134218392</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_lcd.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\TFT_LCD\../Drivers/BSP/Adafruit_Shield/stm32_adafruit_lcd.c\184</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>193</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134218400</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_lcd.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\TFT_LCD\../Drivers/BSP/Adafruit_Shield/stm32_adafruit_lcd.c\193</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>1100</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134218202</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_lcd.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\TFT_LCD\../Drivers/BSP/Adafruit_Shield/stm32_adafruit_lcd.c\1100</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>1120</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134218278</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_lcd.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\TFT_LCD\../Drivers/BSP/Adafruit_Shield/stm32_adafruit_lcd.c\1120</Expression>
-        </Bp>
-        <Bp>
-          <Number>4</Number>
-          <Type>0</Type>
-          <LineNumber>1099</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134218192</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_lcd.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\TFT_LCD\../Drivers/BSP/Adafruit_Shield/stm32_adafruit_lcd.c\1099</Expression>
-        </Bp>
-        <Bp>
-          <Number>5</Number>
-          <Type>0</Type>
-          <LineNumber>1101</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_lcd.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -716,7 +619,7 @@
       <GroupNumber>7</GroupNumber>
       <FileNumber>27</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_lcd.c</PathWithFileName>
