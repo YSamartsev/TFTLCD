@@ -78,6 +78,7 @@
 #define  ST7735_LCD_PIXEL_WIDTH    ((uint16_t)128)
 #define  ST7735_LCD_PIXEL_HEIGHT   ((uint16_t)128)
 
+
 /** 
   * @brief  ST7735 Registers  
   */ 
@@ -164,11 +165,9 @@
 /** @defgroup ADAFRUIT_SPI_LCD_Exported_Functions
   * @{
   */ 
-void st7735_Init_old(void);
-	
-void     st7735_Init(void);
-uint16_t st7735_ReadID(void);
 
+uint16_t st7735_ReadID(void);
+void 		 st7735_Init(void);
 void     st7735_DisplayOn(void);
 void     st7735_DisplayOff(void);
 void     st7735_SetCursor(uint16_t Xpos, uint16_t Ypos);
@@ -302,7 +301,7 @@ void     LCD_Delay(uint32_t delay);
 #define ST7735_WHITE   0xFFFF
 void ST7735_Backlight_On(void);
 void ST7735_Backlight_Off(void);
-void ST7735_Init(void);
+
 void ST7735_DrawPixel(uint16_t x, uint16_t y, uint16_t color);
 void ST7735_DrawString(uint16_t x, uint16_t y, const char* str, FontDef font, uint16_t color, uint16_t bgcolor);
 void ST7735_FillRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);

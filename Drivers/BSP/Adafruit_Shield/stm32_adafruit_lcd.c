@@ -135,9 +135,9 @@ uint32_t bi;
 /** @defgroup STM32_ADAFRUIT_LCD_Private_Variables
   * @{
   */ 
-LCD_DrawPropTypeDef DrawProp;
+	LCD_DrawPropTypeDef DrawProp;
 
- LCD_DrvTypeDef  *lcd_drv; 
+	LCD_DrvTypeDef  *lcd_drv; 
 
 //SPI_HandleTypeDef LCD_SPI_PORT;
 
@@ -192,7 +192,7 @@ uint8_t BSP_LCD_Init(void)
 
 #elif defined (TFT_LCD_7789)
 
-	LCD_Init(); //Конфігурація драйвера ST7789 LCD
+	st7789_Init(); //Конфігурація драйвера ST7789 LCD
 	LCD_Fill_Color(WHITE);
 #endif
 	HAL_Delay(10);
@@ -1754,7 +1754,7 @@ void LCD_Test(void)
 
 	//	If FLASH cannot storage anymore datas, please delete codes below.
 	LCD_Fill_Color(LCD_WHITE);
-	LCD_DrawImage(0, 0, 128, 128, (uint16_t *)saber);
+	//LCD_DrawImage(0, 0, 128, 128, (uint16_t *)saber);
 		HAL_Delay(100);
 }
 

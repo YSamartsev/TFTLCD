@@ -334,7 +334,7 @@ printf("==================Start RTC Watch===================\n\r");
 /* Initialize the LCD */
 	BSP_LCD_Init(); //Спочатку через PA7 RESET, потім керується через Регістри
 	
-	
+		
  #ifdef TFT_LCD_7735	 
 	while (1)
 	{
