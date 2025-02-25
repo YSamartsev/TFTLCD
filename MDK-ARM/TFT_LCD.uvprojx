@@ -548,16 +548,16 @@
               <FileType>1</FileType>
               <FilePath>..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_lcd.c</FilePath>
             </File>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP\Adafruit_Shield\fonts.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Drivers/BSP/Components</GroupName>
           <Files>
-            <File>
-              <FileName>fonts.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Drivers\BSP\Components\st7789\fonts.c</FilePath>
-            </File>
             <File>
               <FileName>st7789.c</FileName>
               <FileType>1</FileType>

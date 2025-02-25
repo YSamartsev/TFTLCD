@@ -334,18 +334,18 @@ printf("==================Start RTC Watch===================\n\r");
 /* Initialize the LCD */
 	BSP_LCD_Init(); //Спочатку через PA7 RESET, потім керується через Регістри
 	
-		
+	
  #ifdef TFT_LCD_7735	 
 	while (1)
 	{
 
 		//st7735_DisplayOff();
-		ST7735_FillScreen(RED);
+		ST7735_FillScreen(LCD_RED);
 		   //char *myChar = "A";
 		   //ST7735_WriteChar(10, 20, *myChar, Font_16x26, WHITE, RED);
 		//ST7735_FillScreen(RED);
 		//st7735_DisplayOn();
-		ST7735_FillScreen(BLUE);
+		ST7735_FillScreen(LCD_BLUE);
 			//Display on TFT Images existing on SD card 
 			//Display on TFT Images existing on SD card 
 			//TFT_DisplayImages();
@@ -353,6 +353,7 @@ printf("==================Start RTC Watch===================\n\r");
 		//st7735_DisplayOn();
 		//T7735_FillScreen(ST7735_WHITE);
 		//HAL_Delay(500);
+		LCD_Test();
 } 
 #endif 
 
@@ -362,35 +363,35 @@ if (Bluetooth_present == SHIELD_DETECTED)
 		{
 			Error_Handler();
 		}
-		ST7789_WriteString(10, 180, myCommandAT.ATstring, Font_16x26, RED, WHITE);
-		ST7789_WriteString(10, 206, myAnswerAT.ATresponse, Font_16x26, RED, WHITE);
+		ST7789_WriteString(10, 180, myCommandAT.ATstring, Font_16x26, LCD_RED, LCD_WHITE);
+		ST7789_WriteString(10, 206, myAnswerAT.ATresponse, Font_16x26, LCD_RED, LCD_WHITE);
 		HAL_Delay(500);
 
 		if (myExchange(myCommandAT.ATversion, myAnswerAT.VESIONresponse) != SUCCESS)
 		{
 			Error_Handler();
 		}
-		ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); //Заповнюю екран білим кольором
+		ST7789_DrawFilledRectangle(0, 180, 240, 240, LCD_WHITE); //Заповнюю екран білим кольором
 	
-		ST7789_WriteString(10, 180, myCommandAT.ATversion, Font_16x26, RED, WHITE); 
-		ST7789_WriteString(10, 206, myAnswerAT.VESIONresponse, Font_16x26, RED, WHITE);
+		ST7789_WriteString(10, 180, myCommandAT.ATversion, Font_16x26, LCD_RED, LCD_WHITE); 
+		ST7789_WriteString(10, 206, myAnswerAT.VESIONresponse, Font_16x26, LCD_RED, LCD_WHITE);
 		HAL_Delay(500);
 
 		if (myExchange(myCommandAT.ATname, myAnswerAT.NAMEresponse) != SUCCESS)
 		{
 			Error_Handler();
 		}	
-		ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); 
-		ST7789_WriteString(10, 180, myCommandAT.ATname, Font_16x26, RED, WHITE);
-		ST7789_WriteString(10, 206, myAnswerAT.NAMEresponse, Font_16x26, RED, WHITE);
+		ST7789_DrawFilledRectangle(0, 180, 240, 240, LCD_WHITE); 
+		ST7789_WriteString(10, 180, myCommandAT.ATname, Font_16x26, LCD_RED, LCD_WHITE);
+		ST7789_WriteString(10, 206, myAnswerAT.NAMEresponse, Font_16x26, LCD_RED, LCD_WHITE);
 		HAL_Delay(500);
-		ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE);
+		ST7789_DrawFilledRectangle(0, 180, 240, 240, LCD_WHITE);
 		myAnswerAT.BLUETOOTH_shield = "BL present";
-		ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, RED, WHITE);
+		ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_RED, LCD_WHITE);
 	}else
 	{
 		myAnswerAT.BLUETOOTH_shield = "BL not present";
-		ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, RED, WHITE);
+		ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_RED, LCD_WHITE);
 	}
  
 	*aRxBuffer = 0x00;
@@ -400,8 +401,8 @@ if (Bluetooth_present == SHIELD_DETECTED)
     //SDCard_Config(); 
 		printf("===========AAAAAAAAAAAAA==============\n\r");
 
-		ST7789_WriteString(10, 20, "Real Date:", Font_16x26, RED, WHITE);	
-		ST7789_WriteString(10, 100, "Real Time:", Font_16x26, RED, WHITE);
+		ST7789_WriteString(10, 20, "Real Date:", Font_16x26, LCD_RED, LCD_WHITE);	
+		ST7789_WriteString(10, 100, "Real Time:", Font_16x26, LCD_RED, LCD_WHITE);
 	
 	  /* Configure RTC Alarm */
 		RTC_AlarmConfig(); //Для переривання через інтервал часу 
@@ -798,7 +799,7 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
 	printf("date = %s\n\r", temp1);
 		
-	ST7789_WriteString(x, y, temp1, Font_16x26, RED, WHITE);	 //& "." & realmonth
+	ST7789_WriteString(x, y, temp1, Font_16x26, LCD_RED, LCD_WHITE);	 //& "." & realmonth
 	//free(temp1);
 
 } 
@@ -827,7 +828,7 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	concat_time(temp1, realhours, reatminutes, reatseconds); //соединить строки -> *temp2
 	printf("time = %s\n\r", temp1);
 			
-	ST7789_WriteString(x, y, temp1, Font_16x26, RED, WHITE);	 //& "." & realmonth
+	ST7789_WriteString(x, y, temp1, Font_16x26, LCD_RED, LCD_WHITE);	 //& "." & realmonth
 	//free(temp1);
 
 } 

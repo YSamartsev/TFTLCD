@@ -141,6 +141,7 @@
  *If you want to use another color, you can choose one in RGB565 format.
  */
 
+/*
 #define WHITE       0xFFFF
 #define BLACK       0x0000
 #define BLUE        0x001F
@@ -162,7 +163,7 @@
 #define LIGHTGREEN  0X841F
 #define LGRAY       0XC618
 #define LGRAYBLUE   0XA651
-#define LBBLUE      0X2B12
+#define LBBLUE      0X2B12 */
 
 /* Control Registers and constant codes */
 #define ST7789_NOP     0x00

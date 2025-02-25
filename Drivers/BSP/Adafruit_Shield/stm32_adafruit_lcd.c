@@ -139,7 +139,7 @@ LCD_DrawPropTypeDef DrawProp;
 
  LCD_DrvTypeDef  *lcd_drv; 
 
-//SPI_HandleTypeDef ST7789_SPI_PORT;
+//SPI_HandleTypeDef LCD_SPI_PORT;
 
 //SPI_HandleTypeDef hnucleo_Spi;
 
@@ -183,22 +183,21 @@ uint8_t BSP_LCD_Init(void)
 #ifdef TFT_LCD_7735	
 	
 	lcd_drv = &st7735_drv;
-  //lcd_drv = &st7789_drv;
+  //lcd_drv = &LCD_drv;
   /* LCD Init */   
   lcd_drv->Init();
 	//ST7735_Init(); //Конфігурація драйвера ST7789 LCD
 	//ST7735_FillScreen(WHITE);
-	LCD_Fill_Color(WHITE);
+	LCD_Fill_Color(LCD_WHITE);
 
 #elif defined (TFT_LCD_7789)
 
-	ST7789_Init(); //Конфігурація драйвера ST7789 LCD
+	LCD_Init(); //Конфігурація драйвера ST7789 LCD
 	LCD_Fill_Color(WHITE);
 #endif
-	LCD_Test();
 	HAL_Delay(10);
 	
-	//ST7789_Fill_Color(RED);
+	//LCD_Fill_Color(RED);
   
   /* Initialize the font */
   BSP_LCD_SetFont(&LCD_DEFAULT_FONT);
@@ -304,8 +303,8 @@ void BSP_LCD_Clear(uint16_t Color)
   
   for(counter = 0; counter < 240; counter++) //T7789_WIDTH BSP_LCD_GetYSize(); counter++)
 	{
-    //BSP_LCD_DrawHLine(0, counter, 240); //ST7789_HEIGHT BSP_LCD_GetXSize());
-		ST7789_DrawLine(0, counter, 239, counter, LCD_COLOR_WHITE);
+    //BSP_LCD_DrawHLine(0, counter, 240); //LCD_HEIGHT BSP_LCD_GetXSize());
+		LCD_DrawLine(0, counter, 239, counter, LCD_WHITE);
   }
   DrawProp.TextColor = color_backup; 
   BSP_LCD_SetTextColor(DrawProp.TextColor);
@@ -450,7 +449,7 @@ void BSP_LCD_DrawHLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length)
 {
   uint32_t index = 0;
 
-	//ST7789_DrawLine(Xpos, Ypos, 240 - 1, 240 - 1, DrawProp.TextColor)
+	//LCD_DrawLine(Xpos, Ypos, 240 - 1, 240 - 1, DrawProp.TextColor)
 
   
   if(lcd_drv->DrawHLine != NULL)
@@ -1095,8 +1094,8 @@ void LCD_Fill_Color(uint16_t color)
 {
 	uint16_t i = 0, j = 0, z = 0;
 #ifdef TFT_LCD_7789
-	uint16_t	LCD_WIDTH = ST7789_WIDTH;
-	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
+	uint16_t	LCD_WIDTH = LCD_WIDTH;
+	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
 #elif defined (TFT_LCD_7735)
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
@@ -1106,7 +1105,7 @@ void LCD_Fill_Color(uint16_t color)
 	LCD_CS_LOW();
 
 	#ifdef USE_DMA
-		for (i = 0; i < ST7789_HEIGHT / HOR_LEN; i++)
+		for (i = 0; i < LCD_HEIGHT / HOR_LEN; i++)
 		{
 			memset(disp_buf, color, sizeof(disp_buf));
 			LCD_SendData(disp_buf, sizeof(disp_buf));
@@ -1134,20 +1133,20 @@ static void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t
 
 #ifdef TFT_LCD_7789	
 	/* Column Address set */
-	LCD_SendCommand(ST7789_CASET); 
+	LCD_SendCommand(LCD_CASET); 
 	{
 		uint8_t data[] = {x_start >> 8, x_start & 0xFF, x_end >> 8, x_end & 0xFF};
 		LCD_SendData(data, sizeof(data));
 	}
 
 	/* Row Address set */
-	LCD_SendCommand(ST7789_RASET);
+	LCD_SendCommand(LCD_RASET);
 	{
 		uint8_t data[] = {y_start >> 8, y_start & 0xFF, y_end >> 8, y_end & 0xFF};
 		LCD_SendData(data, sizeof(data));
 	}
 	/* Write to RAM */
-	LCD_SendCommand(ST7789_RAMWR);
+	LCD_SendCommand(LCD_RAMWR);
 #elif defined TFT_LCD_7735
 		/* Column Address set */
 	LCD_SendCommand(ST7735_CASET); 
@@ -1170,114 +1169,257 @@ static void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t
 	LCD_CS_HIGH();
 }
 
-void LCD_Test(void)
+/**
+ * @brief Draw a Pixel
+ * @param x&y -> coordinate to Draw
+ * @param color -> color of the Pixel
+ * @return none
+ */
+void LCD_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
 {
-	LCD_Fill_Color(WHITE);
-		HAL_Delay(100);
-	LCD_WriteString(10, 10, "Font test.", Font_16x26, RED, WHITE);
-	LCD_Fill_Color(CYAN);
-		HAL_Delay(100);
-	LCD_Fill_Color(RED);
-    HAL_Delay(100);
-	LCD_Fill_Color(BLUE);
-    HAL_Delay(100);
-	LCD_Fill_Color(GREEN);
-    HAL_Delay(100);
-	LCD_Fill_Color(YELLOW);
-    HAL_Delay(100);
-	ST7789_Fill_Color(BROWN);
-    HAL_Delay(100);
-	LCD_Fill_Color(DARKBLUE);
-    HAL_Delay(100);
-	LCD_Fill_Color(MAGENTA);
-    HAL_Delay(100);
-	LCD_Fill_Color(LIGHTGREEN);
-    HAL_Delay(100);
-	LCD_Fill_Color(LGRAY);
-    HAL_Delay(100);
-	LCD_Fill_Color(LBBLUE);
-    HAL_Delay(100);
-	LCD_Fill_Color(WHITE);
-		HAL_Delay(100);
-
-	LCD_Fill_Color(RED);
-	LCD_WriteString(10, 10, "Rect./Line.", Font_11x18, YELLOW, BLACK);
-/*
-	LCD_DrawRectangle(30, 30, 100, 100, WHITE);
-		HAL_Delay(100);
-
-	LCD_Fill_Color(RED);
-	//ST7789_WriteString(10, 10, "Filled Rect.", Font_11x18, YELLOW, BLACK);
-	LCD_DrawFilledRectangle(30, 30, 50, 50, WHITE);
-		HAL_Delay(100);
-
-	LCD_Fill_Color(RED);
-	//ST7789_WriteString(10, 10, "Circle.", Font_11x18, YELLOW, BLACK);
-	LCD_DrawCircle(60, 60, 25, WHITE);
-		HAL_Delay(100);
-
-	LCD_Fill_Color(RED);
-	LCD_WriteString(10, 10, "Filled Cir.", Font_11x18, YELLOW, BLACK);
-	LCD_DrawFilledCircle(60, 60, 25, WHITE);
-		HAL_Delay(100);
-
-	LCD_Fill_Color(RED);
-	//ST7789_WriteString(10, 10, "Triangle", Font_11x18, YELLOW, BLACK);
-	LCD_DrawTriangle(30, 30, 30, 70, 60, 40, WHITE);
-		HAL_Delay(100);
-
-	LCD_Fill_Color(RED);
-	//ST7789_WriteString(10, 10, "Filled Tri", Font_11x18, YELLOW, BLACK);
-	LCD_DrawFilledTriangle(30, 30, 30, 70, 60, 40, WHITE);
-		HAL_Delay(100);
-
-	LCD_WriteString(10, 10, "Font test.", Font_16x26, GBLUE, WHITE);
-	LCD_WriteString(10, 50, "Hello Steve!", Font_7x10, RED, WHITE);
-	LCD_WriteString(10, 75, "Hello Steve!", Font_11x18, YELLOW, WHITE);
-*/	
-	LCD_WriteString(10, 100, "Hello Steve!", Font_16x26, MAGENTA, WHITE);
-		HAL_Delay(100);
-
-
-	//	If FLASH cannot storage anymore datas, please delete codes below.
-	LCD_Fill_Color(WHITE);
-	//LCD_DrawImage(0, 0, 128, 128, (uint16_t *)saber);
-		HAL_Delay(100);
-}
-
-void LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor)
-{
-	LCD_CS_LOW();
 #ifdef TFT_LCD_7789
-	uint16_t	LCD_WIDTH = ST7789_WIDTH;
-	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
+	uint16_t	LCD_WIDTH = LCD_WIDTH;
+	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
 #elif defined (TFT_LCD_7735)
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
 #endif
-	
-	
-	while (*str) {
-		if (x + font.width >= LCD_WIDTH) {
-			x = 0;
-			y += font.height;
-			if (y + font.height >= LCD_HEIGHT) {
-				break;
-			}
 
-			if (*str == ' ') {
-				// skip spaces in the beginning of the new line
-				str++;
-				continue;
-			}
+	if ((x < 0) || (x >= LCD_WIDTH) ||
+		 (y < 0) || (y >= LCD_HEIGHT))	return;
+	
+	LCD_SetAddressWindow(x, y, x, y);
+	uint8_t data[] = {color >> 8, color & 0xFF};
+	LCD_CS_LOW();
+	LCD_SendData(data, sizeof(data));
+	LCD_CS_HIGH();
+}
+
+/**
+ * @brief Fill an Area with single color
+ * @param xSta&ySta -> coordinate of the start point
+ * @param xEnd&yEnd -> coordinate of the end point
+ * @param color -> color to Fill with
+ * @return none
+ */
+void LCD_Fill(uint16_t xSta, uint16_t ySta, uint16_t xEnd, uint16_t yEnd, uint16_t color)
+{
+#ifdef TFT_LCD_7789
+	uint16_t	LCD_WIDTH = LCD_WIDTH;
+	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
+#elif defined (TFT_LCD_7735)
+	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
+#endif
+
+	if ((xEnd < 0) || (xEnd >= LCD_WIDTH) ||
+		 (yEnd < 0) || (yEnd >= LCD_HEIGHT))	return;
+	LCD_CS_LOW();
+	uint16_t i, j;
+	LCD_SetAddressWindow(xSta, ySta, xEnd, yEnd);
+	for (i = ySta; i <= yEnd; i++)
+		for (j = xSta; j <= xEnd; j++) {
+			uint8_t data[] = {color >> 8, color & 0xFF};
+			LCD_SendData(data, sizeof(data));
 		}
-		LCD_WriteChar(x, y, *str, font, color, bgcolor);
-		x += font.width;
-		str++;
+	LCD_CS_HIGH();
+}
+
+/**
+ * @brief Draw a big Pixel at a point
+ * @param x&y -> coordinate of the point
+ * @param color -> color of the Pixel
+ * @return none
+ */
+void LCD_DrawPixel_4px(uint16_t x, uint16_t y, uint16_t color)
+{
+#ifdef TFT_LCD_7789
+	uint16_t	LCD_WIDTH = LCD_WIDTH;
+	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
+#elif defined (TFT_LCD_7735)
+	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
+#endif
+
+	if ((x <= 0) || (x > LCD_WIDTH) ||
+		 (y <= 0) || (y > LCD_HEIGHT))	return;
+	LCD_CS_LOW();
+	LCD_Fill(x - 1, y - 1, x + 1, y + 1, color);
+	LCD_CS_HIGH();
+}
+
+/**
+ * @brief Draw a line with single color
+ * @param x1&y1 -> coordinate of the start point
+ * @param x2&y2 -> coordinate of the end point
+ * @param color -> color of the line to Draw
+ * @return none
+ */
+void LCD_DrawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color) {
+	uint16_t swap;
+    uint16_t steep = ABS(y1 - y0) > ABS(x1 - x0);
+    if (steep) {
+		swap = x0;
+		x0 = y0;
+		y0 = swap;
+
+		swap = x1;
+		x1 = y1;
+		y1 = swap;
+        //_swap_int16_t(x0, y0);
+        //_swap_int16_t(x1, y1);
+    }
+
+    if (x0 > x1) {
+		swap = x0;
+		x0 = x1;
+		x1 = swap;
+
+		swap = y0;
+		y0 = y1;
+		y1 = swap;
+        //_swap_int16_t(x0, x1);
+        //_swap_int16_t(y0, y1);
+    }
+
+    int16_t dx, dy;
+    dx = x1 - x0;
+    dy = ABS(y1 - y0);
+
+    int16_t err = dx / 2;
+    int16_t ystep;
+
+    if (y0 < y1) {
+        ystep = 1;
+    } else {
+        ystep = -1;
+    }
+
+    for (; x0<=x1; x0++) {
+        if (steep) {
+            LCD_DrawPixel(y0, x0, color);
+        } else {
+            LCD_DrawPixel(x0, y0, color);
+        }
+        err -= dy;
+        if (err < 0) {
+            y0 += ystep;
+            err += dx;
+        }
+    }
+}
+
+/**
+ * @brief Draw a Rectangle with single color
+ * @param xi&yi -> 2 coordinates of 2 top points.
+ * @param color -> color of the Rectangle line
+ * @return none
+ */
+void LCD_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)
+{
+	LCD_CS_LOW();
+	LCD_DrawLine(x1, y1, x2, y1, color);
+	LCD_DrawLine(x1, y1, x1, y2, color);
+	LCD_DrawLine(x1, y2, x2, y2, color);
+	LCD_DrawLine(x2, y1, x2, y2, color);
+	LCD_CS_HIGH();
+}
+
+/** 
+ * @brief Draw a circle with single color
+ * @param x0&y0 -> coordinate of circle center
+ * @param r -> radius of circle
+ * @param color -> color of circle line
+ * @return  none
+ */
+void LCD_DrawCircle(uint16_t x0, uint16_t y0, uint8_t r, uint16_t color)
+{
+	int16_t f = 1 - r;
+	int16_t ddF_x = 1;
+	int16_t ddF_y = -2 * r;
+	int16_t x = 0;
+	int16_t y = r;
+
+	LCD_CS_LOW();
+	LCD_DrawPixel(x0, y0 + r, color);
+	LCD_DrawPixel(x0, y0 - r, color);
+	LCD_DrawPixel(x0 + r, y0, color);
+	LCD_DrawPixel(x0 - r, y0, color);
+
+	while (x < y) {
+		if (f >= 0) {
+			y--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x++;
+		ddF_x += 2;
+		f += ddF_x;
+
+		LCD_DrawPixel(x0 + x, y0 + y, color);
+		LCD_DrawPixel(x0 - x, y0 + y, color);
+		LCD_DrawPixel(x0 + x, y0 - y, color);
+		LCD_DrawPixel(x0 - x, y0 - y, color);
+
+		LCD_DrawPixel(x0 + y, y0 + x, color);
+		LCD_DrawPixel(x0 - y, y0 + x, color);
+		LCD_DrawPixel(x0 + y, y0 - x, color);
+		LCD_DrawPixel(x0 - y, y0 - x, color);
 	}
 	LCD_CS_HIGH();
 }
 
+/**
+ * @brief Draw an Image on the screen
+ * @param x&y -> start point of the Image
+ * @param w&h -> width & height of the Image to Draw
+ * @param data -> pointer of the Image array
+ * @return none
+ */
+void LCD_DrawImage(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t *data)
+{
+#ifdef TFT_LCD_7789
+	uint16_t	LCD_WIDTH = LCD_WIDTH;
+	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
+#elif defined (TFT_LCD_7735)
+	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
+#endif
+
+	if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT))
+		return;
+	if ((x + w - 1) >= LCD_WIDTH)
+		return;
+	if ((y + h - 1) >= LCD_HEIGHT)
+		return;
+
+	LCD_CS_LOW();
+	LCD_SetAddressWindow(x, y, x + w - 1, y + h - 1);
+	LCD_SendData((uint8_t *)data, sizeof(uint16_t) * w * h);
+	LCD_CS_HIGH();
+}
+
+/**
+ * @brief Invert Fullscreen color
+ * @param invert -> Whether to invert
+ * @return none
+ */
+void LCD_InvertColors(uint8_t invert)
+{
+	LCD_CS_LOW();
+	LCD_SendCommand(invert ? 0x21 /* INVON */ : 0x20 /* INVOFF */);
+	LCD_CS_HIGH();
+}
+
+/** 
+ * @brief Write a char
+ * @param  x&y -> cursor of the start point.
+ * @param ch -> char to write
+ * @param font -> fontstyle of the string
+ * @param color -> color of the char
+ * @param bgcolor -> background color of the char
+ * @return  none
+ */
 void LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t color, uint16_t bgcolor)
 {
 	uint32_t i, b, j;
@@ -1302,6 +1444,319 @@ void LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t colo
 	LCD_CS_HIGH();
 }
 
+/** 
+ * @brief Write a string 
+ * @param  x&y -> cursor of the start point.
+ * @param str -> string to write
+ * @param font -> fontstyle of the string
+ * @param color -> color of the string
+ * @param bgcolor -> background color of the string
+ * @return  none
+ */
+void LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor)
+{
+#ifdef TFT_LCD_7789
+	uint16_t	LCD_WIDTH = LCD_WIDTH;
+	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
+#elif defined (TFT_LCD_7735)
+	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
+#endif
+	
+	LCD_CS_LOW();
+	while (*str) {
+		if (x + font.width >= LCD_WIDTH) {
+			x = 0;
+			y += font.height;
+			if (y + font.height >= LCD_HEIGHT) {
+				break;
+			}
+
+			if (*str == ' ') {
+				// skip spaces in the beginning of the new line
+				str++;
+				continue;
+			}
+		}
+		LCD_WriteChar(x, y, *str, font, color, bgcolor);
+		x += font.width;
+		str++;
+	}
+	LCD_CS_HIGH();
+}
+
+/** 
+ * @brief Draw a filled Rectangle with single color
+ * @param  x&y -> coordinates of the starting point
+ * @param w&h -> width & height of the Rectangle
+ * @param color -> color of the Rectangle
+ * @return  none
+ */
+void LCD_DrawFilledRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color)
+{
+#ifdef TFT_LCD_7789
+	uint16_t	LCD_WIDTH = LCD_WIDTH;
+	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
+#elif defined (TFT_LCD_7735)
+	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
+#endif
+
+	LCD_CS_LOW();
+	uint8_t i;
+
+	/* Check input parameters */
+	if (x >= LCD_WIDTH ||
+		y >= LCD_HEIGHT) {
+		/* Return error */
+		return;
+	}
+
+	/* Check width and height */
+	if ((x + w) >= LCD_WIDTH) {
+		w = LCD_WIDTH - x;
+	}
+	if ((y + h) >= LCD_HEIGHT) {
+		h = LCD_HEIGHT - y;
+	}
+
+	/* Draw lines */
+	for (i = 0; i <= h; i++) {
+		/* Draw lines */
+		LCD_DrawLine(x, y + i, x + w, y + i, color);
+	}
+	LCD_CS_HIGH();
+}
+
+/** 
+ * @brief Draw a Triangle with single color
+ * @param  xi&yi -> 3 coordinates of 3 top points.
+ * @param color ->color of the lines
+ * @return  none
+ */
+void LCD_DrawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color)
+{
+	LCD_CS_LOW();
+	/* Draw lines */
+	LCD_DrawLine(x1, y1, x2, y2, color);
+	LCD_DrawLine(x2, y2, x3, y3, color);
+	LCD_DrawLine(x3, y3, x1, y1, color);
+	LCD_CS_HIGH();
+}
+
+/** 
+ * @brief Draw a filled Triangle with single color
+ * @param  xi&yi -> 3 coordinates of 3 top points.
+ * @param color ->color of the triangle
+ * @return  none
+ */
+void LCD_DrawFilledTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color)
+{
+	LCD_CS_LOW();
+	int16_t deltax = 0, deltay = 0, x = 0, y = 0, xinc1 = 0, xinc2 = 0,
+			yinc1 = 0, yinc2 = 0, den = 0, num = 0, numadd = 0, numpixels = 0,
+			curpixel = 0;
+
+	deltax = ABS(x2 - x1);
+	deltay = ABS(y2 - y1);
+	x = x1;
+	y = y1;
+
+	if (x2 >= x1) {
+		xinc1 = 1;
+		xinc2 = 1;
+	}
+	else {
+		xinc1 = -1;
+		xinc2 = -1;
+	}
+
+	if (y2 >= y1) {
+		yinc1 = 1;
+		yinc2 = 1;
+	}
+	else {
+		yinc1 = -1;
+		yinc2 = -1;
+	}
+
+	if (deltax >= deltay) {
+		xinc1 = 0;
+		yinc2 = 0;
+		den = deltax;
+		num = deltax / 2;
+		numadd = deltay;
+		numpixels = deltax;
+	}
+	else {
+		xinc2 = 0;
+		yinc1 = 0;
+		den = deltay;
+		num = deltay / 2;
+		numadd = deltax;
+		numpixels = deltay;
+	}
+
+	for (curpixel = 0; curpixel <= numpixels; curpixel++) {
+		LCD_DrawLine(x, y, x3, y3, color);
+
+		num += numadd;
+		if (num >= den) {
+			num -= den;
+			x += xinc1;
+			y += yinc1;
+		}
+		x += xinc2;
+		y += yinc2;
+	}
+	LCD_CS_HIGH();
+}
+
+/** 
+ * @brief Draw a Filled circle with single color
+ * @param x0&y0 -> coordinate of circle center
+ * @param r -> radius of circle
+ * @param color -> color of circle
+ * @return  none
+ */
+void LCD_DrawFilledCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
+{
+	LCD_CS_LOW();
+	int16_t f = 1 - r;
+	int16_t ddF_x = 1;
+	int16_t ddF_y = -2 * r;
+	int16_t x = 0;
+	int16_t y = r;
+
+	LCD_DrawPixel(x0, y0 + r, color);
+	LCD_DrawPixel(x0, y0 - r, color);
+	LCD_DrawPixel(x0 + r, y0, color);
+	LCD_DrawPixel(x0 - r, y0, color);
+	LCD_DrawLine(x0 - r, y0, x0 + r, y0, color);
+
+	while (x < y) {
+		if (f >= 0) {
+			y--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x++;
+		ddF_x += 2;
+		f += ddF_x;
+
+		LCD_DrawLine(x0 - x, y0 + y, x0 + x, y0 + y, color);
+		LCD_DrawLine(x0 + x, y0 - y, x0 - x, y0 - y, color);
+
+		LCD_DrawLine(x0 + y, y0 + x, x0 - y, y0 + x, color);
+		LCD_DrawLine(x0 + y, y0 - x, x0 - y, y0 - x, color);
+	}
+	LCD_CS_HIGH();
+}
+
+
+/**
+ * @brief Open/Close tearing effect line
+ * @param tear -> Whether to tear
+ * @return none
+ */
+void LCD_TearEffect(uint8_t tear)
+{
+	LCD_CS_LOW();
+	LCD_SendCommand(tear ? 0x35 /* TEON */ : 0x34 /* TEOFF */);
+	LCD_CS_HIGH();
+}
+
+void LCD_Test(void)
+{
+	LCD_Fill_Color(LCD_WHITE);
+	HAL_Delay(100);
+	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_16x26, LCD_RED, LCD_WHITE);
+	HAL_Delay(100);
+	LCD_Fill_Color(LCD_WHITE);
+	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_11x18, LCD_RED, LCD_WHITE);
+	HAL_Delay(100);
+	LCD_Fill_Color(LCD_WHITE);
+	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_7x10, LCD_RED, LCD_WHITE);
+	HAL_Delay(100);
+	LCD_Fill_Color(LCD_WHITE);
+	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_16x26, LCD_RED, LCD_WHITE);
+	HAL_Delay(100);
+	LCD_Fill_Color(LCD_WHITE);
+	HAL_Delay(100);
+	
+	LCD_Fill_Color(LCD_CYAN);
+		HAL_Delay(100);
+	LCD_Fill_Color(LCD_RED);
+    HAL_Delay(100);
+	LCD_Fill_Color(LCD_BLUE);
+    HAL_Delay(100);
+	LCD_Fill_Color(LCD_GREEN);
+    HAL_Delay(100);
+	LCD_Fill_Color(LCD_YELLOW);
+    HAL_Delay(100);
+	LCD_Fill_Color(LCD_BROWN);
+    HAL_Delay(100);
+	LCD_Fill_Color(LCD_DARKBLUE);
+    HAL_Delay(100);
+	LCD_Fill_Color(LCD_MAGENTA);
+    HAL_Delay(100);
+	LCD_Fill_Color(LCD_LIGHTGREEN);
+    HAL_Delay(100);
+	LCD_Fill_Color(LCD_LGRAY);
+    HAL_Delay(100);
+	LCD_Fill_Color(LCD_LBBLUE);
+    HAL_Delay(100);
+	LCD_Fill_Color(LCD_WHITE);
+		HAL_Delay(100);
+
+	LCD_Fill_Color(LCD_RED);
+	LCD_WriteString(10, 10, "Rect./Line.", Font_11x18, LCD_YELLOW, LCD_RED);
+
+	LCD_DrawRectangle(30, 30, 100, 100, LCD_WHITE);
+		HAL_Delay(100);
+	LCD_Fill_Color(LCD_RED);
+	
+	LCD_DrawFilledRectangle(30, 30, 50, 50, LCD_WHITE);
+		HAL_Delay(100);
+	LCD_Fill_Color(LCD_RED);
+	
+	LCD_DrawCircle(60, 60, 25, LCD_WHITE);
+		HAL_Delay(100);
+
+	LCD_Fill_Color(LCD_RED);
+	LCD_WriteString(10, 10, "Filled Cir.", Font_11x18, LCD_YELLOW, LCD_RED);
+		HAL_Delay(100);
+	LCD_Fill_Color(LCD_RED);
+	
+	LCD_DrawFilledCircle(60, 60, 25, LCD_WHITE);
+		HAL_Delay(100);
+	LCD_Fill_Color(LCD_RED);
+	
+	//LCD_WriteString(10, 10, "Triangle", Font_11x18, YELLOW, BLACK);
+	LCD_DrawTriangle(30, 30, 30, 70, 60, 40, LCD_WHITE);
+		HAL_Delay(100);
+	LCD_Fill_Color(LCD_RED);
+	
+	//LCD_WriteString(10, 10, "Filled Tri", Font_11x18, YELLOW, BLACK);
+	LCD_DrawFilledTriangle(30, 30, 30, 70, 60, 40, LCD_WHITE);
+		HAL_Delay(100);
+	LCD_Fill_Color(LCD_RED);
+
+	LCD_WriteString(10, 10, "Hello Steve", Font_16x26, LCD_GBLUE, LCD_WHITE);
+		HAL_Delay(100);
+	LCD_Fill_Color(LCD_RED);
+	LCD_WriteString(10, 50, "Hello Steve!", Font_7x10, LCD_RED, LCD_WHITE);
+		HAL_Delay(100);
+	LCD_Fill_Color(LCD_RED);
+	LCD_WriteString(10, 75, "Hello Steve!", Font_11x18, LCD_YELLOW, LCD_WHITE);
+		HAL_Delay(100);
+
+
+	//	If FLASH cannot storage anymore datas, please delete codes below.
+	LCD_Fill_Color(LCD_WHITE);
+	LCD_DrawImage(0, 0, 128, 128, (uint16_t *)saber);
+		HAL_Delay(100);
+}
 
 
 /**
