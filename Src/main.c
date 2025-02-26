@@ -358,7 +358,7 @@ printf("==================Start RTC Watch===================\n\r");
 	HAL_Delay(100);
 	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_16x26, LCD_RED, LCD_WHITE);
 	HAL_Delay(1000);	
-		//LCD_Test();
+	LCD_Test();
 } 
 #endif 
 

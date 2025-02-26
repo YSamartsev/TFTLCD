@@ -645,25 +645,6 @@ void LCD_IO_Init(void)
 	LCD_RST_HIGH(); //Піднімаю RST
 }
 
-/**
-  * @brief  Write command to select the LCD register.
-  * @param  LCDReg: Address of the selected register.
-  * @retval None
-  */
-void LCD_IO_WriteReg(uint8_t LCDReg)
-{
-  /* Reset LCD control line CS */
-  LCD_CS_LOW();
-  
-  /* Set LCD data/command line DC to Low */
-  LCD_DC_LOW();
-    
-  /* Send Command */
-  SPIx_Write(LCDReg);
-  
-  /* Deselect : Chip Select high */
-  LCD_CS_HIGH();
-}
 
 /**
 * @brief  Write register value.

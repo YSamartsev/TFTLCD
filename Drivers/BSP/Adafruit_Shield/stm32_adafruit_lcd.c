@@ -1749,13 +1749,12 @@ void LCD_Test(void)
 		HAL_Delay(100);
 	LCD_Fill_Color(LCD_RED);
 	LCD_WriteString(10, 75, "Hello Steve!", Font_11x18, LCD_YELLOW, LCD_WHITE);
-		HAL_Delay(100);
-
+		HAL_Delay(1000);
 
 	//	If FLASH cannot storage anymore datas, please delete codes below.
 	LCD_Fill_Color(LCD_WHITE);
-	//LCD_DrawImage(0, 0, 128, 128, (uint16_t *)saber);
-		HAL_Delay(100);
+	LCD_DrawImage(0, 0, 128, 128, &saber);
+	HAL_Delay(1000);
 }
 
 
