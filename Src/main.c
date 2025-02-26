@@ -335,32 +335,32 @@ printf("==================Start RTC Watch===================\n\r");
 	BSP_LCD_Init(); //Спочатку через PA7 RESET, потім керується через Регістри
 	
 		
- #ifdef TFT_LCD_7735	 
+
+#ifdef TFT_LCD_7789
+	FontDef Font_Size = ont_16x26;
+#elif defined (TFT_LCD_7735)
+	FontDef Font_Size = Font_11x18;
+	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
+#endif
+	
+	
+	
+/*	
 	while (1)
 	{
-
-		//st7735_DisplayOff();
 		ST7735_FillScreen(LCD_RED);
-		   //char *myChar = "A";
-		   //ST7735_WriteChar(10, 20, *myChar, Font_16x26, WHITE, RED);
-		//ST7735_FillScreen(RED);
-		//st7735_DisplayOn();
 		ST7735_FillScreen(LCD_BLUE);
-			//Display on TFT Images existing on SD card 
-			//Display on TFT Images existing on SD card 
-			//TFT_DisplayImages();
 		HAL_Delay(10);
-		//st7735_DisplayOn();
-		//T7735_FillScreen(ST7735_WHITE);
-		//HAL_Delay(500);
-		
-	LCD_Fill_Color(LCD_WHITE);
-	HAL_Delay(100);
-	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_16x26, LCD_RED, LCD_WHITE);
-	HAL_Delay(1000);	
-	LCD_Test();
-} 
+		LCD_Fill_Color(LCD_WHITE);
+		HAL_Delay(100);
+		LCD_WriteString(10, 10, "11:28 20.02.2025", Font_16x26, LCD_RED, LCD_WHITE);
+		HAL_Delay(1000);	
+		LCD_Test();
+	} 
 #endif 
+*/
+LCD_WriteString(10, 10, "11:28 20.02.2025", Font_Size, LCD_RED, LCD_WHITE);
 
 if (Bluetooth_present == SHIELD_DETECTED)
 	{
@@ -368,35 +368,51 @@ if (Bluetooth_present == SHIELD_DETECTED)
 		{
 			Error_Handler();
 		}
-		ST7789_WriteString(10, 180, myCommandAT.ATstring, Font_16x26, LCD_RED, LCD_WHITE);
-		ST7789_WriteString(10, 206, myAnswerAT.ATresponse, Font_16x26, LCD_RED, LCD_WHITE);
+		//LCD_WriteString(10, 180, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
+
+		//LCD_WriteString(10, 206, myAnswerAT.ATresponse, Font_Size, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.ATresponse, Font_Size, LCD_RED, LCD_WHITE);
 		HAL_Delay(500);
 
 		if (myExchange(myCommandAT.ATversion, myAnswerAT.VESIONresponse) != SUCCESS)
 		{
 			Error_Handler();
 		}
-		ST7789_DrawFilledRectangle(0, 180, 240, 240, LCD_WHITE); //Заповнюю екран білим кольором
+		ST7789_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
 	
-		ST7789_WriteString(10, 180, myCommandAT.ATversion, Font_16x26, LCD_RED, LCD_WHITE); 
-		ST7789_WriteString(10, 206, myAnswerAT.VESIONresponse, Font_16x26, LCD_RED, LCD_WHITE);
+		//LCD_WriteString(10, 180, myCommandAT.ATversion, Font_16x26, LCD_RED, LCD_WHITE); 
+		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATversion, Font_Size, LCD_RED, LCD_WHITE);
+		
+		//LCD_WriteString(10, 206, myAnswerAT.VESIONresponse, Font_16x26, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.VESIONresponse, Font_Size, LCD_RED, LCD_WHITE);
 		HAL_Delay(500);
 
 		if (myExchange(myCommandAT.ATname, myAnswerAT.NAMEresponse) != SUCCESS)
 		{
 			Error_Handler();
 		}	
-		ST7789_DrawFilledRectangle(0, 180, 240, 240, LCD_WHITE); 
-		ST7789_WriteString(10, 180, myCommandAT.ATname, Font_16x26, LCD_RED, LCD_WHITE);
-		ST7789_WriteString(10, 206, myAnswerAT.NAMEresponse, Font_16x26, LCD_RED, LCD_WHITE);
+		
+		ST7789_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
+				
+		//LCD_WriteString(10, 180, myCommandAT.ATname, Font_16x26, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATname, Font_Size, LCD_RED, LCD_WHITE);
+		
+		
+		//LCD_WriteString(10, 206, myAnswerAT.NAMEresponse, Font_16x26, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.NAMEresponse, Font_Size, LCD_RED, LCD_WHITE);
+		
 		HAL_Delay(500);
-		ST7789_DrawFilledRectangle(0, 180, 240, 240, LCD_WHITE);
+		ST7789_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
+		
 		myAnswerAT.BLUETOOTH_shield = "BL present";
-		ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_RED, LCD_WHITE);
+		//LCD_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield, Font_Size, LCD_RED, LCD_WHITE);
 	}else
 	{
 		myAnswerAT.BLUETOOTH_shield = "BL not present";
-		ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_RED, LCD_WHITE);
+		//LCD_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield, Font_Size, LCD_RED, LCD_WHITE);
 	}
  
 	*aRxBuffer = 0x00;
@@ -406,8 +422,8 @@ if (Bluetooth_present == SHIELD_DETECTED)
     //SDCard_Config(); 
 		printf("===========AAAAAAAAAAAAA==============\n\r");
 
-		ST7789_WriteString(10, 20, "Real Date:", Font_16x26, LCD_RED, LCD_WHITE);	
-		ST7789_WriteString(10, 100, "Real Time:", Font_16x26, LCD_RED, LCD_WHITE);
+		LCD_WriteString(10, 20, "Real Date:", Font_16x26, LCD_RED, LCD_WHITE);	
+		LCD_WriteString(10, 100, "Real Time:", Font_16x26, LCD_RED, LCD_WHITE);
 	
 	  /* Configure RTC Alarm */
 		RTC_AlarmConfig(); //Для переривання через інтервал часу 
