@@ -132,7 +132,7 @@ static uint16_t ArrayRGB[320] = {0};
   * @retval None
   */
 
-void st7735_Init_new(void)
+void st7735_Init(void)
 {    
   uint8_t data = 0;
   
@@ -142,6 +142,117 @@ void st7735_Init_new(void)
 	HAL_Delay(10);
   LCD_RESET_SET(); //Скинути і встановити
 
+	LCD_SendCommand(ST7735_SWRESET); 
+HAL_Delay(150);
+
+	LCD_SendCommand(ST7735_SLPOUT); 
+HAL_Delay(255);
+
+	LCD_SendCommand(ST7735_FRMCTR1);
+{
+	uint8_t data1[] = {0x01, 0x2C, 0x2D};
+	LCD_SendData(data1, sizeof(data1));
+}
+
+
+	LCD_SendCommand(ST7735_FRMCTR2);
+{
+	uint8_t data1[] = {0x01, 0x2C, 0x2D};
+	LCD_SendData(data1, sizeof(data1));
+}
+
+	LCD_SendCommand(ST7735_FRMCTR3);
+{
+	uint8_t data1[] = {0x01, 0x2C, 0x2D, 0x01, 0x2C, 0x2D};
+	LCD_SendData(data1, sizeof(data1));
+}
+
+	LCD_SendCommand(ST7735_INVCTR);
+	data = 0x07;
+	LCD_SendData(&data, 1);
+
+	LCD_SendCommand(ST7735_PWCTR1);
+{
+	uint8_t data1[] = {0xA2, 0x02, 0x84};
+	LCD_SendData(data1, sizeof(data1));
+}
+
+	LCD_SendCommand(ST7735_PWCTR2);
+	data = 0xC5;
+	LCD_SendData(&data, 1);
+
+	LCD_SendCommand(ST7735_PWCTR3);
+{
+	uint8_t data1[] = {0x0A, 0x00};
+	LCD_SendData(data1, sizeof(data1));
+}
+
+	LCD_SendCommand(ST7735_PWCTR4);
+{
+	uint8_t data1[] = {0x8A, 0x2A};
+	LCD_SendData(data1, sizeof(data1));
+}
+
+	LCD_SendCommand(ST7735_PWCTR5);
+{
+	uint8_t data1[] = {0x8A, 0xEE};
+	LCD_SendData(data1, sizeof(data1));
+}
+
+	LCD_SendCommand(ST7735_VMCTR1);
+	data = 0x0E;
+	LCD_SendData(&data, 1);
+
+	LCD_SendCommand(ST7735_INVOFF);
+
+	LCD_SendCommand(ST7735_MADCTL);
+	data = 0xC8;
+	LCD_SendData(&data, 1);
+
+	LCD_SendCommand(ST7735_COLMOD);
+	data = 0x05;
+	LCD_SendData(&data, 1);
+
+//Rcmd2
+	LCD_SendCommand(ST7735_CASET);
+{
+	uint8_t data1[] = {0x00, 0x00, 0x00, 0x7F};
+	LCD_SendData(data1, sizeof(data1));
+}
+
+	LCD_SendCommand(ST7735_RASET);
+{
+	uint8_t data1[] = {0x00, 0x00, 0x00, 0x7F};
+	LCD_SendData(data1, sizeof(data1));
+}
+
+//Rcmd3
+	LCD_SendCommand(ST7735_GMCTRP1);
+{
+	uint8_t data1[] = {0x02, 0x1c, 0x07, 0x12, 
+										 0x37, 0x32, 0x29, 0x2d,       
+										 0x29, 0x25, 0x2B, 0x39,
+										 0x00, 0x01, 0x03, 0x10};
+	LCD_SendData(data1, sizeof(data1));
+}
+
+	LCD_SendCommand(ST7735_GMCTRN1);
+{
+	uint8_t data1[] = {0x03, 0x1d, 0x07, 0x06,
+										 0x2E, 0x2C, 0x29, 0x2D,       
+										 0x2E, 0x2E, 0x37, 0x3F,
+										 0x00, 0x00, 0x02, 0x10};
+	LCD_SendData(data1, sizeof(data1));
+}	
+
+	LCD_SendCommand(ST7735_NORON);
+HAL_Delay(10);
+
+	LCD_SendCommand(ST7735_DISPON);
+HAL_Delay(100);	
+	
+	
+/*	
 	LCD_SendCommand(ST7735_SWRESET); //1: Software reset, no args, w/delay
 	HAL_Delay(50);
 
@@ -270,6 +381,8 @@ void st7735_Init_new(void)
 
 	LCD_SendCommand(ST7735_DISPON); // 18: Main screen turn on, no args, delay
 	HAL_Delay(255);
+	*/
+	
 	LCD_CS_HIGH();	
 }
 
@@ -813,7 +926,7 @@ static void ST7735_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint
     }
 }
 
-void st7735_Init(void)
+void st7735_Init_Arduino(void)
 {
   LCD_CS_LOW();
 	LCD_RESET_SET();
