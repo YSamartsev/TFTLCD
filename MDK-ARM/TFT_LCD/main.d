@@ -47,9 +47,10 @@ tft_lcd\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 tft_lcd\main.o: ..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_lcd.h
 tft_lcd\main.o: ..\Drivers\BSP\Adafruit_Shield\../Components/st7735/st7735.h
 tft_lcd\main.o: ..\Drivers\BSP\Adafruit_Shield\../Components/st7735/../Common/lcd.h
-tft_lcd\main.o: ..\Drivers\BSP\Components\st7789\fonts.h
+tft_lcd\main.o: ..\Drivers\BSP\Adafruit_Shield\fonts.h
 tft_lcd\main.o: ..\Drivers\BSP\Adafruit_Shield\../Components/st7735/st7735_cfg.h
 tft_lcd\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 tft_lcd\main.o: ..\Drivers\BSP\Adafruit_Shield\../Components/st7789/st7789.h
+tft_lcd\main.o: ..\Drivers\BSP\Adafruit_Shield\../Components/st7789/fonts.h
 tft_lcd\main.o: ../Inc/../../Utilities/Fonts/fonts.h
 tft_lcd\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

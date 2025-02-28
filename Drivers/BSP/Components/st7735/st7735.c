@@ -86,6 +86,8 @@
   * @{
   */ 
 
+extern SPI_HandleTypeDef SpiHandle;
+
 
 LCD_DrvTypeDef   st7735_drv = 
 {
@@ -592,9 +594,10 @@ static void ST7735_WriteCommand(uint8_t cmd)
   HAL_SPI_Transmit_DMA(&ST7735_SPI_PORT, &cmd, sizeof(cmd));
   //while(hspi1.State == HAL_SPI_STATE_BUSY_TX);
 #else
-  HAL_SPI_Transmit(&ST7735_SPI_PORT, &cmd, sizeof(cmd), HAL_MAX_DELAY);
+  HAL_SPI_Transmit(&SpiHandle, &cmd, sizeof(cmd), HAL_MAX_DELAY);
 #endif
 }
+
 static void ST7735_WriteData(uint8_t* buff, size_t buff_size)
 {
   TFT_DC_D();
@@ -602,7 +605,7 @@ static void ST7735_WriteData(uint8_t* buff, size_t buff_size)
   HAL_SPI_Transmit_DMA(&ST7735_SPI_PORT, buff, buff_size);
   while(hspi1.State == HAL_SPI_STATE_BUSY_TX);
 #else
-  HAL_SPI_Transmit(&ST7735_SPI_PORT, buff, buff_size, HAL_MAX_DELAY);
+  HAL_SPI_Transmit(&SpiHandle, buff, buff_size, HAL_MAX_DELAY);
 #endif
 }
 static void ST7735_ExecuteCommandList(const uint8_t *addr)
@@ -731,7 +734,7 @@ void ST7735_FillRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16
           HAL_SPI_Transmit_DMA(&ST7735_SPI_PORT, data, sizeof(data));
           //while(hspi1.State == HAL_SPI_STATE_BUSY_TX);
 #else
-          HAL_SPI_Transmit(&ST7735_SPI_PORT, data, sizeof(data), HAL_MAX_DELAY);
+          HAL_SPI_Transmit(&SpiHandle, data, sizeof(data), HAL_MAX_DELAY);
 #endif
         }
     }
