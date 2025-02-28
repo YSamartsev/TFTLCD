@@ -352,8 +352,8 @@ if (Bluetooth_present == SHIELD_DETECTED)
 		{
 			Error_Handler();
 		}
-		//LCD_WriteString(10, 180, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
-		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
+		LCD_WriteString(10, 180, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
+		//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
 
 		//LCD_WriteString(10, 206, myAnswerAT.ATresponse, Font_Size, LCD_RED, LCD_WHITE);
 		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.ATresponse, Font_Size, LCD_RED, LCD_WHITE);

@@ -1094,8 +1094,8 @@ void LCD_Fill_Color(uint16_t color)
 {
 	uint16_t i = 0, j = 0, z = 0;
 #ifdef TFT_LCD_7789
-	uint16_t	LCD_WIDTH = LCD_WIDTH;
-	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
+	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
 #elif defined (TFT_LCD_7735)
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
@@ -1178,8 +1178,8 @@ static void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t
 void LCD_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
 {
 #ifdef TFT_LCD_7789
-	uint16_t	LCD_WIDTH = LCD_WIDTH;
-	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
+	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
 #elif defined (TFT_LCD_7735)
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
@@ -1205,8 +1205,8 @@ void LCD_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
 void LCD_Fill(uint16_t xSta, uint16_t ySta, uint16_t xEnd, uint16_t yEnd, uint16_t color)
 {
 #ifdef TFT_LCD_7789
-	uint16_t	LCD_WIDTH = LCD_WIDTH;
-	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
+	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
 #elif defined (TFT_LCD_7735)
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
@@ -1234,8 +1234,8 @@ void LCD_Fill(uint16_t xSta, uint16_t ySta, uint16_t xEnd, uint16_t yEnd, uint16
 void LCD_DrawPixel_4px(uint16_t x, uint16_t y, uint16_t color)
 {
 #ifdef TFT_LCD_7789
-	uint16_t	LCD_WIDTH = LCD_WIDTH;
-	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
+	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
 #elif defined (TFT_LCD_7735)
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
@@ -1379,8 +1379,8 @@ void LCD_DrawCircle(uint16_t x0, uint16_t y0, uint8_t r, uint16_t color)
 void LCD_DrawImage(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t *data)
 {
 #ifdef TFT_LCD_7789
-	uint16_t	LCD_WIDTH = LCD_WIDTH;
-	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
+	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
 #elif defined (TFT_LCD_7735)
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
@@ -1456,8 +1456,8 @@ void LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t colo
 void LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor)
 {
 #ifdef TFT_LCD_7789
-	uint16_t	LCD_WIDTH = LCD_WIDTH;
-	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
+	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
 #elif defined (TFT_LCD_7735)
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
@@ -1495,8 +1495,8 @@ void LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint
 void LCD_DrawFilledRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color)
 {
 #ifdef TFT_LCD_7789
-	uint16_t	LCD_WIDTH = LCD_WIDTH;
-	uint16_t	LCD_HEIGHT = LCD_HEIGHT;
+	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
 #elif defined (TFT_LCD_7735)
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;

@@ -159,12 +159,12 @@ void LCD_SendData(uint8_t *buff, size_t buff_size)
 		#ifdef USE_DMA
 			if (DMA_MIN_SIZE <= buff_size)
 			{
-				HAL_SPI_Transmit_DMA(&ST7789_SPI_PORT, buff, chunk_size);
-				while (ST7789_SPI_PORT.hdmatx->State != HAL_DMA_STATE_READY)
+				HAL_SPI_Transmit_DMA(&SpiHandle, buff, chunk_size);
+				while (SpiHandle.hdmatx->State != HAL_DMA_STATE_READY)
 				{}
 			}
 			else
-				HAL_SPI_Transmit(&ST7789_SPI_PORT, buff, chunk_size, HAL_MAX_DELAY);
+				HAL_SPI_Transmit(SpiHandle, buff, chunk_size, HAL_MAX_DELAY);
 		#else
 			HAL_SPI_Transmit(&SpiHandle, buff, chunk_size, HAL_MAX_DELAY);
 		#endif

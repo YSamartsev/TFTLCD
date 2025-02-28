@@ -93,17 +93,34 @@ void ST7789_SetRotation(uint8_t m)
 	LCD_SendCommand(ST7789_MADCTL);	// MADCTL
 	switch (m) {
 	case 0:
-		LCD_SendSmallData(ST7789_MADCTL_MX | ST7789_MADCTL_MY | ST7789_MADCTL_RGB);
+		//ST7789_WriteSmallData(ST7789_MADCTL_MX | ST7789_MADCTL_MY | ST7789_MADCTL_RGB);
+		{
+			uint8_t data[] = {ST7789_MADCTL_MX | ST7789_MADCTL_MY | ST7789_MADCTL_RGB};
+			LCD_SendData(data, sizeof(data));
+		}
 		break;
 	case 1:
-		LCD_SendSmallData(ST7789_MADCTL_MY | ST7789_MADCTL_MV | ST7789_MADCTL_RGB);
+		//LCD_SendSmallData(ST7789_MADCTL_MY | ST7789_MADCTL_MV | ST7789_MADCTL_RGB);
+		{
+			uint8_t data[] = {ST7789_MADCTL_MY | ST7789_MADCTL_MV | ST7789_MADCTL_RGB};
+			LCD_SendData(data, sizeof(data));
+		}		
+	
 		break;
 	case 2:
-		LCD_SendSmallData(ST7789_MADCTL_RGB);
+		//ST7789_SendSmallData(ST7789_MADCTL_RGB);
+		{
+			uint8_t data[] = {ST7789_MADCTL_RGB};
+			LCD_SendData(data, sizeof(data));
+		}	
 		break;
 	case 3:
-		LCD_SendSmallData(ST7789_MADCTL_MX | ST7789_MADCTL_MV | ST7789_MADCTL_RGB);
-		break;
+		//ST7789_SendSmallData(ST7789_MADCTL_MX | ST7789_MADCTL_MV | ST7789_MADCTL_RGB);
+		{
+			uint8_t data[] = {ST7789_MADCTL_MX | ST7789_MADCTL_MV | ST7789_MADCTL_RGB};
+			LCD_SendData(data, sizeof(data));
+		}
+  	break;
 	default:
 		break;
 	}
@@ -153,10 +170,14 @@ void ST7789_Init(void)
 
 //while(1)
 //{	
-	LCD_SendCommand(ST7789_COLMOD);		//	Set color mode
+		LCD_SendCommand(ST7789_COLMOD);		//	Set color mode
 //}
 	
-    LCD_SendSmallData(ST7789_COLOR_MODE_16bit);
+    //LCD_SendSmallData(ST7789_COLOR_MODE_16bit);
+	{
+		uint8_t data[] = {ST7789_COLOR_MODE_16bit};
+		LCD_SendData(data, sizeof(data));
+	}
   	LCD_SendCommand(0xB2);				//	Porch control
 	{
 		uint8_t data[] = {0x0C, 0x0C, 0x00, 0x33, 0x33};
@@ -166,24 +187,63 @@ void ST7789_Init(void)
 	
 	/* Internal LCD Voltage generator settings */
     LCD_SendCommand(0XB7);				//	Gate Control
-    LCD_SendSmallData(0x35);			//	Default value
-    LCD_SendCommand(0xBB);				//	VCOM setting
-    LCD_SendSmallData(0x19);			//	0.725v (default 0.75v for 0x20)
-    LCD_SendCommand(0xC0);				//	LCMCTRL	
-    LCD_SendSmallData (0x2C);			//	Default value
-    LCD_SendCommand (0xC2);				//	VDV and VRH command Enable
-    LCD_SendSmallData (0x01);			//	Default value
-    LCD_SendCommand (0xC3);				//	VRH set
-    LCD_SendSmallData (0x12);			//	+-4.45v (defalut +-4.1v for 0x0B)
-    LCD_SendCommand (0xC4);				//	VDV set
-    LCD_SendSmallData (0x20);			//	Default value
-    LCD_SendCommand (0xC6);				//	Frame rate control in normal mode
-    LCD_SendSmallData (0x0F);			//	Default value (60HZ)
-    LCD_SendCommand (0xD0);				//	Power control
-    LCD_SendSmallData (0xA4);			//	Default value
-    LCD_SendSmallData (0xA1);			//	Default value
-	/**************** Division line ****************/
+    //LCD_SendSmallData(0x35);			//	Default value
+  {
+		uint8_t data[] = {0x35};
+		LCD_SendData(data, sizeof(data));
+	}		
+	
+		LCD_SendCommand(0xBB);				//	VCOM setting
+    //LCD_SendSmallData(0x19);			//	0.725v (default 0.75v for 0x20)
+		{		
+			uint8_t data[] = {0x19};
+			LCD_SendData(data, sizeof(data)); 
+		}			
+	
+		LCD_SendCommand(0xC0);				//	LCMCTRL	
+    //LCD_SendSmallData (0x2C);			//	Default value
+		{		
+			uint8_t data[] = {0x2C};
+			LCD_SendData(data, sizeof(data)); 
+		}	   
+		
+		LCD_SendCommand (0xC2);				//	VDV and VRH command Enable
+    //LCD_SendSmallData (0x01);			//	Default value
+		{		
+			uint8_t data[] = {0x01};
+			LCD_SendData(data, sizeof(data)); 
+		}	      
+		
+		LCD_SendCommand (0xC3);				//	VRH set
+    //LCD_SendSmallData (0x12);			//	+-4.45v (defalut +-4.1v for 0x0B)
+		{		
+			uint8_t data[] = {0x12};
+			LCD_SendData(data, sizeof(data)); 
+		}    
+		
+		LCD_SendCommand (0xC4);				//	VDV set
+		//LCD_SendSmallData (0x20);			//	Default value
+		{		
+			uint8_t data[] = {0x20};
+			LCD_SendData(data, sizeof(data)); 
+		}
 
+    LCD_SendCommand (0xC6);				//	Frame rate control in normal mode
+    //LCD_SendSmallData (0x0F);			//	Default value (60HZ)
+		{		
+			uint8_t data[] = {0x0F};
+			LCD_SendData(data, sizeof(data)); 
+		}
+
+    LCD_SendCommand (0xD0);				//	Power control
+    //LCD_SendSmallData (0xA4);			//	Default value
+    //LCD_SendSmallData (0xA1);			//	Default value
+		{		
+			uint8_t data[] = {0xA4, 0xA1};
+			LCD_SendData(data, sizeof(data)); 
+		}
+
+		/**************** Division line ****************/
 	LCD_SendCommand(0xE0);
 	{
 		uint8_t data[] = {0xD0, 0x04, 0x0D, 0x11, 0x13, 0x2B, 0x3F, 0x54, 0x4C, 0x18, 0x0D, 0x0B, 0x1F, 0x23};
