@@ -46,7 +46,7 @@
 //#define USING_170X320
 
 /* Choose a display rotation you want to use: (0-3) */
-//#define ST7789_ROTATION 0
+//#define ST7789_ROTATION 0 //x=0, y=0 на протилежній стороні від  роз'єму (так само у 1.44 128x128)
 //#define ST7789_ROTATION 1
 #define ST7789_ROTATION 2				//  use Normally on 240x240
 //#define ST7789_ROTATION 3

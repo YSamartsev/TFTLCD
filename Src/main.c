@@ -334,7 +334,9 @@ printf("==================Start RTC Watch===================\n\r");
 /* Initialize the LCD */
 	BSP_LCD_Init(); //Спочатку через PA7 RESET, потім керується через Регістри
 	
-		
+	//ВАЖЛИВО!!!! ST7789_SetRotation(ST7789_ROTATION) впливаэ на очищення через зміну координат x=0, 	y=0	екрану !!!!!!
+	//Для 1.44 128x128  x=0, 	y=0 знаходиться навпроти роз'єму в кінці зліва. Це відповідає для st7789: #define ST7789_ROTATION 2	
+	//Але при #define ST7789_ROTATION 2	 точка  x=0, 	y=0	знаходиться біля роз'єму справа!! 
 
 #ifdef TFT_LCD_7789
 	FontDef Font_Size = Font_16x26;
@@ -352,8 +354,8 @@ if (Bluetooth_present == SHIELD_DETECTED)
 		{
 			Error_Handler();
 		}
-		LCD_WriteString(10, 180, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
-		//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
+		//LCD_WriteString(10, 180, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
 
 		//LCD_WriteString(10, 206, myAnswerAT.ATresponse, Font_Size, LCD_RED, LCD_WHITE);
 		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.ATresponse, Font_Size, LCD_RED, LCD_WHITE);
@@ -363,7 +365,7 @@ if (Bluetooth_present == SHIELD_DETECTED)
 		{
 			Error_Handler();
 		}
-		ST7789_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
+		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
 	
 		//LCD_WriteString(10, 180, myCommandAT.ATversion, Font_16x26, LCD_RED, LCD_WHITE); 
 		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATversion, Font_Size, LCD_RED, LCD_WHITE);
@@ -377,7 +379,7 @@ if (Bluetooth_present == SHIELD_DETECTED)
 			Error_Handler();
 		}	
 		
-		ST7789_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
+		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
 				
 		//LCD_WriteString(10, 180, myCommandAT.ATname, Font_16x26, LCD_RED, LCD_WHITE);
 		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATname, Font_Size, LCD_RED, LCD_WHITE);
@@ -387,7 +389,7 @@ if (Bluetooth_present == SHIELD_DETECTED)
 		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.NAMEresponse, Font_Size, LCD_RED, LCD_WHITE);
 		
 		HAL_Delay(500);
-		ST7789_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
+		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
 		
 		myAnswerAT.BLUETOOTH_shield = "BL present";
 		//LCD_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_RED, LCD_WHITE);
