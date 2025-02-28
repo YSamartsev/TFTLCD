@@ -295,14 +295,14 @@ void ST7789_TearEffect(uint8_t tear);
 void ST7789_Test(void);
 
 
-void LCD_WR_REG(uint8_t data);
-void LCD_WR_DATA(uint8_t data);
+void 		LCD_WR_REG(uint8_t data);
+void 		LCD_WR_DATA(uint8_t data);
 uint8_t SPI_WriteByte(SPI_HandleTypeDef* hspi, uint8_t Byte);
-void LCD_WriteReg(uint8_t LCD_Reg, uint16_t LCD_RegValue);
-void LCD_direction(uint8_t direction);
-void LCD_Clear(uint16_t Color);
-void LCD_SetWindows(uint16_t xStar, uint16_t yStar, uint16_t xEnd, uint16_t yEnd);
-void LCD_WriteRAM_Prepare(void);
+void 		LCD_WriteReg(uint8_t LCD_Reg, uint16_t LCD_RegValue);
+void 		LCD_direction(uint8_t direction);
+void 		LCD_Clear(uint16_t Color);
+void 		LCD_SetWindows(uint16_t xStar, uint16_t yStar, uint16_t xEnd, uint16_t yEnd);
+void 		LCD_WriteRAM_Prepare(void);
 
 
 #ifndef ST7789_ROTATION

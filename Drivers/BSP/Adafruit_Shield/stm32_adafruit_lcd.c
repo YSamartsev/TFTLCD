@@ -192,8 +192,8 @@ uint8_t BSP_LCD_Init(void)
 
 #elif defined (TFT_LCD_7789)
 
-	st7789_Init(); //Конфігурація драйвера ST7789 LCD
-	LCD_Fill_Color(WHITE);
+	ST7789_Init(); //Конфігурація драйвера ST7789 LCD
+	LCD_Fill_Color(LCD_WHITE);
 #endif
 	HAL_Delay(10);
 	
@@ -1133,20 +1133,20 @@ static void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t
 
 #ifdef TFT_LCD_7789	
 	/* Column Address set */
-	LCD_SendCommand(LCD_CASET); 
+	LCD_SendCommand(ST7789_CASET); 
 	{
 		uint8_t data[] = {x_start >> 8, x_start & 0xFF, x_end >> 8, x_end & 0xFF};
 		LCD_SendData(data, sizeof(data));
 	}
 
 	/* Row Address set */
-	LCD_SendCommand(LCD_RASET);
+	LCD_SendCommand(ST7789_RASET);
 	{
 		uint8_t data[] = {y_start >> 8, y_start & 0xFF, y_end >> 8, y_end & 0xFF};
 		LCD_SendData(data, sizeof(data));
 	}
 	/* Write to RAM */
-	LCD_SendCommand(LCD_RAMWR);
+	LCD_SendCommand(ST7789_RAMWR);
 #elif defined TFT_LCD_7735
 		/* Column Address set */
 	LCD_SendCommand(ST7735_CASET); 
