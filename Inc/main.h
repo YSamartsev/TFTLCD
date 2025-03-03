@@ -110,6 +110,9 @@ typedef struct
 /*#define RTC_CLOCK_SOURCE_LSI*/
 #define RTC_CLOCK_SOURCE_LSE
 
+#define TFT_LCD_7735
+//#define TFT_LCD_7789
+
 /* Exported functions ------------------------------------------------------- */
 void Error_Handler(void);
 void Test_Colors(void);
@@ -121,7 +124,7 @@ HAL_StatusTypeDef myExchange(char *myAT, char *myRES);
 static int Buffercmp(uint8_t * pBuffer1, uint8_t * pBuffer2, uint16_t BufferLength);
 uint8_t RTC_Data_Update(uint8_t index);
 static void RTC_SECUpdate(void);
-static char calcModulo256(char *aRxBuffer, uint16_t BufferLength);
+char calcModulo256(char *aRxBuffer, uint16_t BufferLength);
 
 #endif /* __MAIN_H */
 

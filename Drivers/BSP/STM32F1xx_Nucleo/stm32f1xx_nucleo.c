@@ -87,9 +87,9 @@ extern SPI_HandleTypeDef SpiHandle;
 /** @defgroup STM32F1XX_NUCLEO_Private_Variables STM32F1XX NUCLEO Private Variables
   * @{
   */ 
-GPIO_TypeDef* LED_PORT[LEDn] = (LED2_GPIO_PORT);
+GPIO_TypeDef* LED_PORT[LEDn] = {LED0_GPIO_PORT};
 
-const uint16_t LED_PIN[LEDn] = {LED2_PIN};
+const uint16_t LED_PIN[LEDn] = {LED0_PIN};
 
 GPIO_TypeDef* BUTTON_PORT[BUTTONn]  = {USER_BUTTON_GPIO_PORT}; 
 const uint16_t BUTTON_PIN[BUTTONn]  = {USER_BUTTON_PIN}; 
@@ -126,6 +126,70 @@ static ADC_ChannelConfTypeDef sConfig;
 /** @defgroup STM32F1XX_NUCLEO_Exported_Functions STM32F1XX NUCLEO Exported Functions
   * @{
   */ 
+
+
+/**
+ * @brief Write command to ST7789 controller
+ * @param cmd -> command to write
+ * @return none
+ */
+void LCD_SendCommand(uint8_t cmd)
+{
+	LCD_CS_LOW();
+	LCD_DC_LOW();
+	HAL_SPI_Transmit(&SpiHandle, &cmd, sizeof(cmd), HAL_MAX_DELAY);
+	LCD_CS_HIGH();
+}
+
+/**
+ * @brief Write data to ST7789 controller
+ * @param buff -> pointer of data buffer
+ * @param buff_size -> size of the data buffer
+ * @return none
+ */
+void LCD_SendData(uint8_t *buff, size_t buff_size)
+{
+	LCD_CS_LOW();
+	LCD_DC_HIGH();
+
+	// split data in small chunks because HAL can't send more than 64K at once
+
+	while (buff_size > 0) {
+		uint16_t chunk_size = buff_size > 65535 ? 65535 : buff_size;
+		#ifdef USE_DMA
+			if (DMA_MIN_SIZE <= buff_size)
+			{
+				HAL_SPI_Transmit_DMA(&SpiHandle, buff, chunk_size);
+				while (SpiHandle.hdmatx->State != HAL_DMA_STATE_READY)
+				{}
+			}
+			else
+				HAL_SPI_Transmit(SpiHandle, buff, chunk_size, HAL_MAX_DELAY);
+		#else
+			HAL_SPI_Transmit(&SpiHandle, buff, chunk_size, HAL_MAX_DELAY);
+		#endif
+		buff += chunk_size;
+		buff_size -= chunk_size;
+	}
+
+	LCD_CS_HIGH();
+}
+/**
+ * @brief Write data to ST7789 controller, simplify for 8bit data.
+ * data -> data to write
+ * @return none
+ */
+void LCD_SendSmallData(uint8_t data)
+{
+	LCD_CS_LOW();
+	LCD_DC_Set();
+	HAL_SPI_Transmit(&SpiHandle, &data, sizeof(data), HAL_MAX_DELAY);
+	LCD_CS_HIGH();
+}
+
+
+
+
 
 /**
   * @brief  This method returns the STM32F1XX NUCLEO BSP Driver revision
@@ -315,23 +379,18 @@ void SPIx_MspInit(void)
   /*** Configure the GPIOs ***/  
   /* Enable GPIO clock */
   NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE();
-  NUCLEO_SPIx_MISO_MOSI_GPIO_CLK_ENABLE();
-
+  
   /* Configure SPI SCK */
   gpioinitstruct.Pin        = NUCLEO_SPIx_SCK_PIN;
   gpioinitstruct.Mode       = GPIO_MODE_AF_PP;
   gpioinitstruct.Speed      = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(NUCLEO_SPIx_SCK_GPIO_PORT, &gpioinitstruct);
 
-  /* Configure SPI MISO and MOSI */ 
+  /* Configure SPI MOSI */ 
   gpioinitstruct.Pin        = NUCLEO_SPIx_MOSI_PIN;
-  HAL_GPIO_Init(NUCLEO_SPIx_MISO_MOSI_GPIO_PORT, &gpioinitstruct);
+  HAL_GPIO_Init(NUCLEO_SPIx_MOSI_GPIO_PORT, &gpioinitstruct);
   
-  gpioinitstruct.Pin        = NUCLEO_SPIx_MISO_PIN;
-  gpioinitstruct.Mode       = GPIO_MODE_INPUT;
-  HAL_GPIO_Init(NUCLEO_SPIx_MISO_MOSI_GPIO_PORT, &gpioinitstruct);
-
-  /*** Configure the SPI peripheral ***/ 
+   /*** Configure the SPI peripheral ***/ 
   /* Enable SPI clock */
   NUCLEO_SPIx_CLK_ENABLE();
 }
@@ -364,7 +423,6 @@ void SPIx_Init(void)
     SpiHandle.Init.NSS                = SPI_NSS_SOFT;
     SpiHandle.Init.TIMode             = SPI_TIMODE_DISABLE;
     SpiHandle.Init.Mode               = SPI_MODE_MASTER;
-    
 				
 		HAL_SPI_Init(&SpiHandle);
 		//SPI_Cmd(SPI2, ENABLE);
@@ -418,7 +476,10 @@ void SPIx_Write(uint8_t Value)
   uint8_t data;
 
   status = HAL_SPI_TransmitReceive(&SpiHandle, (uint8_t*) &Value, &data, 1, SpixTimeout);
-
+	//HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, const uint8_t *pData, uint16_t Size, uint32_t Timeout)
+	
+	//status = HAL_SPI_Transmit(&SpiHandle, (uint8_t*) &Value, 1, SpixTimeout);
+	
   /* Check the communication status */
   if(status != HAL_OK)
   {
@@ -559,22 +620,22 @@ void LCD_IO_Init(void)
   GPIO_InitTypeDef  gpioinitstruct;
 
   /* LCD_CS_GPIO and LCD_DC_GPIO Periph clock enable */
-  LCD_CS_GPIO_CLK_ENABLE(); //PB12 CLK
+  LCD_CS_GPIO_CLK_ENABLE(); //Не використовую
   LCD_DC_GPIO_CLK_ENABLE(); //PB1 CLK
-  LCD_RST_GPIO_CLK_ENABLE(); //PB11 CLK
+  LCD_RST_GPIO_CLK_ENABLE(); //PA7 CLK
 	
   /* Configure типу роботи піна PB12: LCD_CS_PIN pin : LCD Card CS pin */
-  gpioinitstruct.Pin    = LCD_CS_PIN; //PB12
+  gpioinitstruct.Pin    = LCD_CS_PIN; //PB12 Не використовую
   gpioinitstruct.Mode   = GPIO_MODE_OUTPUT_PP;
   gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(LCD_CS_GPIO_PORT, &gpioinitstruct); 
       
   /* Configure типу роботи піна PB1: LCD_DC_PIN pin: LCD Card DC pin */
-  gpioinitstruct.Pin    = LCD_DC_PIN; //PB1
+  gpioinitstruct.Pin    = LCD_DC_PIN; //PB1 Команда / Дані
   HAL_GPIO_Init(LCD_DC_GPIO_PORT, &gpioinitstruct); 
 	
 	/* Configure типу роботи піна PB11 LCD_RST_PIN pin */
-  gpioinitstruct.Pin    = LCD_RST_PIN; //PB11
+  gpioinitstruct.Pin    = LCD_RST_PIN; //PA7 Скидання дисплея
 	gpioinitstruct.Mode   = GPIO_MODE_OUTPUT_PP;
   HAL_GPIO_Init(LCD_RST_GPIO_PORT, &gpioinitstruct); 
 
@@ -584,32 +645,13 @@ void LCD_IO_Init(void)
 	LCD_RST_HIGH(); //Піднімаю RST
 }
 
-/**
-  * @brief  Write command to select the LCD register.
-  * @param  LCDReg: Address of the selected register.
-  * @retval None
-  */
-void LCD_IO_WriteReg(uint8_t LCDReg)
-{
-  /* Reset LCD control line CS */
-  LCD_CS_LOW();
-  
-  /* Set LCD data/command line DC to Low */
-  LCD_DC_LOW();
-    
-  /* Send Command */
-  SPIx_Write(LCDReg);
-  
-  /* Deselect : Chip Select high */
-  LCD_CS_HIGH();
-}
 
 /**
 * @brief  Write register value.
 * @param  pData Pointer on the register value
 * @param  Size Size of byte to transmit to the register
 */
-void LCD_IO_WriteMultipleData(uint8_t *pData, uint32_t Size)
+void LCD_SendMultipleData(uint8_t *pData, uint32_t Size)
 {
   uint32_t counter = 0;
   

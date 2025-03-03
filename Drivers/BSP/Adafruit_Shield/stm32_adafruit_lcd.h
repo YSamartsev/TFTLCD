@@ -116,7 +116,7 @@ typedef enum
 /** 
   * @brief  LCD color  
   */
-#define LCD_COLOR_BLACK         0x0000
+/*#define LCD_COLOR_BLACK         0x0000
 #define LCD_COLOR_GREY          0xF7DE          
 #define LCD_COLOR_BLUE          0x001F
 #define LCD_COLOR_RED           0xF800
@@ -125,6 +125,31 @@ typedef enum
 #define LCD_COLOR_MAGENTA       0xF81F
 #define LCD_COLOR_YELLOW        0xFFE0
 #define LCD_COLOR_WHITE         0xFFFF
+*/
+#define LCD_WHITE       0xFFFF
+#define LCD_BLACK       0x0000
+#define LCD_BLUE        0x001F
+#define LCD_RED         0xF800
+#define LCD_MAGENTA     0xF81F
+#define LCD_GREEN       0x07E0
+#define LCD_CYAN        0x7FFF
+#define LCD_YELLOW      0xFFE0
+#define LCD_GRAY        0x8430
+#define LCD_BRED        0XF81F
+#define LCD_GRED        0xFFE0
+#define LCD_GBLUE       0x07FF
+#define LCD_BROWN       0xBC40
+#define LCD_BRRED       0xFC07
+#define LCD_DARKBLUE    0x01CF
+#define LCD_LIGHTBLUE   0x7D7C
+#define LCD_GRAYBLUE    0X5458
+
+#define LCD_LIGHTGREEN  0X841F
+#define LCD_LGRAY       0XC618
+#define LCD_LGRAYBLUE   0XA651
+#define LCD_LBBLUE      0X2B12
+
+
 
 /** 
   * @brief LCD default font 
@@ -171,7 +196,13 @@ void     BSP_LCD_FillEllipse(int Xpos, int Ypos, int XRadius, int YRadius);
 
 void     BSP_LCD_DisplayOff(void);
 void     BSP_LCD_DisplayOn(void);
-
+void 		 LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+void 		 LCD_Fill_Color(uint16_t color);
+void		 LCD_Test(void);
+void		 LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor);
+void 		 LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t color, uint16_t bgcolor);
+void 		 LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor);
+void 		 LCD_DrawFilledRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
 /**
   * @}
   */

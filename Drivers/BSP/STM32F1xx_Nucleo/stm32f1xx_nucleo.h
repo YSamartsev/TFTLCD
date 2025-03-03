@@ -12,29 +12,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * Конфігурація плати Плата stm32f103 Smart -> Nucleo
   *
   ******************************************************************************
   */
@@ -92,6 +70,7 @@ typedef enum
   JOY_UP = 5
 } JOYState_TypeDef;
 
+
 /**
   * @}
   */ 
@@ -112,13 +91,13 @@ typedef enum
   */
 #define LEDn	1
 
-#define LED2_PIN                         GPIO_PIN_13 //GPIO_PIN_5
-#define LED2_GPIO_PORT                   GPIOC //GPIOA
-#define LED2_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOC_CLK_ENABLE()  //__HAL_RCC_GPIOA_CLK_ENABLE()  
-#define LED2_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOC_CLK_DISABLE() //__HAL_RCC_GPIOA_CLK_DISABLE()  
+#define LED0_PIN                         GPIO_PIN_13 // PC13 Світлодіод LED0 по принципові схемі STM32_Smart_STM32F103C8T6-STM32_Smart_V2.0.pdf
+#define LED0_GPIO_PORT                   GPIOC 
+#define LED0_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOC_CLK_ENABLE()  
+#define LED0_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOC_CLK_DISABLE()
 
-#define LEDx_GPIO_CLK_ENABLE(__INDEX__)   do { if((__INDEX__) == 0) LED2_GPIO_CLK_ENABLE();} while(0)
-#define LEDx_GPIO_CLK_DISABLE(__INDEX__)  (((__INDEX__) == 0) ? LED2_GPIO_CLK_DISABLE() : 0)
+#define LEDx_GPIO_CLK_ENABLE(__INDEX__)   do { if((__INDEX__) == 0) LED0_GPIO_CLK_ENABLE();} while(0)
+#define LEDx_GPIO_CLK_DISABLE(__INDEX__)  (((__INDEX__) == 0) ? LED0_GPIO_CLK_DISABLE() : 0)
 
 /**
   * @}
@@ -132,11 +111,11 @@ typedef enum
 /**
   * @brief User push-button
  */
-#define USER_BUTTON_PIN                  GPIO_PIN_0  //GPIO_PIN_13
-#define USER_BUTTON_GPIO_PORT            GPIOA //GPIOC
+#define USER_BUTTON_PIN                  GPIO_PIN_0  
+#define USER_BUTTON_GPIO_PORT            GPIOA // PA0 Кнопка SW-SPST по принциповіё схемі STM32_Smart_STM32F103C8T6-STM32_Smart_V2.0.pdf
 #define USER_BUTTON_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOA_CLK_ENABLE() //__HAL_RCC_GPIOC_CLK_ENABLE()
 #define USER_BUTTON_GPIO_CLK_DISABLE()   __HAL_RCC_GPIOA_CLK_DISABLE() //__HAL_RCC_GPIOC_CLK_DISABLE()
-#define USER_BUTTON_EXTI_IRQn            EXTI0_IRQn //EXTI15_10_IRQn
+#define USER_BUTTON_EXTI_IRQn            EXTI0_IRQn 
 /* Aliases */
 #define KEY_BUTTON_PIN                   USER_BUTTON_PIN
 #define KEY_BUTTON_GPIO_PORT             USER_BUTTON_GPIO_PORT
@@ -154,25 +133,27 @@ typedef enum
   * @{
   */
 /*###################### SPI1 ###################################*/
-#define NUCLEO_SPIx                                 SPI2 //SPI1
-#define NUCLEO_SPIx_CLK_ENABLE()                    __HAL_RCC_SPI2_CLK_ENABLE() //__HAL_RCC_SPI1_CLK_ENABLE()
+#define NUCLEO_SPIx                                 SPI2 
+#define NUCLEO_SPIx_CLK_ENABLE()                    __HAL_RCC_SPI2_CLK_ENABLE() 
 
-#define NUCLEO_SPIx_SCK_GPIO_PORT                   GPIOB //GPIOA
-#define NUCLEO_SPIx_SCK_PIN                         GPIO_PIN_13 //GPIO_PIN_5
-#define NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOB_CLK_ENABLE() //__HAL_RCC_GPIOA_CLK_ENABLE()
-#define NUCLEO_SPIx_SCK_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOB_CLK_DISABLE() //__HAL_RCC_GPIOA_CLK_DISABLE()
+#define NUCLEO_SPIx_SCK_PIN                         GPIO_PIN_13 
+#define NUCLEO_SPIx_SCK_GPIO_PORT                   GPIOB  //SPI SCK PB13
+#define NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOB_CLK_ENABLE() 
+#define NUCLEO_SPIx_SCK_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOB_CLK_DISABLE()
 
-#define NUCLEO_SPIx_MISO_MOSI_GPIO_PORT             GPIOB //GPIOA
-#define NUCLEO_SPIx_MISO_MOSI_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOB_CLK_ENABLE() //__HAL_RCC_GPIOA_CLK_ENABLE()
-#define NUCLEO_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()    __HAL_RCC_GPIOB_CLK_DISABLE() //__HAL_RCC_GPIOA_CLK_DISABLE()
-#define NUCLEO_SPIx_MISO_PIN                        GPIO_PIN_14 //GPIO_PIN_6
-#define NUCLEO_SPIx_MOSI_PIN                        GPIO_PIN_15 //GPIO_PIN_7
-/* Maximum Timeout values for flags waiting loops. These timeouts are not based
-   on accurate values, they just guarantee that the application will not remain
-   stuck if the SPI communication is corrupted.
-   You may modify these timeout values depending on CPU frequency and application
-   conditions (interrupts routines ...). */   
-#define NUCLEO_SPIx_TIMEOUT_MAX                   1000
+
+#define NUCLEO_SPIx_MOSI_PIN                        GPIO_PIN_15
+#define NUCLEO_SPIx_MOSI_GPIO_PORT             			GPIOB 
+#define NUCLEO_SPIx_MOSI_GPIO_CLK_ENABLE()    		 __HAL_RCC_GPIOB_CLK_ENABLE()
+#define NUCLEO_SPIx_MOSI_GPIO_CLK_DISABLE()    		 __HAL_RCC_GPIOB_CLK_DISABLE()
+
+#define NUCLEO_SPIx_MISO_PIN                        GPIO_PIN_14 
+#define NUCLEO_SPIx_MISO_GPIO_PORT             			GPIOB 
+#define NUCLEO_SPIx__MISO_GPIO_CLK_ENABLE()    		  __HAL_RCC_GPIOB_CLK_ENABLE()
+#define NUCLEO_SPIx__MISO_GPIO_CLK_DISABLE()    		__HAL_RCC_GPIOB_CLK_DISABLE()
+
+
+#define NUCLEO_SPIx_TIMEOUT_MAX                     1000
 
 
 /**
@@ -184,6 +165,7 @@ typedef enum
 /**
   * @brief  LCD Control Lines management Вибір LCD Chip Select
   */
+
 #define LCD_CS_LOW()      HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_RESET)
 #define LCD_CS_HIGH()     HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_SET)
 
@@ -192,6 +174,7 @@ typedef enum
 
 #define LCD_RST_LOW()     HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_RESET)
 #define LCD_RST_HIGH()    HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_SET)
+
 
 /**
   * @brief  SD Control Interface pins (shield D4)
@@ -204,7 +187,7 @@ typedef enum
 /**
   * @brief  LCD Control Interface pins (shield D10)
   */
-#define LCD_CS_PIN                                 GPIO_PIN_12 //GPIO_PIN_6 SPI2_NSS
+#define LCD_CS_PIN                               GPIO_PIN_12 //SPI2_NSS - не використовую
 #define LCD_CS_GPIO_PORT                           GPIOB
 #define LCD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
 #define LCD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
@@ -213,18 +196,29 @@ typedef enum
 // Використовую PB PIN_11 в платі з проводочком
 // Використовую PA PIN_7 в платі без проводочка
 
-#define LCD_RST_PIN                              GPIO_PIN_7 //GPIO_PIN_11 
-#define LCD_RST_GPIO_PORT                        GPIOA //GPIOB 
+#define LCD_RST_PIN                              GPIO_PIN_7  //PA7
+#define LCD_RST_GPIO_PORT                        GPIOA 
 #define LCD_RST_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOA_CLK_ENABLE() //__HAL_RCC_GPIOB_CLK_ENABLE()
 #define LCD_RST_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOA_CLK_DISABLE() //__HAL_RCC_GPIOB _CLK_DISABLE()
 
 /**
   * @brief  LCD Data/Command Interface pins
   */
-#define LCD_DC_PIN                                 GPIO_PIN_1 //GPIO_PIN_9
-#define LCD_DC_GPIO_PORT                           GPIOB //GPIOA
+#define LCD_DC_PIN                                 GPIO_PIN_1 //PB1
+#define LCD_DC_GPIO_PORT                           GPIOB 
 #define LCD_DC_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE() //__HAL_RCC_GPIOA_CLK_ENABLE()
 #define LCD_DC_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE() //__HAL_RCC_GPIOA_CLK_DISABLE()
+
+
+/* Basic operations */
+#define LCD_RST_Clr() HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_RESET)
+#define LCD_RST_Set() HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_SET)
+
+#define LCD_DC_ReSet() HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_RESET)
+#define LCD_DC_Set() HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_SET)
+
+#define LCD_Select() HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_RESET)
+#define LCD_UnSelect() HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_SET)
 
 
 /*##################### ADC1 ###################################*/
@@ -298,9 +292,11 @@ uint8_t            SD_IO_WriteByte(uint8_t Data);
 uint8_t                   SD_IO_ReadByte(void);
 
 /* LCD IO functions */
-void               LCD_IO_WriteData(uint8_t Data);
-void               LCD_IO_WriteMultipleData(uint8_t *pData, uint32_t Size);
-void               LCD_IO_WriteReg(uint8_t LCDReg);
+void							 LCD_SendCommand(uint8_t cmd);
+void 							 LCD_SendData(uint8_t *buff, size_t buff_size);
+
+//void               LCD_IO_WriteData(uint8_t Data);
+void               LCD_SendMultipleData(uint8_t *pData, uint32_t Size);
 void               LCD_Delay(uint32_t delay);
 
 

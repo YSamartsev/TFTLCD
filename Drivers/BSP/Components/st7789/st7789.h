@@ -46,7 +46,7 @@
 //#define USING_170X320
 
 /* Choose a display rotation you want to use: (0-3) */
-//#define ST7789_ROTATION 0
+//#define ST7789_ROTATION 0 //x=0, y=0 на протилежній стороні від  роз'єму (так само у 1.44 128x128)
 //#define ST7789_ROTATION 1
 #define ST7789_ROTATION 2				//  use Normally on 240x240
 //#define ST7789_ROTATION 3
@@ -141,6 +141,7 @@
  *If you want to use another color, you can choose one in RGB565 format.
  */
 
+/*
 #define WHITE       0xFFFF
 #define BLACK       0x0000
 #define BLUE        0x001F
@@ -162,7 +163,7 @@
 #define LIGHTGREEN  0X841F
 #define LGRAY       0XC618
 #define LGRAYBLUE   0XA651
-#define LBBLUE      0X2B12
+#define LBBLUE      0X2B12 */
 
 /* Control Registers and constant codes */
 #define ST7789_NOP     0x00
@@ -259,16 +260,6 @@ extern _lcd_dev lcddev;
 #define ST7789_COLOR_MODE_16bit 0x55    //  RGB565 (16bit)
 #define ST7789_COLOR_MODE_18bit 0x66    //  RGB666 (18bit)
 
-/* Basic operations */
-#define ST7789_RST_Clr() HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_RESET)
-#define ST7789_RST_Set() HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_SET)
-
-#define ST7789_DC_Clr() HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_RESET)
-#define ST7789_DC_Set() HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_SET)
-
-#define ST7789_Select() HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_RESET)
-#define ST7789_UnSelect() HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_SET)
-
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 
 /* Basic functions. */
@@ -304,14 +295,14 @@ void ST7789_TearEffect(uint8_t tear);
 void ST7789_Test(void);
 
 
-void LCD_WR_REG(uint8_t data);
-void LCD_WR_DATA(uint8_t data);
+void 		LCD_WR_REG(uint8_t data);
+void 		LCD_WR_DATA(uint8_t data);
 uint8_t SPI_WriteByte(SPI_HandleTypeDef* hspi, uint8_t Byte);
-void LCD_WriteReg(uint8_t LCD_Reg, uint16_t LCD_RegValue);
-void LCD_direction(uint8_t direction);
-void LCD_Clear(uint16_t Color);
-void LCD_SetWindows(uint16_t xStar, uint16_t yStar, uint16_t xEnd, uint16_t yEnd);
-void LCD_WriteRAM_Prepare(void);
+void 		LCD_WriteReg(uint8_t LCD_Reg, uint16_t LCD_RegValue);
+void 		LCD_direction(uint8_t direction);
+void 		LCD_Clear(uint16_t Color);
+void 		LCD_SetWindows(uint16_t xStar, uint16_t yStar, uint16_t xEnd, uint16_t yEnd);
+void 		LCD_WriteRAM_Prepare(void);
 
 
 #ifndef ST7789_ROTATION

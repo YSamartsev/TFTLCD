@@ -86,7 +86,6 @@ https://www.keil.com/support/man/docs/jlink/jlink_trace_itm_viewer.asp
 #define TRCENA 0x01000000
 =================================================*/
 
-
 #define SD_CARD_NOT_FORMATTED                    0
 #define SD_CARD_FILE_NOT_SUPPORTED               1
 #define SD_CARD_OPEN_FAIL                        2
@@ -116,7 +115,7 @@ char realdatatime[20];
 void SystemClock_Config(void);
 
 static void MX_UART2_Init(void);
-static void MX_SPI_Init(void);
+//static void MX_SPI_Init(void);
 
 static void RTC_AlarmConfig(void);
 static void RTC_SECConfig(void);
@@ -124,12 +123,12 @@ static void RTC_SECConfig(void);
 static void RTC_DateShow(uint16_t x, uint16_t y); //, uint8_t* showdate);
 static void RTC_TimeShow(uint16_t x, uint16_t y); //, uint8_t* showtime);
 
-static void LED2_Blink(void);
-static ShieldStatus TFT_ShieldDetect(void);
-static void SDCard_Config(void);
-static void TFT_DisplayErrorMessage(uint8_t message);
-static void TFT_DisplayMenu(void);
-static void TFT_DisplayImages(void);
+//static void LED0_Blink(void);
+//static ShieldStatus TFT_ShieldDetect(void);
+//static void SDCard_Config(void);
+//static void TFT_DisplayErrorMessage(uint8_t message);
+//static void TFT_DisplayMenu(void);
+//static void TFT_DisplayImages(void);
 
 
 /* ==========Для реалізації printf================== 
@@ -233,10 +232,9 @@ int __backspace(FILE *f)
 	
 	char myTemp[2];
 	
-
 int main(void)
 	//Початкова дата встановлюеться в  RTC_AlarmConfig
-                                                                                                                                                                                                                                                                                           {  
+                                                                                                                                                                                                                                                                                         {  
   /* STM32F103xB HAL library initialization:
        - Configure the Flash prefetch
        - Systick timer is configured by default as source of time base, but user 
@@ -247,7 +245,7 @@ int main(void)
        - Set NVIC Group Priority to 4
        - Low Level Initialization
      */
-  HAL_Init();  //Тут встановлюється пріорітет і група пріорітетів
+     HAL_Init();  //Тут встановлюється пріорітет і група пріорітетів
   
   /* Configure the system clock = 64 MHz */
   SystemClock_Config();
@@ -342,45 +340,73 @@ printf("==================Start RTC Watch===================\n\r");
 */
 
 /* Initialize the LCD */
-	BSP_LCD_Init(); //Спочатку через PB11 RESET, потім керується через Регістри
+	BSP_LCD_Init(); //Спочатку через PA7 RESET, потім керується через Регістри
+	
+	//ВАЖЛИВО!!!! ST7789_SetRotation(ST7789_ROTATION) впливаэ на очищення через зміну координат x=0, 	y=0	екрану !!!!!!
+	//Для 1.44 128x128  x=0, 	y=0 знаходиться навпроти роз'єму в кінці зліва. Це відповідає для st7789: #define ST7789_ROTATION 2	
+	//Але при #define ST7789_ROTATION 2	 точка  x=0, 	y=0	знаходиться біля роз'єму справа!! 
 
-	ST7789_Fill_Color(WHITE);
-
-	if (Bluetooth_present == SHIELD_DETECTED)
+#ifdef TFT_LCD_7789
+	FontDef Font_Size = Font_16x26;
+	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;	
+#elif defined (TFT_LCD_7735)
+	FontDef Font_Size = Font_11x18;
+	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
+#endif
+	
+if (Bluetooth_present == SHIELD_DETECTED)
 	{
 		if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != HAL_OK)
 		{
 			Error_Handler();
 		}
-		ST7789_WriteString(10, 180, myCommandAT.ATstring, Font_16x26, RED, WHITE);
-		ST7789_WriteString(10, 206, myAnswerAT.ATresponse, Font_16x26, RED, WHITE);
+		//LCD_WriteString(10, 180, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
+
+		//LCD_WriteString(10, 206, myAnswerAT.ATresponse, Font_Size, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.ATresponse, Font_Size, LCD_RED, LCD_WHITE);
 		HAL_Delay(500);
 
 		if (myExchange(myCommandAT.ATversion, myAnswerAT.VESIONresponse) != SUCCESS)
 		{
 			Error_Handler();
 		}
-		ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); //Заповнюю екран білим кольором
+		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
 	
-		ST7789_WriteString(10, 180, myCommandAT.ATversion, Font_16x26, RED, WHITE); 
-		ST7789_WriteString(10, 206, myAnswerAT.VESIONresponse, Font_16x26, RED, WHITE);
+		//LCD_WriteString(10, 180, myCommandAT.ATversion, Font_16x26, LCD_RED, LCD_WHITE); 
+		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATversion, Font_Size, LCD_RED, LCD_WHITE);
+		
+		//LCD_WriteString(10, 206, myAnswerAT.VESIONresponse, Font_16x26, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.VESIONresponse, Font_Size, LCD_RED, LCD_WHITE);
 		HAL_Delay(500);
 
 		if (myExchange(myCommandAT.ATname, myAnswerAT.NAMEresponse) != SUCCESS)
 		{
 			Error_Handler();
 		}	
-		ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE); 
-		ST7789_WriteString(10, 180, myCommandAT.ATname, Font_16x26, RED, WHITE);
-		ST7789_WriteString(10, 206, myAnswerAT.NAMEresponse, Font_16x26, RED, WHITE);
+		
+		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
+				
+		//LCD_WriteString(10, 180, myCommandAT.ATname, Font_16x26, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATname, Font_Size, LCD_RED, LCD_WHITE);
+		
+		
+		//LCD_WriteString(10, 206, myAnswerAT.NAMEresponse, Font_16x26, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.NAMEresponse, Font_Size, LCD_RED, LCD_WHITE);
+		
 		HAL_Delay(500);
-		ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE);
+		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
+		
 		myAnswerAT.BLUETOOTH_shield = "BL present";
-		ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, RED, WHITE);
+		//LCD_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield, Font_Size, LCD_RED, LCD_WHITE);
 	}else
 	{
 		myAnswerAT.BLUETOOTH_shield = "BL not present";
-		ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, RED, WHITE);
+		//LCD_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield, Font_Size, LCD_RED, LCD_WHITE);
 	}
  
 	*aRxBuffer = 0x00;
@@ -390,13 +416,20 @@ printf("==================Start RTC Watch===================\n\r");
     //SDCard_Config(); 
 		printf("===========AAAAAAAAAAAAA==============\n\r");
 
-		ST7789_WriteString(10, 20, "Real Date:", Font_16x26, RED, WHITE);	
-		ST7789_WriteString(10, 100, "Real Time:", Font_16x26, RED, WHITE);
+		//LCD_WriteString(10, 20, "Real Date:", Font_16x26, LCD_RED, LCD_WHITE);	
+LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:", Font_Size, LCD_RED, LCD_WHITE);
 	
+		//LCD_WriteString(10, 100, "Real Time:", Font_16x26, LCD_RED, LCD_WHITE);
+LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Font_Size, LCD_RED, LCD_WHITE);	
 	  /* Configure RTC Alarm */
 		RTC_AlarmConfig(); //Для переривання через інтервал часу 
-		RTC_DateShow(10, 50); //Показати дату, Дата читаэться з 	RtcHandle.DateToUpdate
-		RTC_TimeShow(10, 130);  //Показати час
+
+//RTC_DateShow(10, 50); //Показати дату, Дата читаэться з 	RtcHandle.DateToUpdate
+RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
+
+//RTC_TimeShow(10, 130);  //Показати час
+RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);		
+		
 		curentTimeSecond = stimestructureget.Seconds;
 		RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
 
@@ -406,7 +439,8 @@ printf("==================Start RTC Watch===================\n\r");
 		 {
 			 //Для цього зробив структуру stimestructureget публычною
 			  HAL_Delay(1200);
-				RTC_DateShow(10, 50); //показати дату після 24:00;
+				//RTC_DateShow(10, 50); //показати дату після 24:00;
+			  RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100); //показати дату після 24:00;
 	   } 
 
 /*HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
@@ -432,17 +466,14 @@ https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 			
 			//switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
 			switch (HAL_UARTEx_ReceiveToIdle(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer), (uint16_t*) &UartHandle.RxXferSize , 2000)) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
-				{ //При цій функції буде виникати sizeof(aRxBuffer) раз переривання. Відбувається помилка
+			{ //При цій функції буде виникати sizeof(aRxBuffer) раз переривання. Відбувається помилка
 				case HAL_OK:
 				mycrc = calcModulo256(aRxBuffer, UartHandle.RxXferSize - 2); //mycrc це byte. aRxBuffer[12] і aRxBuffer[13] це ASCII коди
 				//Перетворення символа в байт	
 				sprintf(&myTemp[0], "%x", (mycrc & 0xf0)>>4);					
 				sprintf(&myTemp[1], "%x",  mycrc & 0x0f);
-				
-
-				
 				//myTemp = (aRxBuffer[12] & 0x0f) * 16 + (aRxBuffer[13] & 0x0f);
-					//if (UartReady == SET)
+				//if (UartReady == SET)
 					//{
 					//Ця функція заповнює регістри UART і переводить його в режим переривання. Без очікування Timeout
 					//ST7789_WriteString(10, 180, aRxBuffer, Font_16x26, RED, WHITE);
@@ -451,16 +482,17 @@ https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 					//if(mycrc == myTemp)
 					{
 						RTC_SECUpdate();
-						RTC_DateShow(10, 50); //, aShowDate);
-						RTC_TimeShow(10, 130); //Показати час з stimestructureget
+						//RTC_DateShow(10, 50); //, aShowDate);
+						RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
+
+						
+						//RTC_TimeShow(10, 130); //Показати час з stimestructureget
+						RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
 						//UartReady = RESET;
 					} 
 						break;
-					//} 
-					break;
 				case HAL_ERROR:
-						
-					break;
+						break;
 				case HAL_BUSY:
 					/*if (UartReady == SET)
 					{
@@ -570,7 +602,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
   */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
 {
-  return;  
 	Error_Handler();
 }
 
@@ -683,7 +714,7 @@ static void RTC_SECConfig(void)
 {
   RTC_DateTypeDef  sdatestructure;
   RTC_TimeTypeDef  stimestructure;
-  RTC_AlarmTypeDef salarmstructure;
+  //RTC_AlarmTypeDef salarmstructure;
  
  //##-1- Configure the Date #################################################
   // Set Date: 25.
@@ -714,10 +745,10 @@ static void RTC_SECConfig(void)
   // Set Alarm to 02:20:30 
   //   RTC Alarm Generation: Alarm on Hours, Minutes and Seconds 
 	//Alarm спрацьовує Відносно HAL_RTC_SetTime
-  salarmstructure.Alarm = RTC_ALARM_A; //0U
-	salarmstructure.AlarmTime.Hours = 0x14;
-  salarmstructure.AlarmTime.Minutes = 0x50;
-  salarmstructure.AlarmTime.Seconds = 0x01; //0x30; //В цей час спрацьовує Alarm
+  //salarmstructure.Alarm = RTC_ALARM_A; //0U
+	//salarmstructure.AlarmTime.Hours = 0x14;
+  //salarmstructure.AlarmTime.Minutes = 0x50;
+  //salarmstructure.AlarmTime.Seconds = 0x01; //0x30; //В цей час спрацьовує Alarm
   
  	//HAL_RTCEx_SetSecond_IT(RTC_HandleTypeDef *hrtc);
 	if(HAL_RTCEx_SetSecond_IT(&RtcHandle) != HAL_OK)
@@ -743,7 +774,7 @@ static void RTC_SECUpdate(void)
 {
   RTC_DateTypeDef  sdatestructure;
   RTC_TimeTypeDef  stimestructure;
-  RTC_AlarmTypeDef salarmstructure;
+  //RTC_AlarmTypeDef salarmstructure;
  
  //##-1- Configure the Date #################################################
   // Set Date: 25.
@@ -775,6 +806,12 @@ static void RTC_SECUpdate(void)
 
 static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Дати в точці х,у дисплея
 {
+#ifdef TFT_LCD_7789
+	FontDef Font_Size = Font_16x26;
+#elif defined (TFT_LCD_7735)
+	FontDef Font_Size = Font_11x18;
+#endif
+
   RTC_DateTypeDef sdatestructureget;
   
   HAL_RTC_GetDate(&RtcHandle, &sdatestructureget, RTC_FORMAT_BIN);
@@ -783,7 +820,7 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	
 	//snprintf(realdate, sizeof realdate, "%s", &sdatestructureget.Date);
 	
-	sprintf(realdate, "%02d", sdatestructureget.Date, 2);
+	sprintf(realdate, "%02d", sdatestructureget.Date);
 	sprintf(realmonth, "%02d", sdatestructureget.Month);
 	sprintf(realyear, "%02d", sdatestructureget.Year);
 		
@@ -792,7 +829,7 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
 	printf("date = %s\n\r", temp1);
 		
-	ST7789_WriteString(x, y, temp1, Font_16x26, RED, WHITE);	 //& "." & realmonth
+	LCD_WriteString(x, y, temp1, Font_Size, LCD_RED, LCD_WHITE);	 //& "." & realmonth
 	//free(temp1);
 
 } 
@@ -805,9 +842,15 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	*/
 static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати початкової точки рядка дисплея 
 {
+#ifdef TFT_LCD_7789
+	FontDef Font_Size = Font_16x26;
+#elif defined (TFT_LCD_7735)
+	FontDef Font_Size = Font_11x18;
+#endif
+
   //stimestructureget; //Структура Година, Хвилина, Секунда
  
-  HAL_RTC_GetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BIN); //З лічильника CNTH_CNTL RTC формується структура stimestructureget
+ 	HAL_RTC_GetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BIN); //З лічильника CNTH_CNTL RTC формується структура stimestructureget
  
   //printf("%02d.%02d.20%02d %02d:%02d:%02d\n\r",sdatestructureget.Date, sdatestructureget.Month, sdatestructureget.Year, stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
 	
@@ -821,7 +864,7 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	concat_time(temp1, realhours, reatminutes, reatseconds); //соединить строки -> *temp2
 	printf("time = %s\n\r", temp1);
 			
-	ST7789_WriteString(x, y, temp1, Font_16x26, RED, WHITE);	 //& "." & realmonth
+	LCD_WriteString(x, y, temp1, Font_Size, LCD_RED, LCD_WHITE);	 //& "." & realmonth
 	//free(temp1);
 
 } 
@@ -829,7 +872,7 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 void concat_date(char * myconcat, char *s1, char *s2, char *s3)
 {
 	char mypoint[1] = ".";
-	char myspace[1] = " ";
+	//char myspace[1] = " ";
 	char mydate[2] = "20";
 	
 	memcpy(&myconcat[0], s1, 2); //"30"
@@ -861,10 +904,24 @@ void concat_time(char * myconcat, char *s1, char *s2, char *s3)
 
 void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 {
+
+#ifdef TFT_LCD_7789
+	FontDef Font_Size = Font_16x26;
+	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;	
+#elif defined (TFT_LCD_7735)
+	FontDef Font_Size = Font_11x18;
+	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
+#endif
+
+
 	//RTC_TimeTypeDef stimestructureget; 
 	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN); //Це потрібно, щоб в main було видно stimestructureget
-	RTC_TimeShow(10, 130);  //, aShowTime);
-	HAL_GPIO_TogglePin(LED2_GPIO_PORT, LED2_PIN);
+	//RTC_TimeShow(10, 130);  //, aShowTime);
+	RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
+	
+	HAL_GPIO_TogglePin(LED0_GPIO_PORT, LED0_PIN);
 
 	
 	//Перевірка на підключення bluetooth
@@ -880,7 +937,7 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 		}else
 		{
 			Bluetooth_present = SHIELD_DETECTED;
-			//HAL_GPIO_TogglePin(LED2_GPIO_PORT, LED2_PIN);
+			//HAL_GPIO_TogglePin(LED0_GPIO_PORT, LED0_PIN);
 			myAnswerAT.BLUETOOTH_shield = "BL present";
 			ST7789_DrawFilledRectangle(0, 180, 240, 240, WHITE);
 			ST7789_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, RED, WHITE);
@@ -922,22 +979,17 @@ HAL_StatusTypeDef myExchange(char *myAT, char *myRES) //Обмін команд�
 				if(Buffercmp((uint8_t *) aRxBuffer, (uint8_t *) myRES, COUNTmyresponseAT))  //перевірка на відповідність AT команди і відповіді
 				{
 					return HAL_ERROR;
-					break;
 				}
 				return HAL_OK;
-				break;
 			case HAL_ERROR:
 				Error_Handler();
 				break;			
 			case HAL_BUSY:
 				return HAL_BUSY;
-				break;
 			case HAL_TIMEOUT:
 				return HAL_TIMEOUT;
-				break;
-		}
-	
-		
+	}
+	return HAL_OK;
 }
 
 /**
@@ -966,13 +1018,13 @@ static char calcModulo256(char *myString, uint16_t BufferLength)
     {
       int crc = 0; //48 49 48 50 48 51 48 52 48 53 48 55
 			uint8_t mymod = 0;
-			char *mycrc;
+			//char *mycrc;
       for (int i = 0; i < BufferLength; i++) {
 				crc += (uint16_t) *(myString + i);
       } //598 (0x0256)
       mymod = crc - (uint16_t) (crc % 256) * 256; // 598 - 2*256 = 597- 512 = 86 (0x056)
 			return mymod;
-    }
+		}   
 
 //==============================================================================
 
