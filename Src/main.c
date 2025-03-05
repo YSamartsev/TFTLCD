@@ -218,7 +218,7 @@ int __backspace(FILE *f)
 //		uint8_t in, jn;
 	const uint16_t * mydata;
 	RTC_TimeTypeDef stimestructureget; //Зробив публічною структурою Година, Хвилина, Секунда, щоб визначати час 24:59
-	
+	RTC_DateTypeDef sdatestructureget; //Зробив публічною структурою Година, Хвилина, Секунда, щоб визначати час 24:59
 
 /* Buffer used for transmission */
 	char *aTxBuffer;
@@ -229,6 +229,9 @@ int __backspace(FILE *f)
 	answerAT	myAnswerAT;
 	uint8_t curentTimeSecond;	
 	ShieldStatus Bluetooth_present;
+	
+	uint8_t myFlag_Show_Date = 1;
+	uint8_t currentDate;
 	
 	char myTemp[2];
 	
@@ -422,7 +425,7 @@ LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:", Fon
 		//LCD_WriteString(10, 100, "Real Time:", Font_16x26, LCD_RED, LCD_WHITE);
 LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Font_Size, LCD_RED, LCD_WHITE);	
 	  /* Configure RTC Alarm */
-		RTC_AlarmConfig(); //Для переривання через інтервал часу 
+		RTC_AlarmConfig(); //Configure the current time and date
 
 //RTC_DateShow(10, 50); //Показати дату, Дата читаэться з 	RtcHandle.DateToUpdate
 RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
@@ -435,13 +438,19 @@ RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);
 
 	while (1)
 	{	
-		printf("Hours = %d Minutes = %d Seconds = %d", stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
-		if ((stimestructureget.Hours == 0x17) && (stimestructureget.Minutes == 0x3B) &&  (stimestructureget.Seconds >= 0x3B))
+		printf("Hours = %d Minutes = %d Seconds = %d\n\r", stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);	
+		//if ((stimestructureget.Hours == 0x17) && (stimestructureget.Minutes == 0x3B) &&  (stimestructureget.Seconds >= 0x3B))
+		if (myFlag_Show_Date)
 		 {
-			 //Для цього зробив структуру stimestructureget публычною
-			  HAL_Delay(1200);
-				//RTC_DateShow(10, 50); //показати дату після 24:00;
-			  RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100); //показати дату після 24:00;
+			 //обновлять Дату, пока myFlag_Show_Date = 1
+			
+			 //RTC_DateShow(10, 50); //показати пока не зміниться поточна дата
+			 printf("Year = %d Month = %d Date = %d\n\r", sdatestructureget.Date, sdatestructureget.Month, sdatestructureget.Year);	
+			 RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100); //показати дату після 24:00;
+			 if (sdatestructureget.Date != currentDate)
+			 {
+				 myFlag_Show_Date = 0; //Значить змінилася поточна дата
+			 }
 	   } 
 
 /*HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
@@ -686,9 +695,9 @@ static void RTC_AlarmConfig(void)
   
  // ##-2- Configure the Time #################################################
  //  Set Time: 14:45:01 
-  stimestructure.Hours = 0x14; //1x10+4 14 годин
-  stimestructure.Minutes = 0x45; //4x10+5 45 хвилин
-  stimestructure.Seconds = 0x01; //0x10+1 1 секунда
+  stimestructure.Hours = 0x23; //1x10+4 14 годин
+  stimestructure.Minutes = 0x59; //4x10+5 45 хвилин
+  stimestructure.Seconds = 0x55; //0x10+1 1 секунда
   
   if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
@@ -732,7 +741,7 @@ static void RTC_SECConfig(void)
   
   //##-2- Configure the Time #################################################
   // Set Time: 23:59:50 година.хвилина.секунда 
-  stimestructure.Hours = 0x13;
+  stimestructure.Hours = 0x23;
   stimestructure.Minutes = 0x59;
   stimestructure.Seconds = 0x55;
   
@@ -773,19 +782,19 @@ uint8_t RTC_Data_Update(uint8_t index) //Оновити дату і час
 //Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
 static void RTC_SECUpdate(void)
 {
-  RTC_DateTypeDef  sdatestructure;
-  RTC_TimeTypeDef  stimestructure;
+  //RTC_DateTypeDef  sdatestructure;
+  //RTC_TimeTypeDef  stimestructure;
   //RTC_AlarmTypeDef salarmstructure;
  
  //##-1- Configure the Date #################################################
   // Set Date: 25.
   
-	sdatestructure.Date = RTC_Data_Update(0); //0x10+7
-	sdatestructure.Month = RTC_Data_Update(2); //RTC_MONTH_JANUARY; //01 = 0x10+01
-	sdatestructure.Year = RTC_Data_Update(4); //0x25; //0x14;
+	sdatestructureget.Date = RTC_Data_Update(0); //0x10+7
+	sdatestructureget.Month = RTC_Data_Update(2); //RTC_MONTH_JANUARY; //01 = 0x10+01
+	sdatestructureget.Year = RTC_Data_Update(4); //0x25; //0x14;
   //sdatestructure.WeekDay = RTC_Data_Update(6); //RTC_WEEKDAY_TUESDAY; 02 = 0x10+02
   
-  if(HAL_RTC_SetDate(&RtcHandle, &sdatestructure,RTC_FORMAT_BCD) != HAL_OK) //Запис Дати з sdatestructure в RtcHandle
+  if(HAL_RTC_SetDate(&RtcHandle, &sdatestructureget,RTC_FORMAT_BCD) != HAL_OK) //Запис Дати з sdatestructure в RtcHandle
   {
     // Initialization Error //
     Error_Handler(); 
@@ -793,11 +802,11 @@ static void RTC_SECUpdate(void)
   
   //##-2- Configure the Time #################################################
   // Set Time: 23:59:50 година.хвилина.секунда 
-  stimestructure.Hours = RTC_Data_Update(6);
-  stimestructure.Minutes = RTC_Data_Update(8);
-  stimestructure.Seconds = RTC_Data_Update(10);
+  stimestructureget.Hours = RTC_Data_Update(6);
+  stimestructureget.Minutes = RTC_Data_Update(8);
+  stimestructureget.Seconds = RTC_Data_Update(10);
   
-  if(HAL_RTC_SetTime(&RtcHandle, &stimestructure,RTC_FORMAT_BCD) != HAL_OK) //Запис Часу з sdatestructure в RtcHandle
+  if(HAL_RTC_SetTime(&RtcHandle, &stimestructureget,RTC_FORMAT_BCD) != HAL_OK) //Запис Часу з sdatestructure в RtcHandle
   {
     // Initialization Error 
     Error_Handler(); 
@@ -813,7 +822,7 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	FontDef Font_Size = Font_11x18;
 #endif
 
-  RTC_DateTypeDef sdatestructureget;
+ //RTC_DateTypeDef sdatestructureget;
   
   HAL_RTC_GetDate(&RtcHandle, &sdatestructureget, RTC_FORMAT_BIN);
   
@@ -863,7 +872,7 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	
 	char temp1[9];
 	concat_time(temp1, realhours, reatminutes, reatseconds); //соединить строки -> *temp2
-	printf("time = %s\n\r", temp1);
+	//printf("time = %s\n\r", temp1);
 			
 	LCD_WriteString(x, y, temp1, Font_Size, LCD_RED, LCD_WHITE);	 //& "." & realmonth
 	//free(temp1);
@@ -921,7 +930,16 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN); //Це потрібно, щоб в main було видно stimestructureget
 	//RTC_TimeShow(10, 130);  //, aShowTime);
 	RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
-	
+	if ((stimestructureget.Hours == 0x17) && (stimestructureget.Minutes == 0x3B) &&  (stimestructureget.Seconds >= 0x3B))
+		 {
+			 //Для цього зробив структуру stimestructureget публычною
+			  //HAL_Delay(2000);
+				//RTC_DateShow(10, 50); //показати дату після 24:00;
+			 //printf("Year = %d Month = %d Date = %d\n\r", sdatestructureget.Date, sdatestructureget.Month, sdatestructureget.Year);	
+			 //RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100); //показати дату після 24:00;
+			 currentDate = sdatestructureget.Date;
+			 myFlag_Show_Date = 1;
+	   } 	
 	HAL_GPIO_TogglePin(LED0_GPIO_PORT, LED0_PIN);
 
 	

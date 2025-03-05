@@ -3,7 +3,7 @@
 <title>Static Call Graph - [TFT_LCD\TFT_LCD.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image TFT_LCD\TFT_LCD.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Wed Mar 05 11:12:49 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Wed Mar 05 14:43:06 2025
 <BR><P>
 <H3>Maximum Stack Usage =        368 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -561,7 +561,7 @@ Global Symbols
 <LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemClock_Config
 </UL>
 
-<P><STRONG><a name="[6c]"></a>HAL_RTCEx_RTCEventCallback</STRONG> (Thumb, 74 bytes, Stack size 32 bytes, main.o(i.HAL_RTCEx_RTCEventCallback))
+<P><STRONG><a name="[6c]"></a>HAL_RTCEx_RTCEventCallback</STRONG> (Thumb, 114 bytes, Stack size 32 bytes, main.o(i.HAL_RTCEx_RTCEventCallback))
 <BR><BR>[Stack]<UL><LI>Max Depth = 352<LI>Call Chain = HAL_RTCEx_RTCEventCallback &rArr; RTC_TimeShow &rArr; LCD_WriteString &rArr; LCD_WriteChar &rArr; LCD_SetAddressWindow &rArr; LCD_SendData &rArr; HAL_SPI_Transmit &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[6d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_GetTime
@@ -1073,7 +1073,6 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = __2printf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[35]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-<LI><a href="#[6e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_TimeShow
 <LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_DateShow
 <LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LCD_Fill_Color
 </UL>
@@ -1118,7 +1117,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> printf8.o(i.__0printf$8)
 </UL>
-<P><STRONG><a name="[35]"></a>main</STRONG> (Thumb, 1518 bytes, Stack size 24 bytes, main.o(i.main))
+<P><STRONG><a name="[35]"></a>main</STRONG> (Thumb, 1524 bytes, Stack size 24 bytes, main.o(i.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 344<LI>Call Chain = main &rArr; RTC_TimeShow &rArr; LCD_WriteString &rArr; LCD_WriteChar &rArr; LCD_SetAddressWindow &rArr; LCD_SendData &rArr; HAL_SPI_Transmit &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPIx_MspInit
@@ -1315,8 +1314,8 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[35]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[b3]"></a>RTC_SECUpdate</STRONG> (Thumb, 96 bytes, Stack size 16 bytes, main.o(i.RTC_SECUpdate))
-<BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = RTC_SECUpdate &rArr; HAL_RTC_SetTime &rArr; RTC_WriteTimeCounter &rArr; RTC_ExitInitMode
+<P><STRONG><a name="[b3]"></a>RTC_SECUpdate</STRONG> (Thumb, 92 bytes, Stack size 8 bytes, main.o(i.RTC_SECUpdate))
+<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = RTC_SECUpdate &rArr; HAL_RTC_SetTime &rArr; RTC_WriteTimeCounter &rArr; RTC_ExitInitMode
 </UL>
 <BR>[Calls]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_SetTime
 <LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_SetDate
@@ -1326,14 +1325,13 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[35]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[6e]"></a>RTC_TimeShow</STRONG> (Thumb, 116 bytes, Stack size 48 bytes, main.o(i.RTC_TimeShow))
+<P><STRONG><a name="[6e]"></a>RTC_TimeShow</STRONG> (Thumb, 108 bytes, Stack size 48 bytes, main.o(i.RTC_TimeShow))
 <BR><BR>[Stack]<UL><LI>Max Depth = 320<LI>Call Chain = RTC_TimeShow &rArr; LCD_WriteString &rArr; LCD_WriteChar &rArr; LCD_SetAddressWindow &rArr; LCD_SendData &rArr; HAL_SPI_Transmit &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LCD_WriteString
 <LI><a href="#[6d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_GetTime
 <LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;concat_time
 <LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2sprintf
-<LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[35]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[6c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTCEx_RTCEventCallback
