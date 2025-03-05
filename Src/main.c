@@ -435,7 +435,8 @@ RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);
 
 	while (1)
 	{	
-		 if ((stimestructureget.Hours == 0x17) && (stimestructureget.Minutes == 0x3B) &&  (stimestructureget.Seconds == 0x3B))
+		printf("Hours = %d Minutes = %d Seconds = %d", stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
+		if ((stimestructureget.Hours == 0x17) && (stimestructureget.Minutes == 0x3B) &&  (stimestructureget.Seconds >= 0x3B))
 		 {
 			 //Для цього зробив структуру stimestructureget публычною
 			  HAL_Delay(1200);
@@ -445,7 +446,7 @@ RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);
 
 /*HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
-Ця функція використовується, коли у потоці байт може бути переривання(простой). Тоді виникае IDLE і можна перевірити
+Ця функція використовується, коли у потоці байтів може бути переривання(простой). Тоді виникае IDLE і можна перевірити
 кількість прийнятих байт і або продовжити приймання або зупинити прийом.
 Перриваняя виникае коли досягнуто Size, або виникла IDLE. Це можна перевірити в HAL_UARTEx_RxEventCallback
 */
@@ -717,7 +718,7 @@ static void RTC_SECConfig(void)
   //RTC_AlarmTypeDef salarmstructure;
  
  //##-1- Configure the Date #################################################
-  // Set Date: 25.
+  // Set Date: 07.01.25
   sdatestructure.Year = 0x25; //0x14;
   sdatestructure.Month = 0x01; //RTC_MONTH_JANUARY; //01 = 0x10+01
   sdatestructure.Date = 0x07; //0x10+7
@@ -732,8 +733,8 @@ static void RTC_SECConfig(void)
   //##-2- Configure the Time #################################################
   // Set Time: 23:59:50 година.хвилина.секунда 
   stimestructure.Hours = 0x13;
-  stimestructure.Minutes = 0x29;
-  stimestructure.Seconds = 0x50;
+  stimestructure.Minutes = 0x59;
+  stimestructure.Seconds = 0x55;
   
   if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
