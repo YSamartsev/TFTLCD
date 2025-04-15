@@ -257,6 +257,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 extern uint8_t myTemp;
+extern __IO ITStatus UartReady;
 
 /** @addtogroup STM32F1xx_HAL_Driver
   * @{
@@ -1694,7 +1695,7 @@ HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle(UART_HandleTypeDef *huart, uint8_t *p
     *RxLen = huart->RxXferSize - huart->RxXferCount;
     /* At end of Rx process, restore huart->RxState to Ready */
     huart->RxState = HAL_UART_STATE_READY;
-
+		UartReady = SET;
     return HAL_OK;
   }
   else

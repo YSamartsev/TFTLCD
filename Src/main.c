@@ -460,29 +460,26 @@ https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 			switch (HAL_UARTEx_ReceiveToIdle(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer), (uint16_t*) &UartHandle.RxXferSize , 2000)) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
 			{ //При цій функції буде виникати sizeof(aRxBuffer) раз переривання. Відбувається помилка
 				case HAL_OK:
-				mycrc = calcModulo256(aRxBuffer, UartHandle.RxXferSize - 2); //mycrc це byte. aRxBuffer[12] і aRxBuffer[13] це ASCII коди
-				//Перетворення символа в байт	
-				sprintf(&myTemp[0], "%x", (mycrc & 0xf0)>>4);					
-				sprintf(&myTemp[1], "%x",  mycrc & 0x0f);
-					//if (UartReady == SET)
-					//{
-					//Ця функція заповнює регістри UART і переводить його в режим переривання. Без очікування Timeout
-					//ST7789_WriteString(10, 180, aRxBuffer, Font_16x26, RED, WHITE);
-					//printf("Code = %s", aRxBuffer[0]);
-					if(Buffercmp((uint8_t *) &aRxBuffer[12], (uint8_t*) &myTemp, 2) == 0) 
-					//if(mycrc == myTemp)
+					if(UartReady == SET)
 					{
-						RTC_SECUpdate();
-						//RTC_DateShow(10, 50); //, aShowDate);
-						RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
-
-						
-						//RTC_TimeShow(10, 130); //Показати час з stimestructureget
-						RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
-						//UartReady = RESET;
-					}
-						break;
-					//} 
+						mycrc = calcModulo256(aRxBuffer, UartHandle.RxXferSize - 2); //mycrc це byte. aRxBuffer[12] і aRxBuffer[13] це ASCII коди
+						//Перетворення символа в байт	
+						sprintf(&myTemp[0], "%x", (mycrc & 0xf0)>>4);					
+						sprintf(&myTemp[1], "%x",  mycrc & 0x0f);
+					  //Ця функція заповнює регістри UART і переводить його в режим переривання. Без очікування Timeout
+						//ST7789_WriteString(10, 180, aRxBuffer, Font_16x26, RED, WHITE);
+						//printf("Code = %s", aRxBuffer[0]);
+						if(Buffercmp((uint8_t *) &aRxBuffer[12], (uint8_t*) &myTemp, 2) == 0) 
+						//if(mycrc == myTemp)
+							{
+								RTC_SECUpdate();
+								//RTC_DateShow(10, 50); //, aShowDate);
+								RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
+								//RTC_TimeShow(10, 130); //Показати час з stimestructureget
+								RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
+							}
+						UartReady = RESET;
+					} 
 					break;
 				case HAL_ERROR:
 						
