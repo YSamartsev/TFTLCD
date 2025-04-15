@@ -180,14 +180,16 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc)
   RCC_OscInitStruct.LSIState = RCC_LSI_OFF;
   if(HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   { 
-    Error_Handler();
+    char *myError = "HAL_RCC_OscConfig";
+		Error_Handler(myError);
   }
   
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
   PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
   if(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   { 
-    Error_Handler();
+    char *myError = "HAL_RCCEx_PeriphCLKConfig";
+		Error_Handler(myError);
   }
 #elif defined (RTC_CLOCK_SOURCE_LSI)  
   RCC_OscInitStruct.OscillatorType =  RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_LSE;

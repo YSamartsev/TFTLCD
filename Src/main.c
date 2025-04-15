@@ -234,6 +234,8 @@ int __backspace(FILE *f)
 	uint8_t currentDate;
 	
 	char myTemp[2];
+	uint32_t isrflags;  
+	uint32_t cr1its;
 	
 int main(void)
 	//Початкова дата встановлюеться в  RTC_AlarmConfig
@@ -269,6 +271,9 @@ int main(void)
 	myAnswerAT.BLUETOOTH_shield = "BL present";
 		
 	Bluetooth_present = SHIELD_DETECTED;	
+	
+	uint32_t isrflags = READ_REG(UartHandle.Instance->SR);  
+	uint32_t cr1its   = READ_REG(UartHandle.Instance->CR1);
 	
 	//char myAT_RES[2][20]; //Перший індекс - кількість рядків, другий = максимальна кількість символів
 	
@@ -311,10 +316,15 @@ int main(void)
   */
 	RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
 
-	if (HAL_RTC_Init(&RtcHandle) != HAL_OK)
+
+
+	if (HAL_RTC_Init(&RtcHandle) != HAL_OK) 
   {
-    Error_Handler();
+    char *myError = "HAL_RTC_Init";
+		Error_Handler(myError);
   } 
+
+
 
 /* -------------RTC End--------------*/
 
@@ -363,7 +373,8 @@ if (Bluetooth_present == SHIELD_DETECTED)
 	{
 		if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != HAL_OK)
 		{
-			Error_Handler();
+			char *myError = "myExchange";
+			Error_Handler(myError);
 		}
 		//LCD_WriteString(10, 180, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
 		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
@@ -374,7 +385,8 @@ if (Bluetooth_present == SHIELD_DETECTED)
 
 		if (myExchange(myCommandAT.ATversion, myAnswerAT.VESIONresponse) != SUCCESS)
 		{
-			Error_Handler();
+			char *myError = "myExchange";
+			Error_Handler(myError);
 		}
 		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
 	
@@ -387,7 +399,8 @@ if (Bluetooth_present == SHIELD_DETECTED)
 
 		if (myExchange(myCommandAT.ATname, myAnswerAT.NAMEresponse) != SUCCESS)
 		{
-			Error_Handler();
+			char *myError = "myExchange";
+			Error_Handler(myError);
 		}	
 		
 		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
@@ -437,9 +450,9 @@ RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);
 		RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
 
 	while (1)
-	{	
-		printf("Hours = %d Minutes = %d Seconds = %d\n\r", stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);	
-		//if ((stimestructureget.Hours == 0x17) && (stimestructureget.Minutes == 0x3B) &&  (stimestructureget.Seconds >= 0x3B))
+	{
+		//printf("Hours = %d Minutes = %d Seconds = %d\n\r", stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);	
+
 		if (myFlag_Show_Date)
 		 {
 			 //обновлять Дату, пока myFlag_Show_Date = 1
@@ -473,33 +486,61 @@ https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 					UartReady = RESET;
 				}
 			} */
-			
-			//switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
-			switch (HAL_UARTEx_ReceiveToIdle(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer), (uint16_t*) &UartHandle.RxXferSize , 2000)) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
+			//USART_SR_RXNE - Це маска біта  SR_RXNE. Спочатку треба прочитати регистр SR
+ 			switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
+			//switch (HAL_UARTEx_ReceiveToIdle(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer), (uint16_t*) &UartHandle.RxXferSize , 2000)) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
 			{ //При цій функції буде виникати sizeof(aRxBuffer) раз переривання. Відбувається помилка
 				case HAL_OK:
-				mycrc = calcModulo256(aRxBuffer, UartHandle.RxXferSize - 2); //mycrc це byte. aRxBuffer[12] і aRxBuffer[13] це ASCII коди
-				//Перетворення символа в байт	
-				sprintf(&myTemp[0], "%x", (mycrc & 0xf0)>>4);					
-				sprintf(&myTemp[1], "%x",  mycrc & 0x0f);
-				//myTemp = (aRxBuffer[12] & 0x0f) * 16 + (aRxBuffer[13] & 0x0f);
-				//if (UartReady == SET)
-					//{
-					//Ця функція заповнює регістри UART і переводить його в режим переривання. Без очікування Timeout
-					//ST7789_WriteString(10, 180, aRxBuffer, Font_16x26, RED, WHITE);
-					//printf("Code = %s", aRxBuffer[0]);
-					if(Buffercmp((uint8_t *) &aRxBuffer[12], (uint8_t*) &myTemp, 2) == 0) 
-					//if(mycrc == myTemp)
+					if(UartReady == SET)
 					{
-						RTC_SECUpdate();
-						//RTC_DateShow(10, 50); //, aShowDate);
-						RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
+//Приклад прийнятої послідовності 
+//мобільний формує коригуючу послідовність байтів: 0x32 0x38 0x30 0x33 0x32 0x35 0x31 0x33	px35 0x38 0x30 0x35 == Mb
+// кожен байт - це 4-х розрядний код символа цифри	2 8 0 3 2 5 1 3 5 8 0 5		
+//Моб додаток визначає crc цієї послідовності байт: залишок від crc (Число) = (0x32+0x38+0x30+0x33+0x32+0x35+0x31+0x33+px35+0x38+0x30+0x35) / 256 = 0x6A =106
+//До послідовнсті Mb додаються два байта: код символа "6"  + код симола "a", тобто 0x36 + 0x61 
+//Тут приймається послідовнсть байтів: 	0x32 0x38 0x30 0x33 0x32 0x35 0x31 0x33	px35 0x38 0x30 0x35 0x36  0x61	
+//mycrc = crc = 0x6A
+//myTemp[0] формується як ACII код старшого розряду mycrc
+//myTemp[1] формується як ACII код молодшого розряду mycrc
+						mycrc = calcModulo256(aRxBuffer, UartHandle.RxXferSize - 2); //mycrc це byte. aRxBuffer[12] і aRxBuffer[13] це ASCII коди
+						//Перетворення символа в байт	
+						char myTempD[2];
+				
+						uint8_t dTemp = (mycrc & 0xf0)>>4;
+						sprintf(&myTempD[0], "%x", dTemp);	
+					
+					
+						dTemp = (mycrc & 0x0f);
+						sprintf(&myTempD[1], "%x",  dTemp);
+				 
+printf("mycr1 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
+			
+				
+				 
+						printf("aRxBufer:\n\r");
+						for(uint8_t ix = 0; ix < 14; ix++)
+						{	
+							printf("0x%x ", aRxBuffer[ix]);
+					
+						}	
+printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
+						//Ця функція заповнює регістри UART і переводить його в режим переривання. Без очікування Timeout
+						//ST7789_WriteString(10, 180, aRxBuffer, Font_16x26, RED, WHITE);
+						//printf("Code = %s", aRxBuffer[0]);
+						if(Buffercmp((uint8_t *) &aRxBuffer[12], (uint8_t*) &myTempD, 2) == 0) 
+						{
+							//Контрольні суми співпадають
+							RTC_SECUpdate(); ////Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
+							//RTC_DateShow(10, 50); //, aShowDate);
+							RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
 
 						
-						//RTC_TimeShow(10, 130); //Показати час з stimestructureget
-						RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
-						//UartReady = RESET;
+							//RTC_TimeShow(10, 130); //Показати час з stimestructureget
+							RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
 					} 
+				//}
+						UartReady = RESET;
+					}	
 						break;
 				case HAL_ERROR:
 						break;
@@ -513,6 +554,7 @@ https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 						UartReady = RESET;
 						break;
 					} */
+					//printf("Poll Uart: HAL_BUSY\n\r");
 					break;
 				case HAL_TIMEOUT:
 					//UartReady = RESET; //Ця подія в цій функції ніколи не настає
@@ -554,7 +596,8 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
-    Error_Handler();
+    char *myError = "HAL_RCC_OscConfig";
+		Error_Handler(myError);
   }
   //==/** Initializes the CPU, AHB and APB buses clocks
   //
@@ -567,13 +610,15 @@ void SystemClock_Config(void)
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
-    Error_Handler();
+    char *myError = "HAL_RCC_ClockConfig";
+		Error_Handler(myError);
   }
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC;
   PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
-    Error_Handler();
+    char *myError = "HAL_RCCEx_PeriphCLKConfig";
+		Error_Handler(myError);
   }
 } 
 
@@ -612,7 +657,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
   */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
 {
-	Error_Handler();
+	char *myError = "HAL_UART_ErrorCallback";
+	Error_Handler(myError);
 }
 
 
@@ -629,7 +675,8 @@ static void MX_UART2_Init(void)
   if (HAL_UART_Init(&UartHandle) != HAL_OK)
   {
     //== Initialization Error 
-    Error_Handler();
+    char *myError = "HAL_UART_Init";
+		Error_Handler(myError);
   }
 } 
 
@@ -690,7 +737,8 @@ static void RTC_AlarmConfig(void)
   if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
     // Initialization Error 
-    Error_Handler(); 
+    char *myError = "HAL_RTC_SetDate";
+		Error_Handler(myError); 
   } 
   
  // ##-2- Configure the Time #################################################
@@ -702,7 +750,8 @@ static void RTC_AlarmConfig(void)
   if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
      //Initialization Error 
-    Error_Handler(); 
+    char *myError = "HAL_RTC_SetTime";
+		Error_Handler(myError); 
   }  
 
   //##-3- Configure the RTC Alarm peripheral #################################
@@ -716,7 +765,8 @@ static void RTC_AlarmConfig(void)
   if(HAL_RTC_SetAlarm_IT(&RtcHandle,&salarmstructure,RTC_FORMAT_BCD) != HAL_OK)
   {
    // Initialization Error
-    Error_Handler(); 
+    char *myError = "HAL_RTC_SetAlarm_IT";
+		Error_Handler(myError); 
   }
 }
 
@@ -736,7 +786,8 @@ static void RTC_SECConfig(void)
   if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
     // Initialization Error //
-    Error_Handler(); 
+    char *myError = "HAL_RTC_SetDate";
+		Error_Handler(myError);
   } 
   
   //##-2- Configure the Time #################################################
@@ -748,7 +799,8 @@ static void RTC_SECConfig(void)
   if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
     // Initialization Error 
-    Error_Handler(); 
+    char *myError = "HAL_RTC_SetTime";
+		Error_Handler(myError); 
   }  
 
   //##-3- Configure the RTC Alarm peripheral #################################
@@ -764,7 +816,8 @@ static void RTC_SECConfig(void)
 	if(HAL_RTCEx_SetSecond_IT(&RtcHandle) != HAL_OK)
   {
     // Initialization Error 
-    Error_Handler(); 
+		char *myError = "HAL_RTCEx_SetSecond_IT";
+		Error_Handler(myError); 
   }
 } 
 
@@ -797,7 +850,8 @@ static void RTC_SECUpdate(void)
   if(HAL_RTC_SetDate(&RtcHandle, &sdatestructureget,RTC_FORMAT_BCD) != HAL_OK) //Запис Дати з sdatestructure в RtcHandle
   {
     // Initialization Error //
-    Error_Handler(); 
+    char *myError = "HAL_RTC_SetDate";
+		Error_Handler(myError);  
   } 
   
   //##-2- Configure the Time #################################################
@@ -809,7 +863,8 @@ static void RTC_SECUpdate(void)
   if(HAL_RTC_SetTime(&RtcHandle, &stimestructureget,RTC_FORMAT_BCD) != HAL_OK) //Запис Часу з sdatestructure в RtcHandle
   {
     // Initialization Error 
-    Error_Handler(); 
+    char *myError = "HAL_RTC_SetTime";
+		Error_Handler(myError); 
   }  
 }
 
@@ -930,7 +985,7 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN); //Це потрібно, щоб в main було видно stimestructureget
 	//RTC_TimeShow(10, 130);  //, aShowTime);
 	RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
-	if ((stimestructureget.Hours == 0x17) && (stimestructureget.Minutes == 0x3B) &&  (stimestructureget.Seconds >= 0x3B))
+	if ((stimestructureget.Hours == 0x17) && (stimestructureget.Minutes == 0x3B) &&  (stimestructureget.Seconds >= 0x32))
 		 {
 			 //Для цього зробив структуру stimestructureget публычною
 			  //HAL_Delay(2000);
@@ -973,7 +1028,8 @@ HAL_StatusTypeDef myExchange(char *myAT, char *myRES) //Обмін команд�
 		
 	if(HAL_UART_Transmit_IT(&UartHandle, (uint8_t*)aTxBuffer, COUNTmycommandAT)!= HAL_OK)
   {
-    Error_Handler();
+    char *myError = "HAL_UART_Transmit_IT";
+		Error_Handler(myError);
   } 
   /*##-3- Wait for the end of the transfer ###################################*/   
   while (UartReady != SET)
@@ -1001,7 +1057,6 @@ HAL_StatusTypeDef myExchange(char *myAT, char *myRES) //Обмін команд�
 				}
 				return HAL_OK;
 			case HAL_ERROR:
-				Error_Handler();
 				break;			
 			case HAL_BUSY:
 				return HAL_BUSY;
@@ -1036,9 +1091,10 @@ static int Buffercmp(uint8_t * pBuffer1, uint8_t * pBuffer2, uint16_t BufferLeng
 static char calcModulo256(char *myString, uint16_t BufferLength)
     {
       int crc = 0; //48 49 48 50 48 51 48 52 48 53 48 55
+			uint8_t i = 0;
 			uint8_t mymod = 0;
 			//char *mycrc;
-      for (int i = 0; i < BufferLength; i++) {
+      for (i = 0; i < BufferLength; i++) {
 				crc += (uint16_t) *(myString + i);
       } //598 (0x0256)
       mymod = crc - (uint16_t) (crc % 256) * 256; // 598 - 2*256 = 597- 512 = 86 (0x056)
@@ -1047,13 +1103,14 @@ static char calcModulo256(char *myString, uint16_t BufferLength)
 
 //==============================================================================
 
-void Error_Handler(void)
+void Error_Handler(char *myError)
 {
-  while (1)
+	printf("Error in %s\n\r", myError);
+	while (1)
   {
-    /* Toggle LED2 with a period of one second */
-    //BSP_LED_Toggle(LED2);
-    HAL_Delay(1000);
+    /*Toggle LED2 with a period of one second */
+    BSP_LED_Toggle(LED2);
+    HAL_Delay(100);
 		
   }
 }

@@ -114,7 +114,7 @@ typedef struct
 //#define TFT_LCD_7789
 
 /* Exported functions ------------------------------------------------------- */
-void Error_Handler(void);
+void Error_Handler(char *myError);
 void Test_Colors(void);
 //void concat_data(char * mytemp, char *s1, char *s2, char *s3);
 void concat_date(char * myconcat, char *s1, char *s2, char *s3);

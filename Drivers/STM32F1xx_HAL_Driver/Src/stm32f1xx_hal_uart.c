@@ -1350,7 +1350,7 @@ HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, const uint8_t 
   */
 HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 {
-  /* Check that a Rx process is not already ongoing */
+  /* Check that a Rx process is not already ongoing. pData вказує на aRxBuffer. Прийом йде за адресою pRxBuffPtr */
   if (huart->RxState == HAL_UART_STATE_READY)
   {
     if ((pData == NULL) || (Size == 0U))
@@ -1360,10 +1360,9 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
 
     /* Set Reception type to Standard reception */
     huart->ReceptionType = HAL_UART_RECEPTION_STANDARD;
-
-										myTemp = 0;
+					
 		
-    return (UART_Start_Receive_IT(huart, pData, Size));
+    return (UART_Start_Receive_IT(huart, pData, Size)); //Start прийому з перериванням. pRxDuffPtr<-pData=pRxBuffPtr
   }
   else
   {
@@ -2366,10 +2365,7 @@ void HAL_UART_IRQHandler(UART_HandleTypeDef *huart)
     /* UART in mode Receiver -------------------------------------------------*/
     if (((isrflags & USART_SR_RXNE) != RESET) && ((cr1its & USART_CR1_RXNEIE) != RESET))
     {
- 
-						myTemp++;
-
-			UART_Receive_IT(huart);
+ 			UART_Receive_IT(huart);
       return;
     }
   }
@@ -3252,14 +3248,14 @@ HAL_StatusTypeDef UART_Start_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pDat
 
   if (huart->Init.Parity != UART_PARITY_NONE)
   {
-    /* Enable the UART Parity Error Interrupt */
+    /* Enable the UART Parity Error Interrupt якщо вибрано Parity то встановлюється контроль Parity*/
     __HAL_UART_ENABLE_IT(huart, UART_IT_PE);
   }
 
   /* Enable the UART Error Interrupt: (Frame error, noise error, overrun error) */
   __HAL_UART_ENABLE_IT(huart, UART_IT_ERR);
 
-  /* Enable the UART Data Register not empty Interrupt */
+  /* Enable the UART Data Register not empty Interrupt Встановлює CR1_RXNEIE*/
   __HAL_UART_ENABLE_IT(huart, UART_IT_RXNE);
 
   return HAL_OK;
@@ -3616,7 +3612,7 @@ static HAL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef *huart)
     }
     else
     {
-      pdata8bits = (uint8_t *) huart->pRxBuffPtr;
+      pdata8bits = (uint8_t *) huart->pRxBuffPtr; //Тут спадає прапорець RXNE
       pdata16bits  = NULL;
 
       if ((huart->Init.WordLength == UART_WORDLENGTH_9B) || ((huart->Init.WordLength == UART_WORDLENGTH_8B) && (huart->Init.Parity == UART_PARITY_NONE)))
@@ -3686,7 +3682,7 @@ static HAL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef *huart)
 
       return HAL_OK;
     }
-    return HAL_OK;
+    return HAL_OK; //Переривання не скидаєтьсяБ продовжується прийом байтів
   }
   else
   {
