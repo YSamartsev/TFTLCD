@@ -245,7 +245,7 @@ int main(void)
        - Set NVIC Group Priority to 4
        - Low Level Initialization
      */
-     HAL_Init();  //Тут встановлюється пріорітет і група пріорітетів
+   HAL_Init();  //Тут встановлюється пріорітет і група пріорітетів
   
   /* Configure the system clock = 64 MHz */
   SystemClock_Config();
@@ -617,7 +617,7 @@ static void MX_UART2_Init(void)
 
 void LCD_RESET_SET(void)
 {
-		LCD_RST_LOW();  //ST7789_RST_Clr(); //Керується через PB11. В платі не використовується
+		LCD_RST_LOW();  //ST7789_RST_Clr(); //Керується через PB1. В платі не використовується
     HAL_Delay(20);
    
 		LCD_RST_HIGH();  //ST7789_RST_Set();

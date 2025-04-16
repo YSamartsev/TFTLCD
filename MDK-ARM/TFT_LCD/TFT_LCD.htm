@@ -3,7 +3,7 @@
 <title>Static Call Graph - [TFT_LCD\TFT_LCD.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image TFT_LCD\TFT_LCD.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Tue Apr 15 12:00:30 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Wed Apr 16 12:56:04 2025
 <BR><P>
 <H3>Maximum Stack Usage =        368 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -295,7 +295,7 @@ Global Symbols
 
 <P><STRONG><a name="[d7]"></a>_ll_ushift_r</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, llushr.o(.text), UNUSED)
 
-<P><STRONG><a name="[4f]"></a>BSP_LCD_Init</STRONG> (Thumb, 58 bytes, Stack size 8 bytes, stm32_adafruit_lcd.o(i.BSP_LCD_Init))
+<P><STRONG><a name="[4f]"></a>BSP_LCD_Init</STRONG> (Thumb, 70 bytes, Stack size 8 bytes, stm32_adafruit_lcd.o(i.BSP_LCD_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 192<LI>Call Chain = BSP_LCD_Init &rArr; LCD_Fill_Color &rArr; LCD_SetAddressWindow &rArr; LCD_SendData &rArr; HAL_SPI_Transmit &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
@@ -309,11 +309,12 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BSP_LCD_Init
 </UL>
 
-<P><STRONG><a name="[53]"></a>BSP_LED_Init</STRONG> (Thumb, 94 bytes, Stack size 32 bytes, stm32f1xx_nucleo.o(i.BSP_LED_Init))
+<P><STRONG><a name="[53]"></a>BSP_LED_Init</STRONG> (Thumb, 118 bytes, Stack size 32 bytes, stm32f1xx_nucleo.o(i.BSP_LED_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = BSP_LED_Init &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[54]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_Init
 <LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_WritePin
+<LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 </UL>
 <BR>[Called By]<UL><LI><a href="#[35]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -369,7 +370,8 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
 </UL>
-<BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BSP_LCD_Init
+<BR>[Called By]<UL><LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BSP_LED_Init
+<LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BSP_LCD_Init
 <LI><a href="#[35]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LCD_RESET_SET
 <LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_Handler
@@ -871,7 +873,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BSP_LCD_Init
 </UL>
 
-<P><STRONG><a name="[a4]"></a>LCD_IO_Init</STRONG> (Thumb, 156 bytes, Stack size 24 bytes, stm32f1xx_nucleo.o(i.LCD_IO_Init))
+<P><STRONG><a name="[a4]"></a>LCD_IO_Init</STRONG> (Thumb, 178 bytes, Stack size 24 bytes, stm32f1xx_nucleo.o(i.LCD_IO_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 60<LI>Call Chain = LCD_IO_Init &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[54]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_Init

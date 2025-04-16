@@ -38,6 +38,7 @@ tft_lcd\stm32_adafruit_lcd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_
 tft_lcd\stm32_adafruit_lcd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 tft_lcd\stm32_adafruit_lcd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_smartcard.h
 tft_lcd\stm32_adafruit_lcd.o: ..\Drivers\BSP\STM32F1xx_Nucleo\stm32f1xx_nucleo.h
+tft_lcd\stm32_adafruit_lcd.o: ../Inc/main.h
 tft_lcd\stm32_adafruit_lcd.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 tft_lcd\stm32_adafruit_lcd.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 tft_lcd\stm32_adafruit_lcd.o: ..\Middlewares\Third_Party\FatFs\src\ff_gen_drv.h

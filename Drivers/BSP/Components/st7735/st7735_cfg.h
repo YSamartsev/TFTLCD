@@ -2,51 +2,101 @@
  *
  */
 #ifndef ST7735_CFG_H_
-#define ST7735_CFG_H_
+	#define ST7735_CFG_H_
 
-#include "main.h"
-//#define SpiHandle hspi2 //hspi1, hspi2, hspi3...
+	#include "main.h"
+	
+	#ifdef TFT_LCD_1_44________
+		//#define SpiHandle hspi2 //hspi1, hspi2, hspi3...
+		//#define USE_SPI_DMA     //if used DMA for SPI bus
+		//#define ST7735_1_8_DEFAULT_ORIENTATION  // AliExpress/eBay 1.8" display, default orientation
+		//#define ST7735S_1_8_DEFAULT_ORIENTATION   // WaveShare ST7735S-based 1.8" display, default orientation
+		#define ST7735_1_44_DEFAULT_ORIENTATION   // 1.44" display, default orientation
 
-//#define USE_SPI_DMA     //if used DMA for SPI bus
-//#define ST7735_1_8_DEFAULT_ORIENTATION  // AliExpress/eBay 1.8" display, default orientation
-//#define ST7735S_1_8_DEFAULT_ORIENTATION   // WaveShare ST7735S-based 1.8" display, default orientation
-#define ST7735_1_44_DEFAULT_ORIENTATION   // 1.44" display, default orientation
-//#define ST7735_MINI_DEFAULT_ORIENTATION   // mini 160x80 display (it's unlikely you want the default orientation)
-//Port and pin connected signal 'RES' (reset) ST7735 display
-#ifndef ST7735_RES_Pin
-#define ST7735_RES_Pin      GPIO_PIN_7
-#endif
+		//#define ST7735_MINI_DEFAULT_ORIENTATION   // mini 160x80 display (it's unlikely you want the default orientation)
+		//Port and pin connected signal 'RES' (reset) ST7735 display
+		#ifndef LCD_RES_Pin
+			#define LCD_RES_Pin      GPIO_PIN_7
+		#endif
 
-#ifndef ST7735_RES_GPIO_Port
-#define ST7735_RES_GPIO_Port  GPIOA
-#endif
+		#ifndef ST77_RES_GPIO_Port
+			#define ST77_RES_GPIO_Port  GPIOA
+		#	endif
 
-//Port and pin connected signal 'DC' (data or command) ST7735 display
-#ifndef ST7735_DC_Pin
-#define ST7735_DC_Pin       GPIO_PIN_1
-#endif
+		//Port and pin connected signal 'DC' (data or command) ST7735 display
+		#ifndef LCD_DC_Pin
+			#define LCD_DC_Pin       GPIO_PIN_1
+		#endif
 
-#ifndef ST7735_DC_GPIO_Port
-#define ST7735_DC_GPIO_Port   GPIOB
-#endif
+		#ifndef ST77_DC_GPIO_Port
+			#define ST77_DC_GPIO_Port   GPIOB
+		#endif
 
-//Port and pin connected signal 'CS' (chip select) ST7735 display Не використовую
-#ifndef ST7735_CS_Pin
-#define ST7735_CS_Pin       GPIO_PIN_12
-#endif
+		//Port and pin connected signal 'CS' (chip select) ST7735 display Не використовую
+		#ifndef ST77_CS_Pin
+			#define ST77_CS_Pin       GPIO_PIN_12
+		#endif
 
-#ifndef ST7735_CS_GPIO_Port
-#define ST7735_CS_GPIO_Port   GPIOB
-#endif
+		#ifndef ST77_CS_GPIO_Port
+			#define ST77_CS_GPIO_Port   GPIOB
+		#endif
 
-//Port and pin connected signal 'BL' (back light) ST7735 display Не використовую
-#ifndef ST7735_BL_Pin
-#define ST7735_BL_Pin     GPIO_PIN_15
-#endif
+		//Port and pin connected signal 'BL' (back light) ST7735 display Не використовую
+		#ifndef ST77_BL_Pin
+			#define ST77_BL_Pin     GPIO_PIN_15
+		#endif
 
-#ifndef ST7735_BL_GPIO_Port
-#define ST7735_BL_GPIO_Port   GPIOB
-#endif
+		#ifndef ST77_BL_GPIO_Port
+			#define ST77_BL_GPIO_Port   GPIOB
+		#endif
+	#endif
+	
+	#ifdef TFT_LCD_1_77_______
+		//#define SpiHandle //hspi1, hspi2, hspi3...
+		//#define USE_SPI_DMA     //if used DMA for SPI bus
+		//#define ST7735_1_8_DEFAULT_ORIENTATION  // AliExpress/eBay 1.8" display, default orientation
+		//#define ST7735S_1_8_DEFAULT_ORIENTATION   // WaveShare ST7735S-based 1.8" display, default orientation
 
+		#define ST7735_1_77_DEFAULT_ORIENTATION   // 1.77" display, default orientation
+
+		//#define ST7735_MINI_DEFAULT_ORIENTATION   // mini 160x80 display (it's unlikely you want the default orientation)
+		//Port and pin connected signal 'RES' (reset) ST7735 display
+		#ifndef LCD_RES_Pin
+			#define LCD_RES_Pin      GPIO_PIN_1
+		#endif
+
+		#ifndef ST77_RES_GPIO_Port
+			#define ST77_RES_GPIO_Port  GPIOB
+		#	endif
+
+		//Port and pin connected signal 'DC' (data or command) ST7735 display
+		#ifndef LCD_DC_Pin
+			#define LCD_DC_Pin       GPIO_PIN_0
+		#endif
+
+		#ifndef ST77_DC_GPIO_Port
+			#define ST77_DC_GPIO_Port   GPIOB
+		#endif
+
+		//Port and pin connected signal 'CS' (chip select) ST7735 display Не використовую
+		#ifndef ST77_CS_Pin
+			#define ST77_CS_Pin       GPIO_PIN_10
+		#endif
+
+		#ifndef ST77_CS_GPIO_Port
+			#define ST77_CS_GPIO_Port   GPIOB
+		#endif
+
+		//Port and pin connected signal 'BL' (back light) ST7735 display Не використовую
+		#ifndef ST77_BL_Pin
+			#define ST77_BL_Pin     GPIO_PIN_11
+		#endif
+
+		#ifndef ST77_BL_GPIO_Port
+			#define ST77_BL_GPIO_Port   GPIOB
+		#endif
+	#endif	
+	
+	
 #endif /* ST7735_CFG_H_ */
 

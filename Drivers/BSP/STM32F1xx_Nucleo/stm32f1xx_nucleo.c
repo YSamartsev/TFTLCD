@@ -41,6 +41,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_nucleo.h"
+#include "st7735_cfg.h"
 
 extern SPI_HandleTypeDef SpiHandle;
 
@@ -222,11 +223,13 @@ void BSP_LED_Init(Led_TypeDef Led)
   gpioinitstruct.Mode   = GPIO_MODE_OUTPUT_PP;
   gpioinitstruct.Pull   = GPIO_NOPULL;
   gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
-  
   HAL_GPIO_Init(LED_PORT[Led], &gpioinitstruct);
-
-  /* Reset PIN to switch off the LED */
-  HAL_GPIO_WritePin(LED_PORT[Led],LED_PIN[Led], GPIO_PIN_RESET);
+	
+	 	/* Reset PIN to switch off the LED */
+  HAL_GPIO_WritePin(LED_PORT[Led],LED_PIN[Led], GPIO_PIN_RESET); //Запалити світлодіод
+	HAL_Delay(200);
+	/* Setet PIN to switch off the LED */
+  HAL_GPIO_WritePin(LED_PORT[Led],LED_PIN[Led], GPIO_PIN_SET); //потушити світлодіод
 }
 
 /**
@@ -640,8 +643,10 @@ void LCD_IO_Init(void)
   HAL_GPIO_Init(LCD_RST_GPIO_PORT, &gpioinitstruct); 
 
 	/* LCD chip select high */
+	LCD_CS_LOW(); //Для перевірки
   LCD_CS_HIGH(); //Використовую PB12. В платі не використовується
 	
+	LCD_RST_LOW(); //Для перевірки
 	LCD_RST_HIGH(); //Піднімаю RST
 }
 

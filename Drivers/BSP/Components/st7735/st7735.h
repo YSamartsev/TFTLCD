@@ -214,34 +214,50 @@ void     LCD_Delay(uint32_t delay);
 #define ST7735_MADCTL_MV  0x20
 #define ST7735_MADCTL_RGB 0x00
 #define ST7735_MADCTL_BGR 0x08
+
 // AliExpress/eBay 1.8" display, default orientation
 #ifdef ST7735_1_8_DEFAULT_ORIENTATION
-#define ST7735_IS_160X128   1
-#define ST7735_WIDTH        128
-#define ST7735_HEIGHT       160
-#define ST7735_XSTART       0
-#define ST7735_YSTART       0
-#define ST7735_DATA_ROTATION  (ST7735_MADCTL_MX | ST7735_MADCTL_MY)
+	#define ST7735_IS_160X128   1
+	#define ST7735_WIDTH        128
+	#define ST7735_HEIGHT       160
+	#define ST7735_XSTART       0
+	#define ST7735_YSTART       0
+	#define ST7735_DATA_ROTATION  (ST7735_MADCTL_MX | ST7735_MADCTL_MY)
 #endif //ST7735_1_8_DEFAULT_ORIENTATION
+
 // WaveShare ST7735S-based 1.8" display, default orientation
 #ifdef ST7735S_1_8_DEFAULT_ORIENTATION
-#define ST7735_IS_120X128     1
-#define ST7735_WIDTH        128
-#define ST7735_HEIGHT       128
-#define ST7735_XSTART       2
-#define ST7735_YSTART       1
-#define ST7735_DATA_ROTATION  (ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_RGB)
+	#define ST7735_IS_120X128     1
+	#define ST7735_WIDTH        128
+	#define ST7735_HEIGHT       128
+	#define ST7735_XSTART       2
+	#define ST7735_YSTART       1
+	#define ST7735_DATA_ROTATION  (ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_RGB)
 #endif //ST7735S_1_8_DEFAULT_ORIENTATION
+
 // 1.44" display, default orientation
 #ifdef ST7735_1_44_DEFAULT_ORIENTATION
-#define ST7735_IS_128X128     1
-#define ST7735_WIDTH        128
-#define ST7735_HEIGHT       128
-#define ST7735_XSTART       2
-#define ST7735_YSTART       3
-//#define ST7735_VALUE_ROTATION 0
-#define ST7735_DATA_ROTATION  (ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_BGR)
+	#define ST7735_IS_128X128     1
+	#define ST7735_WIDTH        128
+	#define ST7735_HEIGHT       128
+	#define ST7735_XSTART       2
+	#define ST7735_YSTART       3
+	//#define ST7735_VALUE_ROTATION 0
+	#define ST7735_DATA_ROTATION  (ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_BGR)
 #endif //ST7735_1_44_DEFAULT_ORIENTATION
+ 
+// 1.77" display, default orientation
+#ifdef ST7735_1_77_DEFAULT_ORIENTATION
+	#define ST7735_IS_160X128     1
+	#define ST7735_WIDTH        128
+	#define ST7735_HEIGHT       160
+	#define ST7735_XSTART       2
+	#define ST7735_YSTART       3
+	//#define ST7735_VALUE_ROTATION 0
+	#define ST7735_DATA_ROTATION  (ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_BGR)
+#endif //ST7735_1_44_DEFAULT_ORIENTATION
+
+
 // mini 160x80 display (it's unlikely you want the default orientation)
 #ifdef ST7735_MINI_DEFAULT_ORIENTATION
 #define ST7735_IS_128X80    1
@@ -252,6 +268,7 @@ void     LCD_Delay(uint32_t delay);
 //#define ST7735_VALUE_ROTATION 0
 #define ST7735_DATA_ROTATION  (ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_BGR)
 #endif //ST7735_MINI_DEFAULT_ORIENTATION
+
 /****************************/
 #define ST7735_NOP     0x00
 #define ST7735_SWRESET 0x01

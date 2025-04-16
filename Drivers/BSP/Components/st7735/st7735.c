@@ -39,7 +39,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "st7735.h"
 #include "stdlib.h"
-#include "st7735_cfg.h"
+//#include "st7735_cfg.h"
+#include "stm32f1xx_nucleo.h"
 
 //SPI_HandleTypeDef ST7735_SPI_PORT;
 extern SPI_HandleTypeDef SpiHandle;
@@ -142,9 +143,12 @@ void st7735_Init(void)
 	HAL_Delay(10);
   LCD_RESET_SET(); //Скинути і встановити
 
+	//while(1)
+	//{
 	LCD_SendCommand(ST7735_SWRESET); 
 HAL_Delay(150);
-
+	//}
+		
 	LCD_SendCommand(ST7735_SLPOUT); 
 HAL_Delay(255);
 
@@ -479,21 +483,22 @@ void st7735_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp)
  *
  */
 
-#define TFT_BL_H()  HAL_GPIO_WritePin(ST7735_BL_GPIO_Port, ST7735_BL_Pin, GPIO_PIN_SET)
-#define TFT_BL_L()  HAL_GPIO_WritePin(ST7735_BL_GPIO_Port, ST7735_BL_Pin, GPIO_PIN_RESET)
-//#define LCD_CS_HIGH()  HAL_GPIO_WritePin(ST7735_CS_GPIO_Port, ST7735_CS_Pin, GPIO_PIN_SET)
-//#define LCD_CS_LOW()  HAL_GPIO_WritePin(ST7735_CS_GPIO_Port, ST7735_CS_Pin, GPIO_PIN_RESET)
-#define LCD_DC_H()  HAL_GPIO_WritePin(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_SET)
-#define LCD_DC_C()  HAL_GPIO_WritePin(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_RESET)
-#define TFT_RES_H() HAL_GPIO_WritePin(ST7735_RES_GPIO_Port, ST7735_RES_Pin, GPIO_PIN_SET)
-#define TFT_RES_L() HAL_GPIO_WritePin(ST7735_RES_GPIO_Port, ST7735_RES_Pin, GPIO_PIN_RESET)
+//#define TFT_BL_H()  HAL_GPIO_WritePin(LCD_BL_GPIO_Port, ST77_BL_Pin, GPIO_PIN_SET)
+//#define TFT_BL_L()  HAL_GPIO_WritePin(LCD_BL_GPIO_Port, ST77_BL_Pin, GPIO_PIN_RESET)
+//#define LCD_CS_HIGH()  HAL_GPIO_WritePin(ST77_CS_GPIO_Port, ST77_CS_Pin, GPIO_PIN_SET)
+//#define LCD_CS_LOW()  HAL_GPIO_WritePin(ST77_CS_GPIO_Port, ST77_CS_Pin, GPIO_PIN_RESET)
+#define LCD_DC_H()  HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_SET)
+#define LCD_DC_C()  HAL_GPIO_WritePin(LCD_DC_GPIO_Port, LCD_DC_PIN, GPIO_PIN_RESET)
+#define TFT_RES_H() HAL_GPIO_WritePin(LCD_RES_GPIO_Port, LCD_RES_Pin, GPIO_PIN_SET)
+#define TFT_RES_L() HAL_GPIO_WritePin(LCD_RES_GPIO_Port, LCD_RES_Pin, GPIO_PIN_RESET)
 #define ST7735_COLOR565(r, g, b) (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | ((b & 0xF8) >> 3))
 #define SWAP_INT16_T(a, b) { int16_t t = a; a = b; b = t; }
 #define DELAY 0x80
 #if defined(ST7735_1_8_DEFAULT_ORIENTATION) || defined(ST7735S_1_8_DEFAULT_ORIENTATION)
 static uint8_t _data_rotation[4] = { ST7735_MADCTL_MX, ST7735_MADCTL_MY, ST7735_MADCTL_MV, ST7735_MADCTL_RGB };
 #endif
-#if defined(ST7735_1_44_DEFAULT_ORIENTATION) || defined(ST7735_MINI_DEFAULT_ORIENTATION)
+
+#if defined(ST7735_1_44_DEFAULT_ORIENTATION) || defined(ST7735_MINI_DEFAULT_ORIENTATION) || defined(ST7735_1_77_DEFAULT_ORIENTATION)
 static uint8_t _data_rotation[4] = { ST7735_MADCTL_MX, ST7735_MADCTL_MY, ST7735_MADCTL_MV, ST7735_MADCTL_BGR };
 #endif
 static uint8_t _value_rotation = 0;
@@ -501,6 +506,7 @@ static int16_t _height = ST7735_HEIGHT, _width = ST7735_WIDTH;
 static uint8_t _xstart = ST7735_XSTART, _ystart = ST7735_YSTART;
 // based on Adafruit ST7735 library for Arduino
 static const uint8_t
+
 init_cmds1[] = {                // Init for 7735R, part 1 (red or green tab)
       15,                       // 15 commands in list:
       ST7735_SWRESET, DELAY,    //  1: Software reset, 0 args, w/delay
@@ -788,12 +794,12 @@ void ST7735_InvertColors(bool invert)
 
 void ST7735_Backlight_On(void)
 {
-  TFT_BL_H();
+  //   TFT_BL_H();
 }
 
 void ST7735_Backlight_Off(void)
 {
-  TFT_BL_L();
+  //   TFT_BL_L();
 }
 
 /***************************************************************************************

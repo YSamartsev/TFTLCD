@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Drivers/BSP/Components;../Drivers/BSP\Components/Common;..\Middlewares\Third_Party\FatFs\src;..\Drivers\BSP\Adafruit_Shield;..\Drivers\BSP\STM32F1xx_Nucleo;..\Middlewares\Third_Party\FatFs\src\drivers;..\Drivers\BSP\Components\st7789</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Drivers/BSP/Components;../Drivers/BSP\Components/Common;..\Middlewares\Third_Party\FatFs\src;..\Drivers\BSP\Adafruit_Shield;..\Drivers\BSP\STM32F1xx_Nucleo;..\Middlewares\Third_Party\FatFs\src\drivers;..\Drivers\BSP\Components\st7789;..\Drivers\BSP\Components\st7735</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

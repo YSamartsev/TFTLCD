@@ -19,7 +19,21 @@
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MAIN_H
-#define __MAIN_H
+	#define __MAIN_H
+
+
+#define TFT_LCD_7735
+//#define TFT_LCD_7789
+
+#define STM32F103_SMART
+//#define STM32F103_BLUE_BILL
+
+//#define TFT_LCD_1_3
+#define TFT_LCD_1_44
+//#define TFT_LCD_1_77
+
+
+
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
@@ -69,24 +83,6 @@
 /* Exported macro ------------------------------------------------------------*/
 #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 
-/* Definition for SPIx clock resources */
-#define SPIx                             SPI2
-#define SPIx_CLK_ENABLE()                __HAL_RCC_SPI2_CLK_ENABLE()
-#define SPIx_SCK_GPIO_CLK_ENABLE()       __HAL_RCC_GPIOB_CLK_ENABLE()
-#define SPIx_MISO_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOB_CLK_ENABLE()
-#define SPIx_MOSI_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOB_CLK_ENABLE()
-
-/* Definition for SPIx Pins */
-#define SPIx_SCK_PIN                     GPIO_PIN_13
-#define SPIx_SCK_GPIO_PORT               GPIOB
-#define SPIx_MISO_PIN                    GPIO_PIN_14
-#define SPIx_MISO_GPIO_PORT              GPIOB
-#define SPIx_MOSI_PIN                    GPIO_PIN_15
-#define SPIx_MOSI_GPIO_PORT              GPIOB
-
-/* Definition for SPIx's NVIC */
-#define SPIx_IRQn                        SPI2_IRQn
-#define SPIx_IRQHandler                  SPI2_IRQHandler
 
 typedef struct
 {
@@ -110,8 +106,6 @@ typedef struct
 /*#define RTC_CLOCK_SOURCE_LSI*/
 #define RTC_CLOCK_SOURCE_LSE
 
-#define TFT_LCD_7735
-//#define TFT_LCD_7789
 
 /* Exported functions ------------------------------------------------------- */
 void Error_Handler(void);
