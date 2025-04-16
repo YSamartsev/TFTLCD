@@ -132,25 +132,148 @@ typedef enum
 /** @addtogroup STM32F1XX_NUCLEO_BUS STM32F1XX NUCLEO BUS
   * @{
   */
-/*###################### SPI1 ###################################*/
-#define NUCLEO_SPIx                                 SPI2 
-#define NUCLEO_SPIx_CLK_ENABLE()                    __HAL_RCC_SPI2_CLK_ENABLE() 
+/*###################### SPI ###################################*/
+/**
+  * @brief User push-button
+ */
+#define USER_BUTTON_PIN                  GPIO_PIN_0  
+#define USER_BUTTON_GPIO_PORT            GPIOA // PA0 Кнопка SW-SPST по принциповіё схемі STM32_Smart_STM32F103C8T6-STM32_Smart_V2.0.pdf
+#define USER_BUTTON_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOA_CLK_ENABLE() //__HAL_RCC_GPIOC_CLK_ENABLE()
+#define USER_BUTTON_GPIO_CLK_DISABLE()   __HAL_RCC_GPIOA_CLK_DISABLE() //__HAL_RCC_GPIOC_CLK_DISABLE()
+#define USER_BUTTON_EXTI_IRQn            EXTI0_IRQn 
+/* Aliases */
+#define KEY_BUTTON_PIN                   USER_BUTTON_PIN
+#define KEY_BUTTON_GPIO_PORT             USER_BUTTON_GPIO_PORT
+#define KEY_BUTTON_GPIO_CLK_ENABLE()     USER_BUTTON_GPIO_CLK_ENABLE()
+#define KEY_BUTTON_GPIO_CLK_DISABLE()    USER_BUTTON_GPIO_CLK_DISABLE()
+#define KEY_BUTTON_EXTI_IRQn             USER_BUTTON_EXTI_IRQn
 
-#define NUCLEO_SPIx_SCK_PIN                         GPIO_PIN_13 
-#define NUCLEO_SPIx_SCK_GPIO_PORT                   GPIOB  //SPI SCK PB13
-#define NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOB_CLK_ENABLE() 
-#define NUCLEO_SPIx_SCK_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOB_CLK_DISABLE()
+#define BUTTONx_GPIO_CLK_ENABLE(__INDEX__)    do { if((__INDEX__) == 0) USER_BUTTON_GPIO_CLK_ENABLE();} while(0)
+#define BUTTONx_GPIO_CLK_DISABLE(__INDEX__)   (((__INDEX__) == 0) ? USER_BUTTON_GPIO_CLK_DISABLE() : 0)
+/**
+  * @}
+  */
+    
+/** @addtogroup STM32F1XX_NUCLEO_BUS STM32F1XX NUCLEO BUS
+  * @{
+  */
+/*###################### SPI ###################################*/
+#ifdef STM32F103_SMART
+	#define NUCLEO_SPIx                                 SPI2 
+	#define NUCLEO_SPIx_CLK_ENABLE()                    __HAL_RCC_SPI2_CLK_ENABLE() 
+
+	#define NUCLEO_SPIx_SCK_PIN                         GPIO_PIN_13 
+	#define NUCLEO_SPIx_SCK_GPIO_PORT                   GPIOB  //SPI SCK PB13
+	#define NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOB_CLK_ENABLE() 
+	#define NUCLEO_SPIx_SCK_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOB_CLK_DISABLE()
 
 
-#define NUCLEO_SPIx_MOSI_PIN                        GPIO_PIN_15
-#define NUCLEO_SPIx_MOSI_GPIO_PORT             			GPIOB 
-#define NUCLEO_SPIx_MOSI_GPIO_CLK_ENABLE()    		 __HAL_RCC_GPIOB_CLK_ENABLE()
-#define NUCLEO_SPIx_MOSI_GPIO_CLK_DISABLE()    		 __HAL_RCC_GPIOB_CLK_DISABLE()
+	#define NUCLEO_SPIx_MOSI_PIN                        GPIO_PIN_15
+	#define NUCLEO_SPIx_MOSI_GPIO_PORT             			GPIOB 
+	#define NUCLEO_SPIx_MOSI_GPIO_CLK_ENABLE()    		 __HAL_RCC_GPIOB_CLK_ENABLE()
+	#define NUCLEO_SPIx_MOSI_GPIO_CLK_DISABLE()    		 __HAL_RCC_GPIOB_CLK_DISABLE()
 
-#define NUCLEO_SPIx_MISO_PIN                        GPIO_PIN_14 
-#define NUCLEO_SPIx_MISO_GPIO_PORT             			GPIOB 
-#define NUCLEO_SPIx__MISO_GPIO_CLK_ENABLE()    		  __HAL_RCC_GPIOB_CLK_ENABLE()
-#define NUCLEO_SPIx__MISO_GPIO_CLK_DISABLE()    		__HAL_RCC_GPIOB_CLK_DISABLE()
+	#define NUCLEO_SPIx_MISO_PIN                        GPIO_PIN_14 
+	#define NUCLEO_SPIx_MISO_GPIO_PORT             			GPIOB 
+	#define NUCLEO_SPIx__MISO_GPIO_CLK_ENABLE()    		  __HAL_RCC_GPIOB_CLK_ENABLE()
+	#define NUCLEO_SPIx__MISO_GPIO_CLK_DISABLE()    		__HAL_RCC_GPIOB_CLK_DISABLE()
+#endif
+
+/*###################### SPI ###################################*/
+#ifdef STM32F103_BLUE_BILL
+	#define NUCLEO_SPIx                                 SPI1 
+	#define NUCLEO_SPIx_CLK_ENABLE()                    __HAL_RCC_SPI1_CLK_ENABLE() 
+
+	#define NUCLEO_SPIx_SCK_PIN                         GPIO_PIN_5
+	#define NUCLEO_SPIx_SCK_GPIO_PORT                   GPIOA //SPI SCK PB13
+	#define NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOA_CLK_ENABLE() 
+	#define NUCLEO_SPIx_SCK_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOA_CLK_DISABLE()
+
+
+	#define NUCLEO_SPIx_MOSI_PIN                        GPIO_PIN_7
+	#define NUCLEO_SPIx_MOSI_GPIO_PORT             			GPIOA 
+	#define NUCLEO_SPIx_MOSI_GPIO_CLK_ENABLE()    		 __HAL_RCC_GPIOA_CLK_ENABLE()
+	#define NUCLEO_SPIx_MOSI_GPIO_CLK_DISABLE()    		 __HAL_RCC_GPIOA_CLK_DISABLE()
+
+	#define NUCLEO_SPIx_MISO_PIN                        GPIO_PIN_6 
+	#define NUCLEO_SPIx_MISO_GPIO_PORT             			GPIOA 
+	#define NUCLEO_SPIx__MISO_GPIO_CLK_ENABLE()    		  __HAL_RCC_GPIOA_CLK_ENABLE()
+	#define NUCLEO_SPIx__MISO_GPIO_CLK_DISABLE()    		__HAL_RCC_GPIOA_CLK_DISABLE()
+#endif
+
+
+/**
+  * @brief  SD Control Interface pins (shield D4)
+  */
+	
+#ifdef STM32F103_SMART	
+	#define SD_CS_PIN                                 GPIO_PIN_5
+	#define SD_CS_GPIO_PORT                           GPIOB
+	#define SD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
+	#define SD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
+
+/**
+  * @brief  LCD Control Interface pins (shield D10)
+  */
+	#define LCD_CS_PIN                                 GPIO_PIN_12 //SPI2_NSS - не використовую
+	#define LCD_CS_GPIO_PORT                           GPIOB
+	#define LCD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
+	#define LCD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
+
+
+// Використовую PB PIN_11 в платі з проводочком
+// Використовую PA PIN_7 в платі без проводочк
+	#define LCD_RST_PIN                              GPIO_PIN_7  //PA7
+	#define LCD_RST_GPIO_PORT                        GPIOA 
+	#define LCD_RST_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOA_CLK_ENABLE() //__HAL_RCC_GPIOB_CLK_ENABLE()
+	#define LCD_RST_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOA_CLK_DISABLE() //__HAL_RCC_GPIOB _CLK_DISABLE()
+
+/**
+  * @brief  LCD Data/Command Interface pins
+  */
+	#define LCD_DC_PIN                                 GPIO_PIN_1 //PB1
+	#define LCD_DC_GPIO_PORT                           GPIOB 
+	#define LCD_DC_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE() //__HAL_RCC_GPIOA_CLK_ENABLE()
+	#define LCD_DC_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE() //__HAL_RCC_GPIOA_CLK_DISABLE()
+#endif
+
+#ifdef STM32F103_BLUE_BILL	
+	#define SD_CS_PIN                                 GPIO_PIN_10
+	#define SD_CS_GPIO_PORT                           GPIOB
+	#define SD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
+	#define SD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
+
+	#define LCD_CS_PIN                                 GPIO_PIN_11 //SPI1_NSS - не використовую
+	#define LCD_CS_GPIO_PORT                           GPIOB
+	#define LCD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
+	#define LCD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
+
+	#define LCD_RST_PIN                              GPIO_PIN_1  //PB1
+	#define LCD_RST_GPIO_PORT                        GPIOB 
+	#define LCD_RST_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOB_CLK_ENABLE() //
+	#define LCD_RST_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOB_CLK_DISABLE() //
+
+	#define LCD_DC_PIN                                 GPIO_PIN_0 
+	#define LCD_DC_GPIO_PORT                           GPIOB 
+	#define LCD_DC_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE() 
+	#define LCD_DC_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE() 
+#endif
+
+
+#ifdef TFT_LCD_1_77 
+		//#define USE_SPI_DMA     //if used DMA for SPI bus
+		//#define ST7735_1_8_DEFAULT_ORIENTATION  // AliExpress/eBay 1.8" display, default orientation
+		//#define ST7735S_1_8_DEFAULT_ORIENTATION   // WaveShare ST7735S-based 1.8" display, default orientation
+		#define ST7735_1_77_DEFAULT_ORIENTATION   // 1.77" display, default orientation
+#endif
+
+#ifdef TFT_LCD_1_44 
+		//#define SpiHandle hspi2 //hspi1, hspi2, hspi3...
+		//#define USE_SPI_DMA     //if used DMA for SPI bus
+		//#define ST7735_1_8_DEFAULT_ORIENTATION  // AliExpress/eBay 1.8" display, default orientation
+		//#define ST7735S_1_8_DEFAULT_ORIENTATION   // WaveShare ST7735S-based 1.8" display, default orientation
+		#define ST7735_1_44_DEFAULT_ORIENTATION   // 1.44" display, default orientation
+#endif
 
 
 #define NUCLEO_SPIx_TIMEOUT_MAX                     1000

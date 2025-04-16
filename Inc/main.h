@@ -113,6 +113,13 @@ typedef struct
 #define TFT_LCD_7735
 //#define TFT_LCD_7789
 
+#define STM32F103_SMART
+//#define STM32F103_BLUE_BILL
+
+//#define TFT_LCD_1_3
+#define TFT_LCD_1_44
+//#define TFT_LCD_1_77
+
 /* Exported functions ------------------------------------------------------- */
 void Error_Handler(char *myError);
 void Test_Colors(void);
