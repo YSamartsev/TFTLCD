@@ -219,7 +219,7 @@ typedef enum
 	#define SD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
 	#define SD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
 
-	#define LCD_CS_PIN                                 GPIO_PIN_11 //SPI1_NSS - не використовую
+	#define LCD_CS_PIN                                 GPIO_PIN_10 //SPI1_NSS - не використовую
 	#define LCD_CS_GPIO_PORT                           GPIOB
 	#define LCD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
 	#define LCD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()

@@ -188,7 +188,7 @@ uint8_t BSP_LCD_Init(void)
   lcd_drv->Init();
 	//ST7735_Init(); //Конфігурація драйвера ST7789 LCD
 	//ST7735_FillScreen(WHITE);
-	LCD_Fill_Color(LCD_BLUE);
+	LCD_Fill_Color(LCD_RED);
 	HAL_Delay(200);
 	LCD_Fill_Color(LCD_WHITE);
 
