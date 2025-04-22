@@ -214,6 +214,11 @@ typedef enum
 #endif
 
 #ifdef STM32F103_BLUE_BILL	
+	#define LCD_Laser_PIN                             GPIO_PIN_11
+	#define LCD_Laser_GPIO_PORT                       GPIOB
+	#define LCD_Laser_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOB_CLK_ENABLE()
+	#define LCD_Laser_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOB_CLK_DISABLE()
+
 	#define SD_CS_PIN                                 GPIO_PIN_10
 	#define SD_CS_GPIO_PORT                           GPIOB
 	#define SD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
@@ -267,6 +272,9 @@ typedef enum
 
 #define LCD_CS_LOW()      HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_RESET)
 #define LCD_CS_HIGH()     HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_SET)
+
+#define LCD_Laser_LOW()      HAL_GPIO_WritePin(LCD_Laser_GPIO_PORT, LCD_Laser_PIN, GPIO_PIN_RESET)
+#define LCD_Laser_HIGH()     HAL_GPIO_WritePin(LCD_Laser_GPIO_PORT, LCD_Laser_PIN, GPIO_PIN_SET)
 
 #define LCD_DC_LOW()      HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_RESET)
 #define LCD_DC_HIGH()     HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_SET)

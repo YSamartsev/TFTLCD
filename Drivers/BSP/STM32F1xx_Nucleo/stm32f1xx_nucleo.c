@@ -622,10 +622,11 @@ void LCD_IO_Init(void)
 {
   GPIO_InitTypeDef  gpioinitstruct;
 
-  /* LCD_CS_GPIO and LCD_DC_GPIO Periph clock enable */
+  //LCD_Laser_GPIO_CLK_ENABLE();
   LCD_CS_GPIO_CLK_ENABLE(); //Не використовую
   LCD_DC_GPIO_CLK_ENABLE(); //PB1 CLK
   LCD_RST_GPIO_CLK_ENABLE(); //PA7 CLK
+	
 	
   /* Configure типу роботи піна PB12: LCD_CS_PIN pin : LCD Card CS pin */
   gpioinitstruct.Pin    = LCD_CS_PIN; //PB12 Не використовую
@@ -634,7 +635,10 @@ void LCD_IO_Init(void)
   HAL_GPIO_Init(LCD_CS_GPIO_PORT, &gpioinitstruct); 
       
   /* Configure типу роботи піна PB1: LCD_DC_PIN pin: LCD Card DC pin */
-  gpioinitstruct.Pin    = LCD_DC_PIN; //PB1 Команда / Дані
+  //gpioinitstruct.Pin    = LCD_Laser_PIN; //PB1 Команда / Дані
+  //HAL_GPIO_Init(LCD_Laser_GPIO_PORT, &gpioinitstruct); 
+	
+	gpioinitstruct.Pin    = LCD_DC_PIN; //PB1 Команда / Дані
   HAL_GPIO_Init(LCD_DC_GPIO_PORT, &gpioinitstruct); 
 	
 	/* Configure типу роботи піна PB11 LCD_RST_PIN pin */

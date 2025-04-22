@@ -324,7 +324,13 @@ int main(void)
 	
   LCD_IO_Init(); //Визначаються піни для RESET, DC, CS
   // LCD SPI Config: SCK, SDA 
- 
+
+		//LCD_Laser_LOW();  //ST7789_RST_Clr(); //Керується через PB1. В платі не використовується
+    //HAL_Delay(20);
+   
+		//LCD_Laser_HIGH();  //ST7789_RST_Set();
+    //HAL_Delay(10);
+	
  	SPIx_MspInit(); //Конфігурація пінів для MOSI, MOSO, SCK SPIx 
 
 	SPIx_Init(); //Конфігурація параметрів SPI
