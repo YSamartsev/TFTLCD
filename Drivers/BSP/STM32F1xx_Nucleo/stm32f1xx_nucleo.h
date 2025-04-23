@@ -20,7 +20,7 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __STM32F1XX_NUCLEO_H
 #define __STM32F1XX_NUCLEO_H
-
+#include "main.h"
 #ifdef __cplusplus
  extern "C" {
 #endif

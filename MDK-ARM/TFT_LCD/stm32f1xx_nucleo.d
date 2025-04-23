@@ -1,5 +1,6 @@
 tft_lcd\stm32f1xx_nucleo.o: ..\Drivers\BSP\STM32F1xx_Nucleo\stm32f1xx_nucleo.c
 tft_lcd\stm32f1xx_nucleo.o: ..\Drivers\BSP\STM32F1xx_Nucleo\stm32f1xx_nucleo.h
+tft_lcd\stm32f1xx_nucleo.o: ../Inc/main.h
 tft_lcd\stm32f1xx_nucleo.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 tft_lcd\stm32f1xx_nucleo.o: ../Inc/stm32f1xx_hal_conf.h
 tft_lcd\stm32f1xx_nucleo.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h
@@ -32,3 +33,14 @@ tft_lcd\stm32f1xx_nucleo.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd
 tft_lcd\stm32f1xx_nucleo.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
 tft_lcd\stm32f1xx_nucleo.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 tft_lcd\stm32f1xx_nucleo.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_smartcard.h
+tft_lcd\stm32f1xx_nucleo.o: ..\Drivers\BSP\STM32F1xx_Nucleo\stm32f1xx_nucleo.h
+tft_lcd\stm32f1xx_nucleo.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+tft_lcd\stm32f1xx_nucleo.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+tft_lcd\stm32f1xx_nucleo.o: ..\Middlewares\Third_Party\FatFs\src\ff_gen_drv.h
+tft_lcd\stm32f1xx_nucleo.o: ..\Middlewares\Third_Party\FatFs\src\diskio.h
+tft_lcd\stm32f1xx_nucleo.o: ..\Middlewares\Third_Party\FatFs\src\integer.h
+tft_lcd\stm32f1xx_nucleo.o: ..\Middlewares\Third_Party\FatFs\src\ff.h
+tft_lcd\stm32f1xx_nucleo.o: ../Inc/ffconf.h
+tft_lcd\stm32f1xx_nucleo.o: ..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_sd.h
+tft_lcd\stm32f1xx_nucleo.o: ..\Middlewares\Third_Party\FatFs\src\drivers\sd_diskio.h
+tft_lcd\stm32f1xx_nucleo.o: ../Inc/fatfs_storage.h
