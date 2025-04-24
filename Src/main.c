@@ -438,7 +438,7 @@ LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:", Fon
 		//LCD_WriteString(10, 100, "Real Time:", Font_16x26, LCD_RED, LCD_WHITE);
 LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Font_Size, LCD_RED, LCD_WHITE);	
 	  /* Configure RTC Alarm */
-		RTC_AlarmConfig(); //Configure the current time and date
+		RTC_AlarmConfig(); //Встановлюю поточні Дату і Час
 
 //RTC_DateShow(10, 50); //Показати дату, Дата читаэться з 	RtcHandle.DateToUpdate
 RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
@@ -729,9 +729,9 @@ static void RTC_AlarmConfig(void)
   // ##-1- Configure the Date #################################################
   // Set Date: 25.01.20.02 2х10+5
   sdatestructure.Year = 0x25; //2х10+5
-  sdatestructure.Month = 0x01; //RTC_MONTH_JANUARY; //01 = 0x10+1
-  sdatestructure.Date = 0x07; //0x10+7
-  sdatestructure.WeekDay = 0x02; //RTC_WEEKDAY_TUESDAY; 02=0x10+2
+  sdatestructure.Month = 0x04; //RTC_MONTH_JANUARY; //01 = 0x10+1
+  sdatestructure.Date = 0x24; //0x10+7
+  //sdatestructure.WeekDay = 0x04; //RTC_WEEKDAY_TUESDAY; 02=0x10+2
   
   if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
