@@ -236,7 +236,7 @@ int __backspace(FILE *f)
 	char myTemp[2];
 	uint32_t isrflags;  
 	uint32_t cr1its;
-	
+	uint32_t tempTime;
 int main(void)
 	//Початкова дата встановлюеться в  RTC_AlarmConfig
                                                                                                                                                                                                                                                                                          {  
@@ -454,8 +454,10 @@ RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);
 		//printf("Hours = %d Minutes = %d Seconds = %d\n\r", stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);	
 
 		  //обновлять Дату, пока myFlag_Show_Date = 1
-			if (((stimestructureget.Hours*60*60+stimestructureget.Minutes*60 + stimestructureget.Seconds) <=  currentHours_Minutes_Seconds) && myFlag_Show_Date)
-					//RTC_DateShow(10, 50); //показати пока не зміниться поточна дата
+			tempTime = stimestructureget.Hours*60*60+stimestructureget.Minutes*60 + stimestructureget.Seconds;
+			if ((tempTime <  currentHours_Minutes_Seconds) && myFlag_Show_Date)
+			{
+			//RTC_DateShow(10, 50); //показати пока не зміниться поточна дата
 					printf("Year = %d Month = %d Date = %d\n\r", sdatestructureget.Date, sdatestructureget.Month, sdatestructureget.Year);	
 					RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100); //показати дату після 24:00;
 					currentHours_Minutes_Seconds = stimestructureget.Hours*60*60 + stimestructureget.Minutes*60 + stimestructureget.Seconds;
@@ -557,6 +559,7 @@ printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
 					break;
 			} 
 	}
+}
 
 
 /**
