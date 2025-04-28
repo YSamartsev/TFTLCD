@@ -171,6 +171,7 @@ unsigned char backspace_called;
 unsigned char last_char_read;
 int r;
 
+//!!!!!!!!!!!!!!!!!Перед запуском обов'язково зняти /r/d  в налаштуваннях додатка на мобільному!!!!!!!!!!!!!!!!!!!!
 int fgetc(FILE *f)
 {
     /* if we just backspaced, then return the backspaced character */
@@ -314,9 +315,9 @@ int main(void)
   /* RTC configured as follows:
       - Asynch Prediv  = Automatic calculation of prediv for 1 sec timebase
   */
-	RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
 
 
+RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
 
 	if (HAL_RTC_Init(&RtcHandle) != HAL_OK) 
   {
@@ -486,6 +487,10 @@ https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 			} */
 			//USART_SR_RXNE - Це маска біта  SR_RXNE. Спочатку треба прочитати регистр SR
  			switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
+			
+			//switch (HAL_UARTEx_ReceiveToIdle_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer)))
+			
+			
 			//switch (HAL_UARTEx_ReceiveToIdle(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer), (uint16_t*) &UartHandle.RxXferSize , 2000)) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
 			{ //При цій функції буде виникати sizeof(aRxBuffer) раз переривання. Відбувається помилка
 				case HAL_OK:
@@ -515,13 +520,13 @@ printf("mycr1 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
 			
 				
 				 
-						printf("aRxBufer:\n\r");
+						printf("aRxBufer:");
 						for(uint8_t ix = 0; ix < 14; ix++)
 						{	
 							printf("0x%x ", aRxBuffer[ix]);
 					
 						}	
-printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
+printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]); 
 						//Ця функція заповнює регістри UART і переводить його в режим переривання. Без очікування Timeout
 						//ST7789_WriteString(10, 180, aRxBuffer, Font_16x26, RED, WHITE);
 						//printf("Code = %s", aRxBuffer[0]);
@@ -535,7 +540,15 @@ printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
 						
 							//RTC_TimeShow(10, 130); //Показати час з stimestructureget
 							RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
-					} 
+					} else
+					{
+						  /* Disable RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts */
+  
+							/* In case of reception waiting for IDLE event, disable also the IDLE IE interrupt source */
+							/* At end of Rx process, restore huart->RxState to Ready */
+							UartHandle.RxState = HAL_UART_STATE_READY;
+							UartHandle.ReceptionType = HAL_UART_RECEPTION_STANDARD;
+					}
 				//}
 						UartReady = RESET;
 					}	
@@ -657,7 +670,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
 {
 	char *myError = "HAL_UART_ErrorCallback";
-	Error_Handler(myError);
+	
+	//Error_Handler(myError);
 }
 
 
@@ -750,7 +764,9 @@ static void RTC_AlarmConfig(void)
   {
      //Initialization Error 
     char *myError = "HAL_RTC_SetTime";
-		Error_Handler(myError); 
+		printf("%s", myError); 
+		
+		//Error_Handler(myError); 
   }  
 
   //##-3- Configure the RTC Alarm peripheral #################################
@@ -765,7 +781,7 @@ static void RTC_AlarmConfig(void)
   {
    // Initialization Error
     char *myError = "HAL_RTC_SetAlarm_IT";
-		Error_Handler(myError); 
+		printf("%s", myError);  
   }
 }
 
@@ -786,7 +802,8 @@ static void RTC_SECConfig(void)
   {
     // Initialization Error //
     char *myError = "HAL_RTC_SetDate";
-		Error_Handler(myError);
+		printf("%s", myError); 
+		//Error_Handler(myError);
   } 
   
   //##-2- Configure the Time #################################################
@@ -799,7 +816,8 @@ static void RTC_SECConfig(void)
   {
     // Initialization Error 
     char *myError = "HAL_RTC_SetTime";
-		Error_Handler(myError); 
+		printf("%s", myError); 
+		//Error_Handler(myError); 
   }  
 
   //##-3- Configure the RTC Alarm peripheral #################################
@@ -816,7 +834,8 @@ static void RTC_SECConfig(void)
   {
     // Initialization Error 
 		char *myError = "HAL_RTCEx_SetSecond_IT";
-		Error_Handler(myError); 
+		printf("%s", myError); 
+		//Error_Handler(myError); 
   }
 } 
 
@@ -850,7 +869,8 @@ static void RTC_SECUpdate(void)
   {
     // Initialization Error //
     char *myError = "HAL_RTC_SetDate";
-		Error_Handler(myError);  
+		printf("%s", myError); 
+		//Error_Handler(myError);  
   } 
   
   //##-2- Configure the Time #################################################
@@ -863,7 +883,8 @@ static void RTC_SECUpdate(void)
   {
     // Initialization Error 
     char *myError = "HAL_RTC_SetTime";
-		Error_Handler(myError); 
+		printf("%s", myError); 
+		//Error_Handler(myError); 
   }  
 }
 
@@ -1028,7 +1049,8 @@ HAL_StatusTypeDef myExchange(char *myAT, char *myRES) //Обмін команд�
 	if(HAL_UART_Transmit_IT(&UartHandle, (uint8_t*)aTxBuffer, COUNTmycommandAT)!= HAL_OK)
   {
     char *myError = "HAL_UART_Transmit_IT";
-		Error_Handler(myError);
+		printf("%s", myError); 
+		//Error_Handler(myError);
   } 
   /*##-3- Wait for the end of the transfer ###################################*/   
   while (UartReady != SET)

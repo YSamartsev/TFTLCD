@@ -256,6 +256,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
+#include <stdio.h>
 extern uint8_t myTemp;
 
 /** @addtogroup STM32F1xx_HAL_Driver
@@ -3618,6 +3619,7 @@ static HAL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef *huart)
       if ((huart->Init.WordLength == UART_WORDLENGTH_9B) || ((huart->Init.WordLength == UART_WORDLENGTH_8B) && (huart->Init.Parity == UART_PARITY_NONE)))
       {
         *pdata8bits = (uint8_t)(huart->Instance->DR & (uint8_t)0x00FF);
+				                                                    //printf("0x%x ", huart->Instance->DR);
       }
       else
       {

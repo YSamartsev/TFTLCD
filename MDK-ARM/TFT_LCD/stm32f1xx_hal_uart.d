@@ -31,3 +31,4 @@ tft_lcd\stm32f1xx_hal_uart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_
 tft_lcd\stm32f1xx_hal_uart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
 tft_lcd\stm32f1xx_hal_uart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 tft_lcd\stm32f1xx_hal_uart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_smartcard.h
+tft_lcd\stm32f1xx_hal_uart.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
