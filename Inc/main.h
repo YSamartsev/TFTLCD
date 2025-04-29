@@ -112,15 +112,15 @@ typedef struct
 #define RTC_CLOCK_SOURCE_LSE
 
 //=============================Налаштування плат і дисплеїв==============================
-#define TFT_LCD_7735
-//#define TFT_LCD_7789
+//#define TFT_LCD_7735
+#define TFT_LCD_7789
 
-#define STM32F103_SMART
-//#define STM32F103_BLUE_BILL
+//#define STM32F103_SMART
+#define STM32F103_BLUE_BILL
 
 //#define TFT_LCD_1_3
-#define TFT_LCD_1_44
-//#define TFT_LCD_1_77
+//#define TFT_LCD_1_44
+#define TFT_LCD_1_77
 //=======================================================================================
 
 /* Exported functions ------------------------------------------------------- */
