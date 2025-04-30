@@ -3,7 +3,7 @@
 <title>Static Call Graph - [TFT_LCD\TFT_LCD.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image TFT_LCD\TFT_LCD.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Tue Apr 22 17:07:16 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Tue Apr 29 20:30:48 2025
 <BR><P>
 <H3>Maximum Stack Usage =        368 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -566,7 +566,7 @@ Global Symbols
 <LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemClock_Config
 </UL>
 
-<P><STRONG><a name="[6c]"></a>HAL_RTCEx_RTCEventCallback</STRONG> (Thumb, 74 bytes, Stack size 32 bytes, main.o(i.HAL_RTCEx_RTCEventCallback))
+<P><STRONG><a name="[6c]"></a>HAL_RTCEx_RTCEventCallback</STRONG> (Thumb, 76 bytes, Stack size 32 bytes, main.o(i.HAL_RTCEx_RTCEventCallback))
 <BR><BR>[Stack]<UL><LI>Max Depth = 352<LI>Call Chain = HAL_RTCEx_RTCEventCallback &rArr; RTC_TimeShow &rArr; LCD_WriteString &rArr; LCD_WriteChar &rArr; LCD_SetAddressWindow &rArr; LCD_SendData &rArr; HAL_SPI_Transmit &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[6d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_GetTime
@@ -839,7 +839,7 @@ Global Symbols
 <LI><a href="#[2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;st7735_DisplayOff
 </UL>
 
-<P><STRONG><a name="[9e]"></a>LCD_DrawFilledRectangle</STRONG> (Thumb, 122 bytes, Stack size 40 bytes, stm32_adafruit_lcd.o(i.LCD_DrawFilledRectangle))
+<P><STRONG><a name="[9e]"></a>LCD_DrawFilledRectangle</STRONG> (Thumb, 124 bytes, Stack size 40 bytes, stm32_adafruit_lcd.o(i.LCD_DrawFilledRectangle))
 <BR><BR>[Stack]<UL><LI>Max Depth = 272<LI>Call Chain = LCD_DrawFilledRectangle &rArr; LCD_DrawLine &rArr; LCD_DrawPixel &rArr; LCD_SetAddressWindow &rArr; LCD_SendData &rArr; HAL_SPI_Transmit &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_WritePin
@@ -856,7 +856,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LCD_DrawFilledRectangle
 </UL>
 
-<P><STRONG><a name="[a0]"></a>LCD_DrawPixel</STRONG> (Thumb, 92 bytes, Stack size 32 bytes, stm32_adafruit_lcd.o(i.LCD_DrawPixel))
+<P><STRONG><a name="[a0]"></a>LCD_DrawPixel</STRONG> (Thumb, 94 bytes, Stack size 32 bytes, stm32_adafruit_lcd.o(i.LCD_DrawPixel))
 <BR><BR>[Stack]<UL><LI>Max Depth = 184<LI>Call Chain = LCD_DrawPixel &rArr; LCD_SetAddressWindow &rArr; LCD_SendData &rArr; HAL_SPI_Transmit &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_WritePin
@@ -949,7 +949,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LCD_WriteString
 </UL>
 
-<P><STRONG><a name="[aa]"></a>LCD_WriteString</STRONG> (Thumb, 136 bytes, Stack size 64 bytes, stm32_adafruit_lcd.o(i.LCD_WriteString))
+<P><STRONG><a name="[aa]"></a>LCD_WriteString</STRONG> (Thumb, 138 bytes, Stack size 64 bytes, stm32_adafruit_lcd.o(i.LCD_WriteString))
 <BR><BR>[Stack]<UL><LI>Max Depth = 272<LI>Call Chain = LCD_WriteString &rArr; LCD_WriteChar &rArr; LCD_SetAddressWindow &rArr; LCD_SendData &rArr; HAL_SPI_Transmit &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_WritePin
@@ -1012,7 +1012,7 @@ Global Symbols
 <LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPIx_Error
 </UL>
 
-<P><STRONG><a name="[ba]"></a>SPIx_MspInit</STRONG> (Thumb, 110 bytes, Stack size 24 bytes, stm32f1xx_nucleo.o(i.SPIx_MspInit))
+<P><STRONG><a name="[ba]"></a>SPIx_MspInit</STRONG> (Thumb, 106 bytes, Stack size 24 bytes, stm32f1xx_nucleo.o(i.SPIx_MspInit))
 <BR><BR>[Stack]<UL><LI>Max Depth = 60<LI>Call Chain = SPIx_MspInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[54]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_Init

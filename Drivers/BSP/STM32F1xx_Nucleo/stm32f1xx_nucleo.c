@@ -41,7 +41,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_nucleo.h"
-#include "st7735_cfg.h"
+//#include "st7735_cfg.h"
 
 extern SPI_HandleTypeDef SpiHandle;
 

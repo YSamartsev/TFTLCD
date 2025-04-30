@@ -44,4 +44,3 @@ tft_lcd\stm32f1xx_nucleo.o: ../Inc/ffconf.h
 tft_lcd\stm32f1xx_nucleo.o: ..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_sd.h
 tft_lcd\stm32f1xx_nucleo.o: ..\Middlewares\Third_Party\FatFs\src\drivers\sd_diskio.h
 tft_lcd\stm32f1xx_nucleo.o: ../Inc/fatfs_storage.h
-tft_lcd\stm32f1xx_nucleo.o: ..\Drivers\BSP\Components\st7735\st7735_cfg.h
