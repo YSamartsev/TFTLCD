@@ -33,6 +33,7 @@ extern FontDef Font_7x10;
 extern FontDef Font_11x18;
 extern FontDef Font_16x26;
 extern const uint16_t saber;
+//extern uint32_t BSP_DCF77_GetState();
 
 
 
@@ -238,6 +239,20 @@ int __backspace(FILE *f)
 	uint32_t isrflags;  
 	uint32_t cr1its;
 	uint32_t tempTime;
+	
+	char outString[61];
+	char outPoint[61];
+	char strNull = 0x30;
+	char strOne = 0x31;
+	char strPoint = 0x2A;
+	int amountOne = 0;
+	int amountNull = 0;
+	int iCycle = 0;
+	bool bWork = false; //ознака находження в режимі від паузи до паузи
+	GPIO_PinState sensorValue;
+	GPIO_PinState prevSensorValue = GPIO_PIN_RESET;
+	
+	
 int main(void)
 	//Початкова дата встановлюеться в  RTC_AlarmConfig
                                                                                                                                                                                                                                                                                          {  
@@ -256,7 +271,7 @@ int main(void)
   /* Configure the system clock = 64 MHz */
   SystemClock_Config();
 
-	BSP_LED_Init(LED_GREEN);			
+	BSP_LED_Init(LED_GREEN);	//Ініціалізація світлодіода Користувача		
 	
 	MX_UART2_Init();		
 
@@ -336,7 +351,7 @@ RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
      available on adafruit 1.8" TFT shield). If the state of PB.00 is high then
      the adafruit 1.8" TFT shield is available. */  
 	
-  LCD_IO_Init(); //Визначаються піни для RESET, DC, CS
+  LCD_IO_Init(); //Визначаються піни для RESET (OUTPUT), DC(OUTPUT), CS(OUTPUT), DCF77PIN(INPUT)
   // LCD SPI Config: SCK, SDA 
  
  	SPIx_MspInit(); //Конфігурація пінів для MOSI, MOSO, SCK SPIx 
@@ -433,6 +448,7 @@ if (Bluetooth_present == SHIELD_DETECTED)
     //SDCard_Config(); 
 		printf("===========AAAAAAAAAAAAA==============\n\r");
 
+	LCD_Fill_Color(LCD_WHITE);
 		//LCD_WriteString(10, 20, "Real Date:", Font_16x26, LCD_RED, LCD_WHITE);	
 LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:", Font_Size, LCD_RED, LCD_WHITE);
 	
@@ -450,6 +466,83 @@ RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);
 		curentTimeSecond = stimestructureget.Seconds;
 		RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
 
+//#define BLINKPIN 13
+//#define DCF77PIN 2
+
+ 
+printf("0ms       100ms     200ms     300ms     400ms     500ms     600ms     700ms     800ms     900ms     1000ms    1100ms    1200ms\n\r");  
+//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, ". . . . . . .", Font_Size, LCD_RED, LCD_WHITE);	 
+
+
+while (1) {
+		//Частота прийому рівня sensorValue визначається HAL_Delay(10)
+	sensorValue =  BSP_DCF77_GetState();  
+	if (bWork == true){
+		if (sensorValue == 1 && prevSensorValue == 0)
+		{
+			printf(" // "); //Прийнято один байт(рядок логічних [ 1111..100000...0000) або пауза 2 сек
+			amountOne = 0;
+			amountNull = 0;
+			//Розшифровую рядол "11111..100000..0"
+			if (amountNull < 170) {
+				//Прийнято один байт. Розпізнавання байта 0x0 чи 0x1 ? 
+				if (iCycle < 59) {
+					if (amountOne < 12) {
+						strcpy(outString + iCycle, &strNull); //до рядка символів додаю "1"
+					}else {
+						strcpy(outString + iCycle, &strOne); //до рядка символів додаю "0"
+					}
+					++iCycle; //Наступний рядок
+				}else {
+					//Прийнято 59 байт
+					printf("%s\n\r", outString);	
+					LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, outString, Font_Size, LCD_RED, LCD_WHITE);	 
+					iCycle = 0;
+					amountOne = 0;
+					amountNull = 0;
+				}
+			}
+		}
+	}
+	if (sensorValue == 1) {
+		amountOne++; //нарощую кількість логічних 1
+		printf("%c", strOne);
+	}else {
+ 		amountNull++; //нарощую кількість логічних 0
+		printf("%c", strNull);
+	}
+	
+	if (sensorValue == 1 && prevSensorValue == 0){
+		printf("amountNull = %d, amountOne = %d", amountNull, amountOne);
+	
+		if (amountOne <= 14){
+			printf(" DCF77 = %c\n\r", strNull);
+		}else{
+			printf(" DCF77 = %c\n\r", strOne);
+		}
+		
+			
+		if(amountNull > 160){
+			bWork = true;
+		}
+		iCycle = 0;
+		amountNull = 0;
+		amountOne = 0;
+		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
+			
+	}
+	strcpy(outPoint + iCycle, &strPoint); //до рядка символів додаю "0"
+	++iCycle;
+	LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, outPoint, Font_Size, LCD_RED, LCD_WHITE);
+	BSP_LED_Toggle(LED_GREEN); //мигтіння світлодіодом
+	//Serial.print(sensorValue); //Результат інтервалу 10 мсек
+	prevSensorValue = sensorValue;
+	HAL_Delay(10);
+} 
+	
+
+
+//====================================================================previous=================================================
 	while (1)
 	{
 		//printf("Hours = %d Minutes = %d Seconds = %d\n\r", stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);	
@@ -1130,7 +1223,7 @@ void Error_Handler(char *myError)
 	while (1)
   {
     /*Toggle LED2 with a period of one second */
-    BSP_LED_Toggle(LED2);
+    BSP_LED_Toggle(LED_GREEN);
     HAL_Delay(100);
 		
   }

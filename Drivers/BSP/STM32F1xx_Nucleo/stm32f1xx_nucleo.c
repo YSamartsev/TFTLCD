@@ -354,6 +354,11 @@ uint32_t BSP_PB_GetState(Button_TypeDef Button)
   {
   return HAL_GPIO_ReadPin(BUTTON_PORT[Button], BUTTON_PIN[Button]);
   }
+	
+uint32_t BSP_DCF77_GetState()
+  {
+  return HAL_GPIO_ReadPin(IN_DCF77_GPIO_PORT, IN_DCF77_PIN);
+  }	
 /**
   * @}
   */ 
@@ -624,6 +629,8 @@ void LCD_IO_Init(void)
   LCD_DC_GPIO_CLK_ENABLE(); //PB1 CLK
   LCD_RST_GPIO_CLK_ENABLE(); //PA7 CLK
 	
+	DCF77_GPIO_CLK_ENABLE();
+	
   /* Configure типу роботи піна PB12: LCD_CS_PIN pin : LCD Card CS pin */
   gpioinitstruct.Pin    = LCD_CS_PIN; //PB12 Не використовую
   gpioinitstruct.Mode   = GPIO_MODE_OUTPUT_PP;
@@ -638,6 +645,12 @@ void LCD_IO_Init(void)
   gpioinitstruct.Pin    = LCD_RST_PIN; //PA7 Скидання дисплея
 	gpioinitstruct.Mode   = GPIO_MODE_OUTPUT_PP;
   HAL_GPIO_Init(LCD_RST_GPIO_PORT, &gpioinitstruct); 
+	
+	gpioinitstruct.Pin    = DCF77_PIN; //PA1 
+  gpioinitstruct.Mode   = GPIO_MODE_INPUT;
+  HAL_GPIO_Init(DCF77_GPIO_PORT, &gpioinitstruct); 
+	
+	
 
 	/* LCD chip select high */
   LCD_CS_HIGH(); //Використовую PB12. В платі не використовується

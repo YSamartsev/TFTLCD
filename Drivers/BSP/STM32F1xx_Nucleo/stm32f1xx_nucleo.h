@@ -43,8 +43,7 @@
   */
 typedef enum 
 {
-  LED2 = 0,
-  LED_GREEN = LED2
+  LED_GREEN = 0,
 } Led_TypeDef;
 
 typedef enum 
@@ -91,7 +90,7 @@ typedef enum
   */
 #define LEDn	1
 
-#define LED0_PIN                         GPIO_PIN_13 // PC13 Світлодіод LED0 по принципові схемі STM32_Smart_STM32F103C8T6-STM32_Smart_V2.0.pdf
+#define LED0_PIN                         GPIO_PIN_13 // PC13 Світлодіод D2 (LED0) по принциповій схемі STM32_Smart_STM32F103C8T6-STM32_Smart_V2.0.pdf
 #define LED0_GPIO_PORT                   GPIOC 
 #define LED0_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOC_CLK_ENABLE()  
 #define LED0_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOC_CLK_DISABLE()
@@ -235,6 +234,11 @@ typedef enum
 	#define LCD_DC_GPIO_PORT                           GPIOB 
 	#define LCD_DC_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE() //__HAL_RCC_GPIOA_CLK_ENABLE()
 	#define LCD_DC_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE() //__HAL_RCC_GPIOA_CLK_DISABLE()
+	
+	#define IN_DCF77_PIN                                 GPIO_PIN_1 //LED DCF77
+	#define IN_DCF77_GPIO_PORT                           GPIOA 
+	#define IN_DCF77_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOA_CLK_ENABLE() //__HAL_RCC_GPIOA_CLK_ENABLE()
+	#define IN_DCF77_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOA_CLK_DISABLE() //__HAL_RCC_GPIOA_CLK_DISABLE()
 #endif
 
 #ifdef STM32F103_BLUE_BILL	
@@ -332,6 +336,11 @@ typedef enum
 #define LCD_DC_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE() //__HAL_RCC_GPIOA_CLK_ENABLE()
 #define LCD_DC_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE() //__HAL_RCC_GPIOA_CLK_DISABLE()
 
+#define DCF77_PIN                                 GPIO_PIN_1 //PA1
+#define DCF77_GPIO_PORT                           GPIOA 
+#define DCF77_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOA_CLK_ENABLE() 
+#define DCF77_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOA_CLK_DISABLE()
+
 
 /* Basic operations */
 #define LCD_RST_Clr() HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_RESET)
@@ -392,6 +401,7 @@ void            LCD_IO_Init(void);
 void             BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode);
 void             BSP_PB_DeInit(Button_TypeDef Button);
 uint32_t         BSP_PB_GetState(Button_TypeDef Button);
+uint32_t 				 BSP_DCF77_GetState(void);
 
 
 uint8_t          BSP_JOY_Init(void);
