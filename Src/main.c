@@ -496,7 +496,7 @@ while (1) {
 				}else {
 					//Прийнято 59 байт
 					printf("%s\n\r", outString);	
-					LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, outString, Font_Size, LCD_RED, LCD_WHITE);	 
+					//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, outString, Font_Size, LCD_RED, LCD_WHITE);	 
 					iCycle = 0;
 					amountOne = 0;
 					amountNull = 0;
@@ -523,17 +523,17 @@ while (1) {
 		
 			
 		if(amountNull > 160){
-			bWork = true;
+			//bWork = true;
 		}
-		iCycle = 0;
+		//iCycle = 0;
 		amountNull = 0;
 		amountOne = 0;
-		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
+		//LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
 			
 	}
-	strcpy(outPoint + iCycle, &strPoint); //до рядка символів додаю "0"
-	++iCycle;
-	LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, outPoint, Font_Size, LCD_RED, LCD_WHITE);
+	//strcpy(outPoint + iCycle, &strPoint); //до рядка символів додаю "0"
+	//++iCycle;
+	//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, outPoint, Font_Size, LCD_RED, LCD_WHITE);
 	BSP_LED_Toggle(LED_GREEN); //мигтіння світлодіодом
 	//Serial.print(sensorValue); //Результат інтервалу 10 мсек
 	prevSensorValue = sensorValue;
