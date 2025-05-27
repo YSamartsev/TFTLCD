@@ -62,7 +62,12 @@ RTC_HandleTypeDef RtcHandle;
 UART_HandleTypeDef UartHandle;
 __IO ITStatus UartReady = RESET;
 
+RTC_DateTypeDef  sdatestructure;
+RTC_TimeTypeDef  stimestructure;
+RTC_AlarmTypeDef salarmstructure;
+
 SPI_HandleTypeDef SpiHandle;
+I2C_HandleTypeDef hi2c3;
 
 /* Buffer used for displaying Date */
 	uint8_t aShowDate[50] = {0};
@@ -248,7 +253,9 @@ int __backspace(FILE *f)
 	int amountOne = 0;
 	int amountNull = 0;
 	int iCycle = 0;
+	uint8_t lineDCF77[60]; // = {0,0,0,1,1,1,0,1,1,1,1,1,1,1,0,0,0,0,1,0,1,1,1,1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,1,0,1,0,1,0,0,1,0,1,0,0,1,0,0,1,0};
 	bool bWork = false; //ознака находження в режимі від паузи до паузи
+	uint8_t DCF77_Fine;
 	GPIO_PinState sensorValue;
 	GPIO_PinState prevSensorValue = GPIO_PIN_RESET;
 	
@@ -291,11 +298,10 @@ int main(void)
 	uint32_t isrflags = READ_REG(UartHandle.Instance->SR);  
 	uint32_t cr1its   = READ_REG(UartHandle.Instance->CR1);
 	
-	//char myAT_RES[2][20]; //Перший індекс - кількість рядків, другий = максимальна кількість символів
-	
-  /*##-2- Start the transmission process #####################################*/  
-  /* While the UART in reception process, user can transmit data through 
-     "aTxBuffer" buffer */
+				/*if (checkDCF77(lineDCF77, 60) == HAL_ERROR) //Перевірка рядка lineDCF77
+				{
+					bWork = false;
+				} */
 	
 	if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != HAL_OK)
 	{
@@ -455,55 +461,63 @@ LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:", Fon
 		//LCD_WriteString(10, 100, "Real Time:", Font_16x26, LCD_RED, LCD_WHITE);
 LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Font_Size, LCD_RED, LCD_WHITE);	
 	  /* Configure RTC Alarm */
-		RTC_AlarmConfig(); //Встановлюю поточні Дату і Час
-
-//RTC_DateShow(10, 50); //Показати дату, Дата читаэться з 	RtcHandle.DateToUpdate
-RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
-
-//RTC_TimeShow(10, 130);  //Показати час
-RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);		
-		
-		curentTimeSecond = stimestructureget.Seconds;
-		RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
 
 //#define BLINKPIN 13
 //#define DCF77PIN 2
 
- 
+#ifdef DCF77 
 printf("0ms       100ms     200ms     300ms     400ms     500ms     600ms     700ms     800ms     900ms     1000ms    1100ms    1200ms\n\r");  
 //LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, ". . . . . . .", Font_Size, LCD_RED, LCD_WHITE);	 
 
-
-while (1) {
+do {
 		//Частота прийому рівня sensorValue визначається HAL_Delay(10)
 	sensorValue =  BSP_DCF77_GetState();  
 	if (bWork == true){
-		if (sensorValue == 1 && prevSensorValue == 0)
-		{
-			printf(" // "); //Прийнято один байт(рядок логічних [ 1111..100000...0000) або пауза 2 сек
-			amountOne = 0;
-			amountNull = 0;
-			//Розшифровую рядол "11111..100000..0"
-			if (amountNull < 170) {
-				//Прийнято один байт. Розпізнавання байта 0x0 чи 0x1 ? 
-				if (iCycle < 59) {
-					if (amountOne < 12) {
-						strcpy(outString + iCycle, &strNull); //до рядка символів додаю "1"
-					}else {
-						strcpy(outString + iCycle, &strOne); //до рядка символів додаю "0"
-					}
-					++iCycle; //Наступний рядок
-				}else {
-					//Прийнято 59 байт
-					printf("%s\n\r", outString);	
-					//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, outString, Font_Size, LCD_RED, LCD_WHITE);	 
-					iCycle = 0;
-					amountOne = 0;
-					amountNull = 0;
-				}
-			}
+		if (sensorValue == 1) {
+			amountOne++; //нарощую кількість логічних 1
+			printf("%c", strOne);
+		}else {
+			amountNull++; //нарощую кількість логічних 0
+			printf("%c", strNull);
 		}
+		if (sensorValue == 1 && prevSensorValue == 0){
+			printf("amountNull = %d, amountOne = %d", amountNull, amountOne);
+	
+			if (amountOne <= 14){
+				lineDCF77[iCycle] = 0x00;
+				printf(" DCF77 = %c\n\r", strNull);
+			}else{
+				lineDCF77[iCycle] = 0x01;
+				printf(" DCF77 = %c\n\r", strOne);
+			}
+			if(amountNull > 150){
+				printf("Preparing to receive a line of DCF77\n\r");
+				bWork = false; //Кінець прийому рядка хвилини
+				printf("lineDCF77 = \n\r");
+				for (uint8_t i = 0; i < 60; ++i)
+				{
+					printf("%d", lineDCF77[i]);
+				}
+				printf("\n\r");	
+				
+				if (checkDCF77(lineDCF77) == HAL_ERROR)
+				{
+					bWork = false;
+				}
+				iCycle = 0;
+				//Обробка рядка хвилини
+			}
+			++iCycle;
+			amountNull = 0;
+			amountOne = 0;
+			//LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
+		}
+		BSP_LED_Toggle(LED_GREEN); //мигтіння світлодіодом
+		//Serial.print(sensorValue); //Результат інтервалу 10 мсек
+		prevSensorValue = sensorValue;
+		HAL_Delay(10);	
 	}
+	//холостий прогін потоку
 	if (sensorValue == 1) {
 		amountOne++; //нарощую кількість логічних 1
 		printf("%c", strOne);
@@ -520,12 +534,12 @@ while (1) {
 		}else{
 			printf(" DCF77 = %c\n\r", strOne);
 		}
-		
 			
-		if(amountNull > 160){
-			//bWork = true;
+		if(amountNull > 150){
+			bWork = true;
+			printf("Start recording line of DCF77\n\r");
 		}
-		//iCycle = 0;
+		iCycle = 0;
 		amountNull = 0;
 		amountOne = 0;
 		//LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
@@ -538,11 +552,22 @@ while (1) {
 	//Serial.print(sensorValue); //Результат інтервалу 10 мсек
 	prevSensorValue = sensorValue;
 	HAL_Delay(10);
-} 
-	
+}while (DCF77_Fine == 0x00); 
+
+#endif
 
 
 //====================================================================previous=================================================
+		RTC_AlarmConfig(); //Встановлюю поточні Дату і Час
+
+//RTC_DateShow(10, 50); //Показати дату, Дата читаэться з 	RtcHandle.DateToUpdate
+RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
+
+//RTC_TimeShow(10, 130);  //Показати час
+RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);		
+		
+		curentTimeSecond = stimestructureget.Seconds;
+		RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
 	while (1)
 	{
 		//printf("Hours = %d Minutes = %d Seconds = %d\n\r", stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);	
@@ -727,6 +752,64 @@ void SystemClock_Config(void)
   }
 } 
 
+HAL_StatusTypeDef checkOdd(uint8_t *lineDCF77_1, uint8_t lineLength_1) //Перевірка на парність
+{
+	uint8_t iL;
+	uint8_t amountOne_1 = 0;
+	//підрахунок парності
+		for (iL = 0; iL < lineLength_1; iL++)
+		{
+			if ((*(lineDCF77_1+iL) & 0x01) == 1){ 
+				amountOne_1++; //Підрахунок кількості рдиниць
+			}
+		}
+		if(amountOne_1%2 == 0){ //Залишок від ділення
+			if (*(lineDCF77_1+iL) == 0x01){ //парна кількість
+					return HAL_ERROR;
+				}
+		}else{
+			if (*(lineDCF77_1+iL) == 0x00){ //непарна кылькість
+						return HAL_ERROR;
+			}
+		}
+		return HAL_OK;
+}
+
+
+HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77_1) //Перевірка рядка lineDCF77_1
+{
+	if(*(lineDCF77_1+20) == 0x00){ //Перевірка на віт Start  = 1
+		return HAL_ERROR;
+	}
+//	
+	if (checkOdd(lineDCF77_1+29, 6) == HAL_ERROR) //Перевірка на парність годин
+	{
+		return HAL_ERROR;
+	}
+  stimestructure.Hours = *(lineDCF77_1+29) + (*(lineDCF77_1+30))*2 + (*(lineDCF77_1+31))*4 + (*(lineDCF77_1+32))*8 + (*(lineDCF77_1+33))*10 + (*(lineDCF77_1+34))*20;
+//	
+	if (checkOdd(lineDCF77_1+21, 7) == HAL_ERROR) //Перевірка на парність хвилин
+	{
+		return HAL_ERROR;
+	}
+  stimestructure.Minutes = *(lineDCF77_1+21) + (*(lineDCF77_1+22))*2 + (*(lineDCF77_1+23))*4 + (*(lineDCF77_1+24))*8 + (*(lineDCF77_1+25))*10 + (*(lineDCF77_1+26))*20+ (*(lineDCF77_1+27))*40;
+  stimestructure.Seconds = 0x00;	
+//
+	if (checkOdd(lineDCF77_1+36, 22) == HAL_ERROR) //Перевірка на парність День Місяця + День тижня + Місяць + Рік
+	{
+		return HAL_ERROR;
+	}
+  sdatestructure.Date = *(lineDCF77_1+36) + (*(lineDCF77_1+37))*2 + (*(lineDCF77_1+38))*4 + (*(lineDCF77_1+39))*8 + (*(lineDCF77_1+40))*10 + (*(lineDCF77_1+41))*20;
+	sdatestructure.WeekDay = *(lineDCF77_1+42) + (*(lineDCF77_1+43))*2 + (*(lineDCF77_1+44))*4;
+  sdatestructure.Month = *(lineDCF77_1+45) + (*(lineDCF77_1+46))*2 + (*(lineDCF77_1+47))*4 + (*(lineDCF77_1+48))*8 + (*(lineDCF77_1+49))*10;	
+	sdatestructure.Year = *(lineDCF77_1+50) + (*(lineDCF77_1+51))*2 + (*(lineDCF77_1+52))*4 + (*(lineDCF77_1+53))*8 + (*(lineDCF77_1+54))*10 + (*(lineDCF77_1+55))*20 + (*(lineDCF77_1+56))*40 + (*(lineDCF77_1+57))*80;
+		
+	
+	DCF77_Fine = 0x01;
+  return HAL_OK;
+}
+
+
 /**
   * @brief  Tx Transfer completed callback
   * @param  UartHandle: UART handle. 
@@ -829,15 +912,15 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
   */
 static void RTC_AlarmConfig(void)
 {
-  RTC_DateTypeDef  sdatestructure;
-  RTC_TimeTypeDef  stimestructure;
-  RTC_AlarmTypeDef salarmstructure;
+  //RTC_DateTypeDef  sdatestructure;
+  //RTC_TimeTypeDef  stimestructure;
+  //RTC_AlarmTypeDef salarmstructure;
  
   // ##-1- Configure the Date #################################################
   // Set Date: 25.01.20.02 2х10+5
-  sdatestructure.Year = 0x25; //2х10+5
-  sdatestructure.Month = 0x04; //RTC_MONTH_JANUARY; //01 = 0x10+1
-  sdatestructure.Date = 0x24; //0x10+7
+  //sdatestructure.Year = 0x25; //2х10+5
+  //sdatestructure.Month = 0x04; //RTC_MONTH_JANUARY; //01 = 0x10+1
+  //sdatestructure.Date = 0x24; //0x10+7
   //sdatestructure.WeekDay = 0x04; //RTC_WEEKDAY_TUESDAY; 02=0x10+2
   
   if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
@@ -849,9 +932,9 @@ static void RTC_AlarmConfig(void)
   
  // ##-2- Configure the Time #################################################
  //  Set Time: 14:45:01 
-  stimestructure.Hours = 0x23; //1x10+4 14 годин
-  stimestructure.Minutes = 0x59; //4x10+5 45 хвилин
-  stimestructure.Seconds = 0x55; //0x10+1 1 секунда
+  //stimestructure.Hours = 0x23; //1x10+4 14 годин
+  //stimestructure.Minutes = 0x59; //4x10+5 45 хвилин
+  //stimestructure.Seconds = 0x55; //0x10+1 1 секунда
   
   if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
@@ -880,8 +963,8 @@ static void RTC_AlarmConfig(void)
 
 static void RTC_SECConfig(void)
 {
-  RTC_DateTypeDef  sdatestructure;
-  RTC_TimeTypeDef  stimestructure;
+  //RTC_DateTypeDef  sdatestructure;
+  //RTC_TimeTypeDef  stimestructure;
   //RTC_AlarmTypeDef salarmstructure;
  
  //##-1- Configure the Date #################################################
@@ -958,7 +1041,7 @@ static void RTC_SECUpdate(void)
 	sdatestructureget.Year = RTC_Data_Update(4); //0x25; //0x14;
   //sdatestructure.WeekDay = RTC_Data_Update(6); //RTC_WEEKDAY_TUESDAY; 02 = 0x10+02
   
-  if(HAL_RTC_SetDate(&RtcHandle, &sdatestructureget,RTC_FORMAT_BCD) != HAL_OK) //Запис Дати з sdatestructure в RtcHandle
+  if(HAL_RTC_SetDate(&RtcHandle, &sdatestructureget, RTC_FORMAT_BCD) != HAL_OK) //Запис Дати з sdatestructure в RtcHandle
   {
     // Initialization Error //
     char *myError = "HAL_RTC_SetDate";

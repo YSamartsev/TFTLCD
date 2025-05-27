@@ -354,11 +354,13 @@ uint32_t BSP_PB_GetState(Button_TypeDef Button)
   {
   return HAL_GPIO_ReadPin(BUTTON_PORT[Button], BUTTON_PIN[Button]);
   }
-	
+
+#ifdef DCF77	
 uint32_t BSP_DCF77_GetState()
   {
   return HAL_GPIO_ReadPin(IN_DCF77_GPIO_PORT, IN_DCF77_PIN);
   }	
+	#endif
 /**
   * @}
   */ 
@@ -514,107 +516,13 @@ void SPIx_Error (void)
   * @brief  Initialize the SD Card and put it into StandBy State (Ready for 
   *         data transfer).
   */
-void SD_IO_Init(void)
-{
-  GPIO_InitTypeDef  gpioinitstruct = {0};
-  uint8_t counter = 0;
 
-  /* SD_CS_GPIO Periph clock enable */
-  SD_CS_GPIO_CLK_ENABLE();
-
-  /* Configure SD_CS_PIN pin: SD Card CS pin */
-  gpioinitstruct.Pin    = SD_CS_PIN;
-  gpioinitstruct.Mode   = GPIO_MODE_OUTPUT_PP;
-  gpioinitstruct.Pull   = GPIO_PULLUP;
-  gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(SD_CS_GPIO_PORT, &gpioinitstruct);
-
-  /* Configure LCD_CS_PIN pin: LCD Card CS pin */
-  gpioinitstruct.Pin   = LCD_CS_PIN;
-  gpioinitstruct.Mode  = GPIO_MODE_OUTPUT_PP;
-  gpioinitstruct.Pull  = GPIO_NOPULL;
-  gpioinitstruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(SD_CS_GPIO_PORT, &gpioinitstruct);
-  LCD_CS_HIGH();
-  /*------------Put SD in SPI mode--------------*/
-  /* SD SPI Config */
-  SPIx_Init();
-
-  /* SD chip select high */
-  SD_CS_HIGH();
-  
-  /* Send dummy byte 0xFF, 10 times with CS high */
-  /* Rise CS and MOSI for 80 clocks cycles */
-  for (counter = 0; counter <= 9; counter++)
-  {
-    /* Send dummy byte 0xFF */
-    SD_IO_WriteByte(SD_DUMMY_BYTE);
-  }
-}
 
 /**
   * @brief  Set the SD_CS pin.
   * @param  pin value.
   */
-void SD_IO_CSState(uint8_t val)
-{
-  if(val == 1) 
-  {
-    SD_CS_HIGH();
-}
-  else
-  {
-    SD_CS_LOW();
-  }
-}
- 
-/**
-  * @brief  Write byte(s) on the SD
-  * @param  DataIn: Pointer to data buffer to write
-  * @param  DataOut: Pointer to data buffer for read data
-  * @param  DataLength: number of bytes to write
-  */
-void SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength)
-  {
-  /* Send the byte */
-  SPIx_WriteReadData(DataIn, DataOut, DataLength);
-}
 
-/**
-  * @brief  Write a byte on the SD.
-  * @param  Data: byte to send.
-  * @retval Data written
-  */
-uint8_t SD_IO_WriteByte(uint8_t Data)
-{
-  uint8_t tmp;
-
-  /* Send the byte */
-  SPIx_WriteReadData(&Data,&tmp,1);
-  return tmp;
-}
-
-/**
-  * @brief  Write an amount of data on the SD.
-  * @param  Data: byte to send.
-  * @param  DataLength: number of bytes to write
-  */
-void SD_IO_ReadData(uint8_t *DataOut, uint16_t DataLength)
-{
-  /* Send the byte */
-  SD_IO_WriteReadData(DataOut, DataOut, DataLength);
-  }   
- 
-/**
-  * @brief  Write an amount of data on the SD.
-  * @param  Data: byte to send.
-  * @param  DataLength: number of bytes to write
-  */
-void SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength)
-{
-  /* Send the byte */
-  SPIx_WriteData((uint8_t *)Data, DataLength);
-}
 
 /********************************* LINK LCD ***********************************/
 /**

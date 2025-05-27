@@ -206,14 +206,6 @@ typedef enum
   */
 	
 #ifdef STM32F103_SMART	
-	#define SD_CS_PIN                                 GPIO_PIN_5
-	#define SD_CS_GPIO_PORT                           GPIOB
-	#define SD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
-	#define SD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
-
-/**
-  * @brief  LCD Control Interface pins (shield D10)
-  */
 	#define LCD_CS_PIN                                 GPIO_PIN_12 //SPI2_NSS - не використовую
 	#define LCD_CS_GPIO_PORT                           GPIOB
 	#define LCD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
@@ -227,9 +219,7 @@ typedef enum
 	#define LCD_RST_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOA_CLK_ENABLE() //__HAL_RCC_GPIOB_CLK_ENABLE()
 	#define LCD_RST_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOA_CLK_DISABLE() //__HAL_RCC_GPIOB _CLK_DISABLE()
 
-/**
-  * @brief  LCD Data/Command Interface pins
-  */
+
 	#define LCD_DC_PIN                                 GPIO_PIN_1 //PB1
 	#define LCD_DC_GPIO_PORT                           GPIOB 
 	#define LCD_DC_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE() //__HAL_RCC_GPIOA_CLK_ENABLE()
@@ -263,6 +253,13 @@ typedef enum
 	#define LCD_DC_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE() 
 #endif
 
+#ifdef DCF77	
+#define DCF77_PIN                                 GPIO_PIN_1 //PA1
+#define DCF77_GPIO_PORT                           GPIOA 
+#define DCF77_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOA_CLK_ENABLE() 
+#define DCF77_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOA_CLK_DISABLE()
+#endif
+
 
 #ifdef TFT_LCD_1_77 
 		//#define USE_SPI_DMA     //if used DMA for SPI bus
@@ -283,15 +280,6 @@ typedef enum
 #define NUCLEO_SPIx_TIMEOUT_MAX                     1000
 
 
-/**
-  * @brief  SD Control Lines management Вибір SD Card Select
-  */  
-#define SD_CS_LOW()       HAL_GPIO_WritePin(SD_CS_GPIO_PORT, SD_CS_PIN, GPIO_PIN_RESET)
-#define SD_CS_HIGH()      HAL_GPIO_WritePin(SD_CS_GPIO_PORT, SD_CS_PIN, GPIO_PIN_SET)
-    
-/**
-  * @brief  LCD Control Lines management Вибір LCD Chip Select
-  */
 
 #define LCD_CS_LOW()      HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_RESET)
 #define LCD_CS_HIGH()     HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_SET)
@@ -302,44 +290,23 @@ typedef enum
 #define LCD_RST_LOW()     HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_RESET)
 #define LCD_RST_HIGH()    HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_SET)
 
-
-/**
-  * @brief  SD Control Interface pins (shield D4)
-  */
-#define SD_CS_PIN                                 GPIO_PIN_5
-#define SD_CS_GPIO_PORT                           GPIOB
-#define SD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
-#define SD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
-
-/**
-  * @brief  LCD Control Interface pins (shield D10)
-  */
 #define LCD_CS_PIN                               GPIO_PIN_12 //SPI2_NSS - не використовую
 #define LCD_CS_GPIO_PORT                           GPIOB
 #define LCD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
 #define LCD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
-
-
-// Використовую PB PIN_11 в платі з проводочком
-// Використовую PA PIN_7 в платі без проводочка
 
 #define LCD_RST_PIN                              GPIO_PIN_7  //PA7
 #define LCD_RST_GPIO_PORT                        GPIOA 
 #define LCD_RST_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOA_CLK_ENABLE() //__HAL_RCC_GPIOB_CLK_ENABLE()
 #define LCD_RST_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOA_CLK_DISABLE() //__HAL_RCC_GPIOB _CLK_DISABLE()
 
-/**
-  * @brief  LCD Data/Command Interface pins
-  */
+
 #define LCD_DC_PIN                                 GPIO_PIN_1 //PB1
 #define LCD_DC_GPIO_PORT                           GPIOB 
 #define LCD_DC_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE() //__HAL_RCC_GPIOA_CLK_ENABLE()
 #define LCD_DC_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE() //__HAL_RCC_GPIOA_CLK_DISABLE()
 
-#define DCF77_PIN                                 GPIO_PIN_1 //PA1
-#define DCF77_GPIO_PORT                           GPIOA 
-#define DCF77_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOA_CLK_ENABLE() 
-#define DCF77_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOA_CLK_DISABLE()
+
 
 
 /* Basic operations */

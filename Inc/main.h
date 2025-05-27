@@ -121,6 +121,9 @@ typedef struct
 #define TFT_LCD_1_3
 //#define TFT_LCD_1_44
 //#define TFT_LCD_1_77
+
+//Підключення DCF77
+#define DCF77
 //=======================================================================================
 
 /* Exported functions ------------------------------------------------------- */
@@ -135,6 +138,9 @@ static int Buffercmp(uint8_t * pBuffer1, uint8_t * pBuffer2, uint16_t BufferLeng
 uint8_t RTC_Data_Update(uint8_t index);
 static void RTC_SECUpdate(void);
 char calcModulo256(char *aRxBuffer, uint16_t BufferLength);
+//HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77, uint8_t lineLength);
+HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77);
+
 
 #endif /* __MAIN_H */
 
