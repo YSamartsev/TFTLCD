@@ -100,7 +100,7 @@ const uint8_t  BUTTON_IRQn[BUTTONn] = {USER_BUTTON_EXTI_IRQn };
  */
 
 #ifdef HAL_SPI_MODULE_ENABLED
-uint32_t SpixTimeout = NUCLEO_SPIx_TIMEOUT_MAX;        /*<! Value of Timeout when SPI communication fails */
+uint32_t SpixTimeout = SPIx_TIMEOUT_MAX;        /*<! Value of Timeout when SPI communication fails */
 
 #endif /* HAL_SPI_MODULE_ENABLED */
 
@@ -385,21 +385,21 @@ void SPIx_MspInit(void)
   
   /*** Configure the GPIOs ***/  
   /* Enable GPIO clock */
-  NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE();
+  SPIx_SCK_GPIO_CLK_ENABLE();
   
   /* Configure SPI SCK */
-  gpioinitstruct.Pin        = NUCLEO_SPIx_SCK_PIN;
+  gpioinitstruct.Pin        = SPIx_SCK_PIN;
   gpioinitstruct.Mode       = GPIO_MODE_AF_PP;
   gpioinitstruct.Speed      = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(NUCLEO_SPIx_SCK_GPIO_PORT, &gpioinitstruct);
+  HAL_GPIO_Init(SPIx_SCK_GPIO_PORT, &gpioinitstruct);
 
   /* Configure SPI MOSI */ 
-  gpioinitstruct.Pin        = NUCLEO_SPIx_MOSI_PIN;
-  HAL_GPIO_Init(NUCLEO_SPIx_MOSI_GPIO_PORT, &gpioinitstruct);
+  gpioinitstruct.Pin        = SPIx_MOSI_PIN;
+  HAL_GPIO_Init(SPIx_MOSI_GPIO_PORT, &gpioinitstruct);
   
    /*** Configure the SPI peripheral ***/ 
   /* Enable SPI clock */
-  NUCLEO_SPIx_CLK_ENABLE();
+  SPIx_CLK_ENABLE();
 }
 
 /**
@@ -410,7 +410,7 @@ void SPIx_Init(void)
   if(HAL_SPI_GetState(&SpiHandle) == HAL_SPI_STATE_RESET)
   {
 		
-    SpiHandle.Instance = NUCLEO_SPIx;
+    SpiHandle.Instance = SPIx;
       /* SPI baudrate is set to 8 MHz maximum (PCLK2/SPI_BaudRatePrescaler = 64/8 = 8 MHz) 
        to verify these constraints:
           - ST7735 LCD SPI interface max baudrate is 15MHz for write and 6.66MHz for read
@@ -536,8 +536,10 @@ void LCD_IO_Init(void)
   LCD_CS_GPIO_CLK_ENABLE(); //Не використовую
   LCD_DC_GPIO_CLK_ENABLE(); //PB1 CLK
   LCD_RST_GPIO_CLK_ENABLE(); //PA7 CLK
-	
+
+#ifdef DCF77	
 	DCF77_GPIO_CLK_ENABLE();
+#endif
 	
   /* Configure типу роботи піна PB12: LCD_CS_PIN pin : LCD Card CS pin */
   gpioinitstruct.Pin    = LCD_CS_PIN; //PB12 Не використовую
@@ -553,11 +555,12 @@ void LCD_IO_Init(void)
   gpioinitstruct.Pin    = LCD_RST_PIN; //PA7 Скидання дисплея
 	gpioinitstruct.Mode   = GPIO_MODE_OUTPUT_PP;
   HAL_GPIO_Init(LCD_RST_GPIO_PORT, &gpioinitstruct); 
-	
+
+#ifdef DCF77
 	gpioinitstruct.Pin    = DCF77_PIN; //PA1 
   gpioinitstruct.Mode   = GPIO_MODE_INPUT;
   HAL_GPIO_Init(DCF77_GPIO_PORT, &gpioinitstruct); 
-	
+#endif	
 	
 
 	/* LCD chip select high */

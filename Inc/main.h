@@ -36,6 +36,22 @@
 #include "sd_diskio.h"
 #include "fatfs_storage.h"
 
+//=============================Налаштування плат і дисплеїв==============================
+//#define TFT_LCD_7735
+#define TFT_LCD_7789
+
+#define STM32F103_SMART
+//#define STM32F103_BLUE_BILL
+
+#define TFT_LCD_1_3
+//#define TFT_LCD_1_44
+//#define TFT_LCD_1_77
+
+//Підключення DCF77
+//#define DCF77
+//=======================================================================================
+
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 #define  MAX_BMP_FILES  25
@@ -71,23 +87,94 @@
 #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 
 /* Definition for SPIx clock resources */
-#define SPIx                             SPI2
-#define SPIx_CLK_ENABLE()                __HAL_RCC_SPI2_CLK_ENABLE()
-#define SPIx_SCK_GPIO_CLK_ENABLE()       __HAL_RCC_GPIOB_CLK_ENABLE()
-#define SPIx_MISO_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOB_CLK_ENABLE()
-#define SPIx_MOSI_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOB_CLK_ENABLE()
+#ifdef STM32F103_SMART
+	#define SPIx                                 SPI2 
+	#define SPIx_CLK_ENABLE()                    __HAL_RCC_SPI2_CLK_ENABLE() 
 
-/* Definition for SPIx Pins */
-#define SPIx_SCK_PIN                     GPIO_PIN_13
-#define SPIx_SCK_GPIO_PORT               GPIOB
-#define SPIx_MISO_PIN                    GPIO_PIN_14
-#define SPIx_MISO_GPIO_PORT              GPIOB
-#define SPIx_MOSI_PIN                    GPIO_PIN_15
-#define SPIx_MOSI_GPIO_PORT              GPIOB
+	#define SPIx_SCK_PIN                         GPIO_PIN_13 
+	#define SPIx_SCK_GPIO_PORT                   GPIOB  //SPI SCK PB13
+	#define SPIx_SCK_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOB_CLK_ENABLE() 
+	#define SPIx_SCK_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOB_CLK_DISABLE()
 
+
+	#define SPIx_MOSI_PIN                        GPIO_PIN_15
+	#define SPIx_MOSI_GPIO_PORT             			GPIOB 
+	#define SPIx_MOSI_GPIO_CLK_ENABLE()    		 __HAL_RCC_GPIOB_CLK_ENABLE()
+	#define SPIx_MOSI_GPIO_CLK_DISABLE()    		 __HAL_RCC_GPIOB_CLK_DISABLE()
+
+	#define SPIx_MISO_PIN                        GPIO_PIN_14 
+	#define SPIx_MISO_GPIO_PORT             			GPIOB 
+	#define SPIx__MISO_GPIO_CLK_ENABLE()    		  __HAL_RCC_GPIOB_CLK_ENABLE()
+	#define SPIx__MISO_GPIO_CLK_DISABLE()    		__HAL_RCC_GPIOB_CLK_DISABLE()
+
+	/* Definition for SPIx's NVIC */
+	#define SPIx_IRQn                        SPI2_IRQn
+	#define SPIx_IRQHandler                  SPI2_IRQHandler
+
+//Визначення пінів GPIO
+	#define LCD_CS_PIN                                 GPIO_PIN_12 //SPI2_NSS - не використовую
+	#define LCD_CS_GPIO_PORT                           GPIOB
+	#define LCD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
+	#define LCD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
+
+// Використовую PB PIN_11 в платі з проводочком
+// Використовую PA PIN_7 в платі без проводочк
+	#define LCD_RST_PIN                              GPIO_PIN_7  //PA7
+	#define LCD_RST_GPIO_PORT                        GPIOA 
+	#define LCD_RST_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOA_CLK_ENABLE() //__HAL_RCC_GPIOB_CLK_ENABLE()
+	#define LCD_RST_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOA_CLK_DISABLE() //__HAL_RCC_GPIOB _CLK_DISABLE()
+
+	#define LCD_DC_PIN                                 GPIO_PIN_1 //PB1
+	#define LCD_DC_GPIO_PORT                           GPIOB 
+	#define LCD_DC_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE() //__HAL_RCC_GPIOA_CLK_ENABLE()
+	#define LCD_DC_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE() //__HAL_RCC_GPIOA_CLK_DISABLE()
+	
+	#define IN_DCF77_PIN                                 GPIO_PIN_1 //LED DCF77
+	#define IN_DCF77_GPIO_PORT                           GPIOA 
+	#define IN_DCF77_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOA_CLK_ENABLE() //__HAL_RCC_GPIOA_CLK_ENABLE()
+	#define IN_DCF77_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOA_CLK_DISABLE() //__HAL_RCC_GPIOA_CLK_DISABLE()
+#endif
+
+/*###################### SPI ###################################*/
+#ifdef STM32F103_BLUE_BILL
+	#define SPIx                                 SPI1 
+	#define SPIx_CLK_ENABLE()                    __HAL_RCC_SPI1_CLK_ENABLE() 
+
+	#define SPIx_SCK_PIN                         GPIO_PIN_5
+	#define SPIx_SCK_GPIO_PORT                   GPIOA //SPI SCK PB13
+	#define SPIx_SCK_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOA_CLK_ENABLE() 
+	#define SPIx_SCK_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOA_CLK_DISABLE()
+
+
+	#define SPIx_MOSI_PIN                        GPIO_PIN_7
+	#define SPIx_MOSI_GPIO_PORT             			GPIOA 
+	#define SPIx_MOSI_GPIO_CLK_ENABLE()    		 __HAL_RCC_GPIOA_CLK_ENABLE()
+	#define NUCLEO_SPIx_MOSI_GPIO_CLK_DISABLE()    		 __HAL_RCC_GPIOA_CLK_DISABLE()
+
+	#define SPIx_MISO_PIN                        GPIO_PIN_6 
+	#define SPIx_MISO_GPIO_PORT             			GPIOA 
+	#define SPIx__MISO_GPIO_CLK_ENABLE()    		  __HAL_RCC_GPIOA_CLK_ENABLE()
+	#define SPIx__MISO_GPIO_CLK_DISABLE()    		__HAL_RCC_GPIOA_CLK_DISABLE()
 /* Definition for SPIx's NVIC */
-#define SPIx_IRQn                        SPI2_IRQn
-#define SPIx_IRQHandler                  SPI2_IRQHandler
+	#define SPIx_IRQn                        SPI1_IRQn
+	#define SPIx_IRQHandler                  SPI1_IRQHandler
+
+//Визначення пінів GPIO
+	#define LCD_CS_PIN                                 GPIO_PIN_11 //SPI1_NSS - не використовую
+	#define LCD_CS_GPIO_PORT                           GPIOB
+	#define LCD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
+	#define LCD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
+
+	#define LCD_RST_PIN                              GPIO_PIN_1  //PB1
+	#define LCD_RST_GPIO_PORT                        GPIOB 
+	#define LCD_RST_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOB_CLK_ENABLE() //
+	#define LCD_RST_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOB_CLK_DISABLE() //
+
+	#define LCD_DC_PIN                                 GPIO_PIN_0 
+	#define LCD_DC_GPIO_PORT                           GPIOB 
+	#define LCD_DC_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE() 
+	#define LCD_DC_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE() 
+#endif
 
 typedef struct
 {
@@ -111,20 +198,6 @@ typedef struct
 /*#define RTC_CLOCK_SOURCE_LSI*/
 #define RTC_CLOCK_SOURCE_LSE
 
-//=============================Налаштування плат і дисплеїв==============================
-//#define TFT_LCD_7735
-#define TFT_LCD_7789
-
-#define STM32F103_SMART
-//#define STM32F103_BLUE_BILL
-
-#define TFT_LCD_1_3
-//#define TFT_LCD_1_44
-//#define TFT_LCD_1_77
-
-//Підключення DCF77
-#define DCF77
-//=======================================================================================
 
 /* Exported functions ------------------------------------------------------- */
 void Error_Handler(char *myError);

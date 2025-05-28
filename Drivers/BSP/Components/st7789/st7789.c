@@ -1,6 +1,7 @@
 #include "st7789.h"
 #include "fonts.h"
 #include "stm32f1xx_nucleo.h"
+#include "main.h"
 
 extern SPI_HandleTypeDef SpiHandle;
 

@@ -157,55 +157,10 @@ typedef enum
   * @{
   */
 /*###################### SPI ###################################*/
-#ifdef STM32F103_SMART
-	#define NUCLEO_SPIx                                 SPI2 
-	#define NUCLEO_SPIx_CLK_ENABLE()                    __HAL_RCC_SPI2_CLK_ENABLE() 
-
-	#define NUCLEO_SPIx_SCK_PIN                         GPIO_PIN_13 
-	#define NUCLEO_SPIx_SCK_GPIO_PORT                   GPIOB  //SPI SCK PB13
-	#define NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOB_CLK_ENABLE() 
-	#define NUCLEO_SPIx_SCK_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOB_CLK_DISABLE()
-
-
-	#define NUCLEO_SPIx_MOSI_PIN                        GPIO_PIN_15
-	#define NUCLEO_SPIx_MOSI_GPIO_PORT             			GPIOB 
-	#define NUCLEO_SPIx_MOSI_GPIO_CLK_ENABLE()    		 __HAL_RCC_GPIOB_CLK_ENABLE()
-	#define NUCLEO_SPIx_MOSI_GPIO_CLK_DISABLE()    		 __HAL_RCC_GPIOB_CLK_DISABLE()
-
-	#define NUCLEO_SPIx_MISO_PIN                        GPIO_PIN_14 
-	#define NUCLEO_SPIx_MISO_GPIO_PORT             			GPIOB 
-	#define NUCLEO_SPIx__MISO_GPIO_CLK_ENABLE()    		  __HAL_RCC_GPIOB_CLK_ENABLE()
-	#define NUCLEO_SPIx__MISO_GPIO_CLK_DISABLE()    		__HAL_RCC_GPIOB_CLK_DISABLE()
-#endif
-
-/*###################### SPI ###################################*/
-#ifdef STM32F103_BLUE_BILL
-	#define NUCLEO_SPIx                                 SPI1 
-	#define NUCLEO_SPIx_CLK_ENABLE()                    __HAL_RCC_SPI1_CLK_ENABLE() 
-
-	#define NUCLEO_SPIx_SCK_PIN                         GPIO_PIN_5
-	#define NUCLEO_SPIx_SCK_GPIO_PORT                   GPIOA //SPI SCK PB13
-	#define NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOA_CLK_ENABLE() 
-	#define NUCLEO_SPIx_SCK_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOA_CLK_DISABLE()
-
-
-	#define NUCLEO_SPIx_MOSI_PIN                        GPIO_PIN_7
-	#define NUCLEO_SPIx_MOSI_GPIO_PORT             			GPIOA 
-	#define NUCLEO_SPIx_MOSI_GPIO_CLK_ENABLE()    		 __HAL_RCC_GPIOA_CLK_ENABLE()
-	#define NUCLEO_SPIx_MOSI_GPIO_CLK_DISABLE()    		 __HAL_RCC_GPIOA_CLK_DISABLE()
-
-	#define NUCLEO_SPIx_MISO_PIN                        GPIO_PIN_6 
-	#define NUCLEO_SPIx_MISO_GPIO_PORT             			GPIOA 
-	#define NUCLEO_SPIx__MISO_GPIO_CLK_ENABLE()    		  __HAL_RCC_GPIOA_CLK_ENABLE()
-	#define NUCLEO_SPIx__MISO_GPIO_CLK_DISABLE()    		__HAL_RCC_GPIOA_CLK_DISABLE()
-#endif
-
-
-/**
-  * @brief  SD Control Interface pins (shield D4)
-  */
-	
 #ifdef STM32F103_SMART	
+
+/* @brief  LCD Control Interface pins (shield D10)
+  */
 	#define LCD_CS_PIN                                 GPIO_PIN_12 //SPI2_NSS - не використовую
 	#define LCD_CS_GPIO_PORT                           GPIOB
 	#define LCD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
@@ -219,7 +174,9 @@ typedef enum
 	#define LCD_RST_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOA_CLK_ENABLE() //__HAL_RCC_GPIOB_CLK_ENABLE()
 	#define LCD_RST_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOA_CLK_DISABLE() //__HAL_RCC_GPIOB _CLK_DISABLE()
 
-
+/**
+  * @brief  LCD Data/Command Interface pins
+  */
 	#define LCD_DC_PIN                                 GPIO_PIN_1 //PB1
 	#define LCD_DC_GPIO_PORT                           GPIOB 
 	#define LCD_DC_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE() //__HAL_RCC_GPIOA_CLK_ENABLE()
@@ -231,28 +188,10 @@ typedef enum
 	#define IN_DCF77_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOA_CLK_DISABLE() //__HAL_RCC_GPIOA_CLK_DISABLE()
 #endif
 
-#ifdef STM32F103_BLUE_BILL	
-	#define SD_CS_PIN                                 GPIO_PIN_10
-	#define SD_CS_GPIO_PORT                           GPIOB
-	#define SD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
-	#define SD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
-
-	#define LCD_CS_PIN                                 GPIO_PIN_11 //SPI1_NSS - не використовую
-	#define LCD_CS_GPIO_PORT                           GPIOB
-	#define LCD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
-	#define LCD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE()
-
-	#define LCD_RST_PIN                              GPIO_PIN_1  //PB1
-	#define LCD_RST_GPIO_PORT                        GPIOB 
-	#define LCD_RST_GPIO_CLK_ENABLE()                __HAL_RCC_GPIOB_CLK_ENABLE() //
-	#define LCD_RST_GPIO_CLK_DISABLE()               __HAL_RCC_GPIOB_CLK_DISABLE() //
-
-	#define LCD_DC_PIN                                 GPIO_PIN_0 
-	#define LCD_DC_GPIO_PORT                           GPIOB 
-	#define LCD_DC_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE() 
-	#define LCD_DC_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE() 
-#endif
-
+/**
+  * @brief  SD Control Interface pins (shield D4)
+  */
+	
 #ifdef DCF77	
 #define DCF77_PIN                                 GPIO_PIN_1 //PA1
 #define DCF77_GPIO_PORT                           GPIOA 
@@ -277,19 +216,13 @@ typedef enum
 #endif
 
 
-#define NUCLEO_SPIx_TIMEOUT_MAX                     1000
+#define SPIx_TIMEOUT_MAX                     1000
 
 
 
-#define LCD_CS_LOW()      HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_RESET)
-#define LCD_CS_HIGH()     HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_SET)
 
-#define LCD_DC_LOW()      HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_RESET)
-#define LCD_DC_HIGH()     HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_SET)
 
-#define LCD_RST_LOW()     HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_RESET)
-#define LCD_RST_HIGH()    HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_SET)
-
+#ifdef STM32F103_SMART
 #define LCD_CS_PIN                               GPIO_PIN_12 //SPI2_NSS - не використовую
 #define LCD_CS_GPIO_PORT                           GPIOB
 #define LCD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE()
@@ -305,11 +238,18 @@ typedef enum
 #define LCD_DC_GPIO_PORT                           GPIOB 
 #define LCD_DC_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOB_CLK_ENABLE() //__HAL_RCC_GPIOA_CLK_ENABLE()
 #define LCD_DC_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOB_CLK_DISABLE() //__HAL_RCC_GPIOA_CLK_DISABLE()
+#endif
 
+ 
+#define LCD_CS_LOW()      HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_RESET)
+#define LCD_CS_HIGH()     HAL_GPIO_WritePin(LCD_CS_GPIO_PORT, LCD_CS_PIN, GPIO_PIN_SET)
 
+#define LCD_DC_LOW()      HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_RESET)
+#define LCD_DC_HIGH()     HAL_GPIO_WritePin(LCD_DC_GPIO_PORT, LCD_DC_PIN, GPIO_PIN_SET)
 
+#define LCD_RST_LOW()     HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_RESET)
+#define LCD_RST_HIGH()    HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_SET)
 
-/* Basic operations */
 #define LCD_RST_Clr() HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_RESET)
 #define LCD_RST_Set() HAL_GPIO_WritePin(LCD_RST_GPIO_PORT, LCD_RST_PIN, GPIO_PIN_SET)
 
@@ -381,15 +321,6 @@ void               SPIx_WriteData(uint8_t *DataIn, uint16_t DataLength);
 void               SPIx_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLegnth);
 void               SPIx_Error (void);
 void               SPIx_MspInit(void);
-
-/* SD IO functions */
-void               SD_IO_Init(void);
-void               SD_IO_CSState(uint8_t state);
-void               SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength);
-void               SD_IO_ReadData(uint8_t *DataOut, uint16_t DataLength);
-void               SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength);
-uint8_t            SD_IO_WriteByte(uint8_t Data);
-uint8_t                   SD_IO_ReadByte(void);
 
 /* LCD IO functions */
 void							 LCD_SendCommand(uint8_t cmd);

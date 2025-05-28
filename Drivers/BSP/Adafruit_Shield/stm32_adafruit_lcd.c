@@ -78,6 +78,7 @@ EndDependencies */
 #include "../../Utilities/Fonts/font8.c"
 #include "stm32f1xx_hal_spi.h"
 #include "lcd.h"
+#include "stm32f1xx_nucleo.h"
 
 extern SPI_HandleTypeDef SpiHandle;
 extern LCD_DrvTypeDef   st7735_drv;

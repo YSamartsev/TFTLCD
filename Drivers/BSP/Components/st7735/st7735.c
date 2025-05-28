@@ -40,6 +40,7 @@
 #include "st7735.h"
 #include "stdlib.h"
 #include "st7735_cfg.h"
+#include "stm32f1xx_nucleo.h"
 
 //SPI_HandleTypeDef ST7735_SPI_PORT;
 extern SPI_HandleTypeDef SpiHandle;
