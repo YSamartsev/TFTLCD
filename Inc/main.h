@@ -37,18 +37,18 @@
 #include "fatfs_storage.h"
 
 //=============================Налаштування плат і дисплеїв==============================
-//#define TFT_LCD_7735
-#define TFT_LCD_7789
+//#define TFT_LCD_7735  //Для 1.44 128x128
+#define TFT_LCD_7789   //Для 1.3 PS 240x240
 
 #define STM32F103_SMART
 //#define STM32F103_BLUE_BILL
 
-#define TFT_LCD_1_3
-//#define TFT_LCD_1_44
-//#define TFT_LCD_1_77
+#define TFT_LCD_1_3 //Для 1.3 PS 240x240
+//#define TFT_LCD_1_44 //Для 1.44 128x128
+//#define TFT_LCD_1_77 //Для 1.77 
 
 //Підключення DCF77
-//#define DCF77
+#define DCF77
 //=======================================================================================
 
 
