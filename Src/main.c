@@ -483,16 +483,16 @@ do {
 		if (sensorValue == 1 && prevSensorValue == 0){
 			printf("amountNull = %d, amountOne = %d", amountNull, amountOne);
 	
-			if (amountOne <= 14){
+			if (amountOne <= 28){
 				lineDCF77[iCycle] = 0x00;
 				printf(" DCF77 = %c\n\r", strNull);
 			}else{
 				lineDCF77[iCycle] = 0x01;
 				printf(" DCF77 = %c\n\r", strOne);
 			}
-			if(amountNull > 150){
+			if(amountNull > 300){
 				printf("Preparing to receive a line of DCF77\n\r");
-				bWork = false; //Кінець прийому рядка хвилини
+				bWork = false; //Кінець прийому всіх рядків хвилини
 				printf("lineDCF77 = \n\r");
 				for (uint8_t i = 0; i < 60; ++i)
 				{
@@ -500,7 +500,7 @@ do {
 				}
 				printf("\n\r");	
 				
-				if (checkDCF77(lineDCF77) == HAL_ERROR)
+				if (checkDCF77(lineDCF77) == HAL_ERROR) //Первіряється формат рядка хвилини і присвоюється дата час в форматі BCD
 				{
 					bWork = false;
 				}
@@ -515,7 +515,7 @@ do {
 		BSP_LED_Toggle(LED_GREEN); //мигтіння світлодіодом
 		//Serial.print(sensorValue); //Результат інтервалу 10 мсек
 		prevSensorValue = sensorValue;
-		HAL_Delay(10);	
+		HAL_Delay(5);	
 	}
 	//холостий прогін потоку
 	if (sensorValue == 1) {
@@ -529,13 +529,13 @@ do {
 	if (sensorValue == 1 && prevSensorValue == 0){
 		printf("amountNull = %d, amountOne = %d", amountNull, amountOne);
 	
-		if (amountOne <= 14){
+		if (amountOne <= 28){
 			printf(" DCF77 = %c\n\r", strNull);
 		}else{
 			printf(" DCF77 = %c\n\r", strOne);
 		}
 			
-		if(amountNull > 150){
+		if(amountNull > 300){
 			bWork = true;
 			printf("Start recording line of DCF77\n\r");
 		}
@@ -551,7 +551,7 @@ do {
 	BSP_LED_Toggle(LED_GREEN); //мигтіння світлодіодом
 	//Serial.print(sensorValue); //Результат інтервалу 10 мсек
 	prevSensorValue = sensorValue;
-	HAL_Delay(10);
+	HAL_Delay(5);
 }while (DCF77_Fine == 0x00); 
 
 #endif
@@ -786,7 +786,7 @@ HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77_1) //Перевірка рядк
 	{
 		return HAL_ERROR;
 	}
-  stimestructure.Hours = *(lineDCF77_1+29) + (*(lineDCF77_1+30))*2 + (*(lineDCF77_1+31))*4 + (*(lineDCF77_1+32))*8 + (*(lineDCF77_1+33))*10 + (*(lineDCF77_1+34))*20;
+  stimestructure.Hours = 1 + *(lineDCF77_1+29) + (*(lineDCF77_1+30))*2 + (*(lineDCF77_1+31))*4 + (*(lineDCF77_1+32))*8 + (*(lineDCF77_1+33))*10 + (*(lineDCF77_1+34))*20;
 //	
 	if (checkOdd(lineDCF77_1+21, 7) == HAL_ERROR) //Перевірка на парність хвилин
 	{
@@ -794,7 +794,13 @@ HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77_1) //Перевірка рядк
 	}
   stimestructure.Minutes = *(lineDCF77_1+21) + (*(lineDCF77_1+22))*2 + (*(lineDCF77_1+23))*4 + (*(lineDCF77_1+24))*8 + (*(lineDCF77_1+25))*10 + (*(lineDCF77_1+26))*20+ (*(lineDCF77_1+27))*40;
   stimestructure.Seconds = 0x00;	
-//
+	
+	/* Convert the date structure parameters to BCD format */
+  stimestructure.Hours   = (uint8_t) RTC_ByteToBcd2(stimestructure.Hours);
+	stimestructure.Minutes   = (uint8_t) RTC_ByteToBcd2(stimestructure.Minutes);
+	stimestructure.Seconds   = (uint8_t) RTC_ByteToBcd2(stimestructure.Seconds);
+	
+	//
 	if (checkOdd(lineDCF77_1+36, 22) == HAL_ERROR) //Перевірка на парність День Місяця + День тижня + Місяць + Рік
 	{
 		return HAL_ERROR;
@@ -803,9 +809,14 @@ HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77_1) //Перевірка рядк
 	sdatestructure.WeekDay = *(lineDCF77_1+42) + (*(lineDCF77_1+43))*2 + (*(lineDCF77_1+44))*4;
   sdatestructure.Month = *(lineDCF77_1+45) + (*(lineDCF77_1+46))*2 + (*(lineDCF77_1+47))*4 + (*(lineDCF77_1+48))*8 + (*(lineDCF77_1+49))*10;	
 	sdatestructure.Year = *(lineDCF77_1+50) + (*(lineDCF77_1+51))*2 + (*(lineDCF77_1+52))*4 + (*(lineDCF77_1+53))*8 + (*(lineDCF77_1+54))*10 + (*(lineDCF77_1+55))*20 + (*(lineDCF77_1+56))*40 + (*(lineDCF77_1+57))*80;
-		
+
+	/* Convert the date structure parameters to BCD format */
+  sdatestructure.Date   = (uint8_t) RTC_ByteToBcd2(sdatestructure.Date);
+	sdatestructure.WeekDay   = (uint8_t) RTC_ByteToBcd2(sdatestructure.WeekDay);	
+	sdatestructure.Month  = (uint8_t) RTC_ByteToBcd2(sdatestructure.Month);
+	sdatestructure.Year   = (uint8_t) RTC_ByteToBcd2(sdatestructure.Year);
 	
-	DCF77_Fine = 0x01;
+ 	DCF77_Fine = 0x01;
   return HAL_OK;
 }
 
@@ -917,7 +928,7 @@ static void RTC_AlarmConfig(void)
   //RTC_AlarmTypeDef salarmstructure;
  
   // ##-1- Configure the Date #################################################
-  // Set Date: 25.01.20.02 2х10+5
+  // Set Date: 25.01.20.02 2х10+5 в форматі BCD !!!!
   //sdatestructure.Year = 0x25; //2х10+5
   //sdatestructure.Month = 0x04; //RTC_MONTH_JANUARY; //01 = 0x10+1
   //sdatestructure.Date = 0x24; //0x10+7

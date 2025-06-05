@@ -1,13 +1,8 @@
 Dependencies for Project 'TFT_LCD', Target 'TFT_LCD': (DO NOT MODIFY !)
 CompilerVersion: 5060960::V5.06 update 7 (build 960)::.\ARMCC
 F (startup_stm32f103xb.s)(0x680A555B)(--cpu Cortex-M3 -g --apcs=interwork --pd "__MICROLIB SETA 1"-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include--pd "__UVISION_VERSION SETA 533" --pd "_RTE_ SETA 1" --pd "STM32F10X_MD SETA 1" --pd "_RTE_ SETA 1"-o tft_lcd\startup_stm32f103xb.o --depend tft_lcd\startup_stm32f103xb.d)
-<<<<<<< HEAD
-F (..\Src\main.c)(0x684028D5)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_ldm --split_sections --asm --interleave --asm_dir "C:\\Users\\samj\\Documents\\" -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/BSP/Components -I ../Drivers/BSP\Components/Common -I ..\Middlewares\Third_Party\FatFs\src -I ..\Drivers\BSP\Adafruit_Shield -I ..\Drivers\BSP\STM32F1xx_Nucleo -I ..\Middlewares\Third_Party\FatFs\src\drivers -I ..\Drivers\BSP\Components\st7789-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DSTM32F10X_MD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xB-o tft_lcd\main.o --list_dir "C:\\Users\\samj\\Documents\\" --list --omf_browse tft_lcd\main.crf --depend tft_lcd\main.d)
-I (../Inc/main.h)(0x68402A5E)
-=======
-F (..\Src\main.c)(0x6835DDA2)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_ldm --split_sections --asm --interleave --asm_dir "C:\\Users\\samj\\Documents\\" -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/BSP/Components -I ../Drivers/BSP\Components/Common -I ..\Middlewares\Third_Party\FatFs\src -I ..\Drivers\BSP\Adafruit_Shield -I ..\Drivers\BSP\STM32F1xx_Nucleo -I ..\Middlewares\Third_Party\FatFs\src\drivers -I ..\Drivers\BSP\Components\st7789-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DSTM32F10X_MD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xB-o tft_lcd\main.o --list_dir "C:\\Users\\samj\\Documents\\" --list --omf_browse tft_lcd\main.crf --depend tft_lcd\main.d)
-I (../Inc/main.h)(0x68370344)
->>>>>>> d45499a7600d0363d3265eac0c6f69fbd28d98f2
+F (..\Src\main.c)(0x684167B2)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_ldm --split_sections --asm --interleave --asm_dir "C:\\Users\\samj\\Documents\\" -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/BSP/Components -I ../Drivers/BSP\Components/Common -I ..\Middlewares\Third_Party\FatFs\src -I ..\Drivers\BSP\Adafruit_Shield -I ..\Drivers\BSP\STM32F1xx_Nucleo -I ..\Middlewares\Third_Party\FatFs\src\drivers -I ..\Drivers\BSP\Components\st7789-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DSTM32F10X_MD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xB-o tft_lcd\main.o --list_dir "C:\\Users\\samj\\Documents\\" --list --omf_browse tft_lcd\main.crf --depend tft_lcd\main.d)
+I (../Inc/main.h)(0x684164B2)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x66BF252B)
 I (../Inc/stm32f1xx_hal_conf.h)(0x68357619)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x66BF252C)
@@ -34,7 +29,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -66,13 +61,8 @@ I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5E8E7502)
 I (C:\Keil_v5\ARM\ARMCC\include\rt_misc.h)(0x5E8E7502)
 I (C:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5E8E7502)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5E8E7502)
-<<<<<<< HEAD
 F (..\Src\Serial.c)(0x66F16D08)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_ldm --split_sections --asm --interleave --asm_dir "C:\\Users\\samj\\Documents\\" -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/BSP/Components -I ../Drivers/BSP\Components/Common -I ..\Middlewares\Third_Party\FatFs\src -I ..\Drivers\BSP\Adafruit_Shield -I ..\Drivers\BSP\STM32F1xx_Nucleo -I ..\Middlewares\Third_Party\FatFs\src\drivers -I ..\Drivers\BSP\Components\st7789-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DSTM32F10X_MD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xB-o tft_lcd\serial.o --list_dir "C:\\Users\\samj\\Documents\\" --list --omf_browse tft_lcd\serial.crf --depend tft_lcd\serial.d)
-I (../Inc/main.h)(0x68402A5E)
-=======
-F (..\Src\Serial.c)(0x66F16D08)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_ldm --split_sections --asm --interleave --asm_dir "C:\\Users\\samj\\Documents\\" -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/BSP/Components -I ../Drivers/BSP\Components/Common -I ..\Middlewares\Third_Party\FatFs\src -I ..\Drivers\BSP\Adafruit_Shield -I ..\Drivers\BSP\STM32F1xx_Nucleo -I ..\Middlewares\Third_Party\FatFs\src\drivers -I ..\Drivers\BSP\Components\st7789-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DSTM32F10X_MD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xB-o tft_lcd\serial.o --list_dir "C:\\Users\\samj\\Documents\\" --list --omf_browse tft_lcd\serial.crf --depend tft_lcd\serial.d)
-I (../Inc/main.h)(0x68370344)
->>>>>>> d45499a7600d0363d3265eac0c6f69fbd28d98f2
+I (../Inc/main.h)(0x684164B2)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x66BF252B)
 I (../Inc/stm32f1xx_hal_conf.h)(0x68357619)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x66BF252C)
@@ -99,7 +89,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -116,13 +106,8 @@ I (../Inc/ffconf.h)(0x67370441)
 I (..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_sd.h)(0x67C59B21)
 I (..\Middlewares\Third_Party\FatFs\src\drivers\sd_diskio.h)(0x63036F1F)
 I (../Inc/fatfs_storage.h)(0x677D4343)
-<<<<<<< HEAD
 F (..\Src\stm32f1xx_it.c)(0x677D4344)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_ldm --split_sections --asm --interleave --asm_dir "C:\\Users\\samj\\Documents\\" -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/BSP/Components -I ../Drivers/BSP\Components/Common -I ..\Middlewares\Third_Party\FatFs\src -I ..\Drivers\BSP\Adafruit_Shield -I ..\Drivers\BSP\STM32F1xx_Nucleo -I ..\Middlewares\Third_Party\FatFs\src\drivers -I ..\Drivers\BSP\Components\st7789-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DSTM32F10X_MD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xB-o tft_lcd\stm32f1xx_it.o --list_dir "C:\\Users\\samj\\Documents\\" --list --omf_browse tft_lcd\stm32f1xx_it.crf --depend tft_lcd\stm32f1xx_it.d)
-I (../Inc/main.h)(0x68402A5E)
-=======
-F (..\Src\stm32f1xx_it.c)(0x677D4344)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_ldm --split_sections --asm --interleave --asm_dir "C:\\Users\\samj\\Documents\\" -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/BSP/Components -I ../Drivers/BSP\Components/Common -I ..\Middlewares\Third_Party\FatFs\src -I ..\Drivers\BSP\Adafruit_Shield -I ..\Drivers\BSP\STM32F1xx_Nucleo -I ..\Middlewares\Third_Party\FatFs\src\drivers -I ..\Drivers\BSP\Components\st7789-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DSTM32F10X_MD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xB-o tft_lcd\stm32f1xx_it.o --list_dir "C:\\Users\\samj\\Documents\\" --list --omf_browse tft_lcd\stm32f1xx_it.crf --depend tft_lcd\stm32f1xx_it.d)
-I (../Inc/main.h)(0x68370344)
->>>>>>> d45499a7600d0363d3265eac0c6f69fbd28d98f2
+I (../Inc/main.h)(0x684164B2)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x66BF252B)
 I (../Inc/stm32f1xx_hal_conf.h)(0x68357619)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x66BF252C)
@@ -149,7 +134,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -167,13 +152,8 @@ I (..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_sd.h)(0x67C59B21)
 I (..\Middlewares\Third_Party\FatFs\src\drivers\sd_diskio.h)(0x63036F1F)
 I (../Inc/fatfs_storage.h)(0x677D4343)
 I (../Inc/stm32f1xx_it.h)(0x63036F4C)
-<<<<<<< HEAD
 F (..\Src\stm32f1xx_hal_msp.c)(0x681C5A5D)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_ldm --split_sections --asm --interleave --asm_dir "C:\\Users\\samj\\Documents\\" -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/BSP/Components -I ../Drivers/BSP\Components/Common -I ..\Middlewares\Third_Party\FatFs\src -I ..\Drivers\BSP\Adafruit_Shield -I ..\Drivers\BSP\STM32F1xx_Nucleo -I ..\Middlewares\Third_Party\FatFs\src\drivers -I ..\Drivers\BSP\Components\st7789-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DSTM32F10X_MD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xB-o tft_lcd\stm32f1xx_hal_msp.o --list_dir "C:\\Users\\samj\\Documents\\" --list --omf_browse tft_lcd\stm32f1xx_hal_msp.crf --depend tft_lcd\stm32f1xx_hal_msp.d)
-I (../Inc/main.h)(0x68402A5E)
-=======
-F (..\Src\stm32f1xx_hal_msp.c)(0x681C5A5D)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_ldm --split_sections --asm --interleave --asm_dir "C:\\Users\\samj\\Documents\\" -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/BSP/Components -I ../Drivers/BSP\Components/Common -I ..\Middlewares\Third_Party\FatFs\src -I ..\Drivers\BSP\Adafruit_Shield -I ..\Drivers\BSP\STM32F1xx_Nucleo -I ..\Middlewares\Third_Party\FatFs\src\drivers -I ..\Drivers\BSP\Components\st7789-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DSTM32F10X_MD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xB-o tft_lcd\stm32f1xx_hal_msp.o --list_dir "C:\\Users\\samj\\Documents\\" --list --omf_browse tft_lcd\stm32f1xx_hal_msp.crf --depend tft_lcd\stm32f1xx_hal_msp.d)
-I (../Inc/main.h)(0x68370344)
->>>>>>> d45499a7600d0363d3265eac0c6f69fbd28d98f2
+I (../Inc/main.h)(0x684164B2)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x66BF252B)
 I (../Inc/stm32f1xx_hal_conf.h)(0x68357619)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x66BF252C)
@@ -200,7 +180,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -244,7 +224,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -277,7 +257,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -310,7 +290,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -343,7 +323,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -376,13 +356,13 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x6792158E)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_smartcard.h)(0x66BF252C)
-F (..\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_rtc.c)(0x6809D753)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_ldm --split_sections --asm --interleave --asm_dir "C:\\Users\\samj\\Documents\\" -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/BSP/Components -I ../Drivers/BSP\Components/Common -I ..\Middlewares\Third_Party\FatFs\src -I ..\Drivers\BSP\Adafruit_Shield -I ..\Drivers\BSP\STM32F1xx_Nucleo -I ..\Middlewares\Third_Party\FatFs\src\drivers -I ..\Drivers\BSP\Components\st7789-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DSTM32F10X_MD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xB-o tft_lcd\stm32f1xx_hal_rtc.o --list_dir "C:\\Users\\samj\\Documents\\" --list --omf_browse tft_lcd\stm32f1xx_hal_rtc.crf --depend tft_lcd\stm32f1xx_hal_rtc.d)
+F (..\Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_rtc.c)(0x68416476)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_ldm --split_sections --asm --interleave --asm_dir "C:\\Users\\samj\\Documents\\" -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/BSP/Components -I ../Drivers/BSP\Components/Common -I ..\Middlewares\Third_Party\FatFs\src -I ..\Drivers\BSP\Adafruit_Shield -I ..\Drivers\BSP\STM32F1xx_Nucleo -I ..\Middlewares\Third_Party\FatFs\src\drivers -I ..\Drivers\BSP\Components\st7789-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DSTM32F10X_MD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xB-o tft_lcd\stm32f1xx_hal_rtc.o --list_dir "C:\\Users\\samj\\Documents\\" --list --omf_browse tft_lcd\stm32f1xx_hal_rtc.crf --depend tft_lcd\stm32f1xx_hal_rtc.d)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x66BF252B)
 I (../Inc/stm32f1xx_hal_conf.h)(0x68357619)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x66BF252C)
@@ -409,7 +389,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -442,7 +422,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -475,7 +455,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -508,7 +488,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -541,7 +521,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -574,7 +554,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -607,7 +587,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -640,7 +620,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -673,7 +653,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -707,7 +687,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -740,7 +720,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -773,7 +753,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -805,11 +785,7 @@ I (..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_sd.h)(0x67C59B21)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5E8E7502)
 F (..\Drivers\BSP\STM32F1xx_Nucleo\stm32f1xx_nucleo.c)(0x6836FFF1)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_ldm --split_sections --asm --interleave --asm_dir "C:\\Users\\samj\\Documents\\" -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/BSP/Components -I ../Drivers/BSP\Components/Common -I ..\Middlewares\Third_Party\FatFs\src -I ..\Drivers\BSP\Adafruit_Shield -I ..\Drivers\BSP\STM32F1xx_Nucleo -I ..\Middlewares\Third_Party\FatFs\src\drivers -I ..\Drivers\BSP\Components\st7789-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DSTM32F10X_MD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xB-o tft_lcd\stm32f1xx_nucleo.o --list_dir "C:\\Users\\samj\\Documents\\" --list --omf_browse tft_lcd\stm32f1xx_nucleo.crf --depend tft_lcd\stm32f1xx_nucleo.d)
 I (..\Drivers\BSP\STM32F1xx_Nucleo\stm32f1xx_nucleo.h)(0x683700CB)
-<<<<<<< HEAD
-I (../Inc/main.h)(0x68402A5E)
-=======
-I (../Inc/main.h)(0x68370344)
->>>>>>> d45499a7600d0363d3265eac0c6f69fbd28d98f2
+I (../Inc/main.h)(0x684164B2)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x66BF252B)
 I (../Inc/stm32f1xx_hal_conf.h)(0x68357619)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x66BF252C)
@@ -836,7 +812,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -859,11 +835,7 @@ I (../Inc/../Drivers/BSP/Adafruit_Shield/../Components/st7735/../Common/lcd.h)(0
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5E8E7502)
 I (..\Drivers\BSP\Adafruit_Shield\fonts.h)(0x67BEDE24)
 I (../Inc/../Drivers/BSP/Adafruit_Shield/../Components/st7735/st7735_cfg.h)(0x6813819A)
-<<<<<<< HEAD
-I (../Inc/main.h)(0x68402A5E)
-=======
-I (../Inc/main.h)(0x68370344)
->>>>>>> d45499a7600d0363d3265eac0c6f69fbd28d98f2
+I (../Inc/main.h)(0x684164B2)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x66BF252B)
 I (../Inc/stm32f1xx_hal_conf.h)(0x68357619)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x66BF252C)
@@ -889,7 +861,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -919,11 +891,7 @@ I (..\Drivers\BSP\Adafruit_Shield\fonts.h)(0x67BEDE24)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5E8E7502)
 F (..\Drivers\BSP\Components\st7789\st7789.c)(0x6836E7CE)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_ldm --split_sections --asm --interleave --asm_dir "C:\\Users\\samj\\Documents\\" -I ../Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/BSP/Components -I ../Drivers/BSP\Components/Common -I ..\Middlewares\Third_Party\FatFs\src -I ..\Drivers\BSP\Adafruit_Shield -I ..\Drivers\BSP\STM32F1xx_Nucleo -I ..\Middlewares\Third_Party\FatFs\src\drivers -I ..\Drivers\BSP\Components\st7789-I.\RTE\_TFT_LCD-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1\Device\Include-D__UVISION_VERSION="533" -D_RTE_ -DSTM32F10X_MD -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F103xB-o tft_lcd\st7789.o --list_dir "C:\\Users\\samj\\Documents\\" --list --omf_browse tft_lcd\st7789.crf --depend tft_lcd\st7789.d)
 I (..\Drivers\BSP\Components\st7789\st7789.h)(0x67C59B21)
-<<<<<<< HEAD
-I (../Inc/main.h)(0x68402A5E)
-=======
-I (../Inc/main.h)(0x68370344)
->>>>>>> d45499a7600d0363d3265eac0c6f69fbd28d98f2
+I (../Inc/main.h)(0x684164B2)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x66BF252B)
 I (../Inc/stm32f1xx_hal_conf.h)(0x68357619)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x66BF252C)
@@ -950,7 +918,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)
@@ -974,11 +942,7 @@ I (..\Drivers\BSP\Components\st7735\../Common/lcd.h)(0x67C59B21)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5E8E7502)
 I (..\Drivers\BSP\Adafruit_Shield\fonts.h)(0x67BEDE24)
 I (..\Drivers\BSP\Components\st7735\st7735_cfg.h)(0x6813819A)
-<<<<<<< HEAD
-I (../Inc/main.h)(0x68402A5E)
-=======
-I (../Inc/main.h)(0x68370344)
->>>>>>> d45499a7600d0363d3265eac0c6f69fbd28d98f2
+I (../Inc/main.h)(0x684164B2)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x66BF252B)
 I (../Inc/stm32f1xx_hal_conf.h)(0x68357619)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x66BF252C)
@@ -1004,7 +968,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x66BF252B)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x66BF252C)
-I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x66BF252C)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h)(0x68415E4A)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h)(0x66BF252C)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h)(0x66BF252C)

@@ -228,8 +228,6 @@ static uint32_t           RTC_ReadAlarmCounter(RTC_HandleTypeDef *hrtc);
 static HAL_StatusTypeDef  RTC_WriteAlarmCounter(RTC_HandleTypeDef *hrtc, uint32_t AlarmCounter);
 static HAL_StatusTypeDef  RTC_EnterInitMode(RTC_HandleTypeDef *hrtc);
 static HAL_StatusTypeDef  RTC_ExitInitMode(RTC_HandleTypeDef *hrtc);
-static uint8_t            RTC_ByteToBcd2(uint8_t Value);
-static uint8_t            RTC_Bcd2ToByte(uint8_t Value);
 static uint8_t            RTC_IsLeapYear(uint16_t nYear);
 static void               RTC_DateUpdate(RTC_HandleTypeDef *hrtc, uint32_t DayElapsed);
 static uint8_t            RTC_WeekDayNum(uint32_t nYear, uint8_t nMonth, uint8_t nDay);
@@ -1750,7 +1748,7 @@ static HAL_StatusTypeDef RTC_ExitInitMode(RTC_HandleTypeDef *hrtc)
   * @param  Value: Byte to be converted
   * @retval Converted byte
   */
-static uint8_t RTC_ByteToBcd2(uint8_t Value)
+uint8_t RTC_ByteToBcd2(uint8_t Value)
 {
   uint32_t bcdhigh = 0U;
 
@@ -1768,7 +1766,7 @@ static uint8_t RTC_ByteToBcd2(uint8_t Value)
   * @param  Value: BCD value to be converted
   * @retval Converted word
   */
-static uint8_t RTC_Bcd2ToByte(uint8_t Value)
+uint8_t RTC_Bcd2ToByte(uint8_t Value)
 {
   uint32_t tmp = 0U;
   tmp = ((uint8_t)(Value & (uint8_t)0xF0) >> (uint8_t)0x4) * 10U;
