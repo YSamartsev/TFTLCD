@@ -258,11 +258,12 @@ int __backspace(FILE *f)
 	uint8_t DCF77_Fine;
 	GPIO_PinState sensorValue;
 	GPIO_PinState prevSensorValue = GPIO_PIN_RESET;
-	
+	FlagStatus DCF77_Status = RESET;
+
 	
 int main(void)
 	//Початкова дата встановлюеться в  RTC_AlarmConfig
-                                                                                                                                                                                                                                                                                         {  
+                                                                                                                                                                                                                                                                                          {  
   /* STM32F103xB HAL library initialization:
        - Configure the Flash prefetch
        - Systick timer is configured by default as source of time base, but user 
@@ -462,112 +463,126 @@ LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:", Fon
 LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Font_Size, LCD_RED, LCD_WHITE);	
 	  /* Configure RTC Alarm */
 
-//#define BLINKPIN 13
-//#define DCF77PIN 2
-
-#ifdef DCF77 
-printf("0ms       100ms     200ms     300ms     400ms     500ms     600ms     700ms     800ms     900ms     1000ms    1100ms    1200ms\n\r");  
-//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, ". . . . . . .", Font_Size, LCD_RED, LCD_WHITE);	 
-
-do {
-		//Частота прийому рівня sensorValue визначається HAL_Delay(10)
-	sensorValue =  BSP_DCF77_GetState();  
-	if (bWork == true){
-		if (sensorValue == 1) {
-			amountOne++; //нарощую кількість логічних 1
-			printf("%c", strOne);
-		}else {
-			amountNull++; //нарощую кількість логічних 0
-			printf("%c", strNull);
-		}
-		if (sensorValue == 1 && prevSensorValue == 0){
-			printf("amountNull = %d, amountOne = %d", amountNull, amountOne);
-	
-			if (amountOne <= 28){
-				lineDCF77[iCycle] = 0x00;
-				printf(" DCF77 = %c\n\r", strNull);
-			}else{
-				lineDCF77[iCycle] = 0x01;
-				printf(" DCF77 = %c\n\r", strOne);
-			}
-			if(amountNull > 300){
-				printf("Preparing to receive a line of DCF77\n\r");
-				bWork = false; //Кінець прийому всіх рядків хвилини
-				printf("lineDCF77 = \n\r");
-				for (uint8_t i = 0; i < 60; ++i)
-				{
-					printf("%d", lineDCF77[i]);
-				}
-				printf("\n\r");	
-				
-				if (checkDCF77(lineDCF77) == HAL_ERROR) //Первіряється формат рядка хвилини і присвоюється дата час в форматі BCD
-				{
-					bWork = false;
-				}
-				iCycle = 0;
-				//Обробка рядка хвилини
-			}
-			++iCycle;
-			amountNull = 0;
-			amountOne = 0;
-			//LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
-		}
-		BSP_LED_Toggle(LED_GREEN); //мигтіння світлодіодом
-		//Serial.print(sensorValue); //Результат інтервалу 10 мсек
-		prevSensorValue = sensorValue;
-		HAL_Delay(5);	
-	}
-	//холостий прогін потоку
-	if (sensorValue == 1) {
-		amountOne++; //нарощую кількість логічних 1
-		printf("%c", strOne);
-	}else {
- 		amountNull++; //нарощую кількість логічних 0
-		printf("%c", strNull);
-	}
-	
-	if (sensorValue == 1 && prevSensorValue == 0){
-		printf("amountNull = %d, amountOne = %d", amountNull, amountOne);
-	
-		if (amountOne <= 28){
-			printf(" DCF77 = %c\n\r", strNull);
-		}else{
-			printf(" DCF77 = %c\n\r", strOne);
-		}
-			
-		if(amountNull > 300){
-			bWork = true;
-			printf("Start recording line of DCF77\n\r");
-		}
-		iCycle = 0;
-		amountNull = 0;
-		amountOne = 0;
-		//LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
-			
-	}
-	//strcpy(outPoint + iCycle, &strPoint); //до рядка символів додаю "0"
-	//++iCycle;
-	//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, outPoint, Font_Size, LCD_RED, LCD_WHITE);
-	BSP_LED_Toggle(LED_GREEN); //мигтіння світлодіодом
-	//Serial.print(sensorValue); //Результат інтервалу 10 мсек
-	prevSensorValue = sensorValue;
-	HAL_Delay(5);
-}while (DCF77_Fine == 0x00); 
-
+#ifdef DCF77
+	DCF77_Status = RESET;
 #endif
-
-
+	
 //====================================================================previous=================================================
-		RTC_AlarmConfig(); //Встановлюю поточні Дату і Час
+#ifdef DCF77 
+					if (DCF77_Status == RESET){
+						printf("0ms       100ms     200ms     300ms     400ms     500ms     600ms     700ms     800ms     900ms     1000ms    1100ms    1200ms\n\r");  
+						//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, ". . . . . . .", Font_Size, LCD_RED, LCD_WHITE);	 
 
-//RTC_DateShow(10, 50); //Показати дату, Дата читаэться з 	RtcHandle.DateToUpdate
-RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
+						do {
+							//Частота прийому рівня sensorValue визначається HAL_Delay(10)
+							sensorValue =  BSP_DCF77_GetState();  
+							if (bWork == true){
+								if (sensorValue == 1) {
+									amountOne++; //нарощую кількість логічних 1
+									printf("%c", strOne);
+								}else {
+									amountNull++; //нарощую кількість логічних 0
+									printf("%c", strNull);
+								}
+								if (sensorValue == 1 && prevSensorValue == 0){
+									printf("amountNull = %d, amountOne = %d", amountNull, amountOne);
+									if (amountOne <= 28){
+										lineDCF77[iCycle] = 0x00;
+										printf(" DCF77 = %c\n\r", strNull);
+									}else{
+										lineDCF77[iCycle] = 0x01;
+										printf(" DCF77 = %c\n\r", strOne);
+									}
+									if(amountNull > 280){
+										printf("Preparing to receive a line of DCF77\n\r");
+										bWork = false; //Кінець прийому всіх рядків хвилини
+										printf("lineDCF77 = \n\r");
+										for (uint8_t i = 0; i < 60; ++i){
+											printf("%d", lineDCF77[i]);
+										}
+										printf("\n\r");					
+										if (checkDCF77(lineDCF77) == HAL_ERROR){ //Первіряється формат рядка хвилини і присвоюється дата час в форматі BCD
+											bWork = false;
+											DCF77_Status = RESET;
+										}else{
+											DCF77_Status = SET;
+										}
+										iCycle = 0;
+										//Обробка рядка хвилини
+									}
+									++iCycle;
+									amountNull = 0;
+									amountOne = 0;
+								}
+								BSP_LED_Toggle(LED_GREEN); //мигтіння світлодіодом
+								//Serial.print(sensorValue); //Результат інтервалу 10 мсек
+								prevSensorValue = sensorValue;
+								HAL_Delay(5);	
+							}
+							//холостий прогін потоку
+							if (sensorValue == 1) {
+								amountOne++; //нарощую кількість логічних 1
+								printf("%c", strOne);
+							}else {
+								amountNull++; //нарощую кількість логічних 0
+								printf("%c", strNull);
+							}
+							if (sensorValue == 1 && prevSensorValue == 0){
+								printf("amountNull = %d, amountOne = %d", amountNull, amountOne);
+								if (amountOne <= 28){
+									printf(" DCF77 = %c\n\r", strNull);
+								}else{
+									printf(" DCF77 = %c\n\r", strOne);
+								}
+								if(amountNull > 280){
+									bWork = true;
+									printf("Start recording line of DCF77\n\r");
+								}
+								iCycle = 0;
+								amountNull = 0;
+								amountOne = 0;
+							}
+							BSP_LED_Toggle(LED_GREEN); //мигтіння світлодіодом
+							//Serial.print(sensorValue); //Результат інтервалу 10 мсек
+							prevSensorValue = sensorValue;
+							HAL_Delay(5);
+						}while (DCF77_Fine == 0x00); 
+				}
+#else
 
-//RTC_TimeShow(10, 130);  //Показати час
-RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);		
-		
-		curentTimeSecond = stimestructureget.Seconds;
-		RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
+/*				//Для відлагодження в форматі BCD
+
+	stimestructure.Hours   = 0x15; // 18 годин
+	stimestructure.Minutes   = 0x03;  //34 хвилини
+	stimestructure.Seconds   = 0x55;  //5 хвилин
+ 	
+
+  sdatestructure.Date = 0x05; //6 число
+	sdatestructure.WeekDay = 0x04; //Четвертий день тижня
+  sdatestructure.Month = 0x06;	//Шостий місяць
+	sdatestructure.Year = 0x25;  //25 рык
+
+//мобільний формує коригуючу послідовність байтів: 0x32 0x38 0x30 0x33 0x32 0x35 0x31 0x33	px35 0x38 0x30 0x35 == 28,03.2025 13:58:01
+// кожен байт - це 4-х розрядний код символа цифри	2    8    0    3     2    5    1    3    5     8    0    5		
+	aRxBuffer[0] = (sdatestructure.Date >> 4) | 0x30;
+  aRxBuffer[1] = (sdatestructure.Date & 0x0F) | 0x30;
+
+	aRxBuffer[2] = (sdatestructure.Month >> 4) | 0x30;
+  aRxBuffer[3] = (sdatestructure.Month & 0x0F) | 0x30;
+
+	aRxBuffer[4] = (sdatestructure.Year >> 4) | 0x30;
+  aRxBuffer[5] = (sdatestructure.Year & 0x0F) | 0x30;
+
+	aRxBuffer[6] = (stimestructure.Hours >> 4) | 0x30;
+  aRxBuffer[7] = (stimestructure.Hours & 0x0F) | 0x30;
+
+	aRxBuffer[8] = (stimestructure.Minutes >> 4) | 0x30;
+  aRxBuffer[9] = (stimestructure.Minutes & 0x0F) | 0x30;
+
+	aRxBuffer[10] = (stimestructure.Seconds >> 4) | 0x30;
+  aRxBuffer[11] = (stimestructure.Seconds & 0x0F) | 0x30; */
+#endif
+	
 	while (1)
 	{
 		//printf("Hours = %d Minutes = %d Seconds = %d\n\r", stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);	
@@ -604,19 +619,20 @@ https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 				}
 			} */
 			//USART_SR_RXNE - Це маска біта  SR_RXNE. Спочатку треба прочитати регистр SR
- 			switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
+ 			switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))){ //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
 			
 			//switch (HAL_UARTEx_ReceiveToIdle_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer)))
 			
 			
 			//switch (HAL_UARTEx_ReceiveToIdle(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer), (uint16_t*) &UartHandle.RxXferSize , 2000)) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
-			{ //При цій функції буде виникати sizeof(aRxBuffer) раз переривання. Відбувається помилка
+		  //При цій функції буде виникати sizeof(aRxBuffer) раз переривання. Відбувається помилка
 				case HAL_OK:
 					if(UartReady == SET)
 					{
+
 //Приклад прийнятої послідовності 
-//мобільний формує коригуючу послідовність байтів: 0x32 0x38 0x30 0x33 0x32 0x35 0x31 0x33	px35 0x38 0x30 0x35 == Mb
-// кожен байт - це 4-х розрядний код символа цифри	2 8 0 3 2 5 1 3 5 8 0 5		
+//мобільний формує коригуючу послідовність байтів: 0x32 0x38 0x30 0x33 0x32 0x35 0x31 0x33	px35 0x38 0x30 0x35 == 28,03.2025 13:58:01
+// кожен байт - це 4-х розрядний код символа цифри	2    8    0    3     2    5    1    3    5     8    0    5		
 //Моб додаток визначає crc цієї послідовності байт: залишок від crc (Число) = (0x32+0x38+0x30+0x33+0x32+0x35+0x31+0x33+px35+0x38+0x30+0x35) / 256 = 0x6A =106
 //До послідовнсті Mb додаються два байта: код символа "6"  + код симола "a", тобто 0x36 + 0x61 
 //Тут приймається послідовнсть байтів: 	0x32 0x38 0x30 0x33 0x32 0x35 0x31 0x33	px35 0x38 0x30 0x35 0x36  0x61	
@@ -626,18 +642,11 @@ https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 						mycrc = calcModulo256(aRxBuffer, UartHandle.RxXferSize - 2); //mycrc це byte. aRxBuffer[12] і aRxBuffer[13] це ASCII коди
 						//Перетворення символа в байт	
 						char myTempD[2];
-				
 						uint8_t dTemp = (mycrc & 0xf0)>>4;
 						sprintf(&myTempD[0], "%x", dTemp);	
-					
-					
 						dTemp = (mycrc & 0x0f);
 						sprintf(&myTempD[1], "%x",  dTemp);
-				 
 printf("mycr1 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
-			
-				
-				 
 						printf("aRxBufer:");
 						for(uint8_t ix = 0; ix < 14; ix++)
 						{	
@@ -654,36 +663,31 @@ printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
 							RTC_SECUpdate(); ////Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
 							//RTC_DateShow(10, 50); //, aShowDate);
 							RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
-
-						
+	
 							//RTC_TimeShow(10, 130); //Показати час з stimestructureget
 							RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
-					} else
-					{
+						}else	{
 						  /* Disable RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts */
   
 							/* In case of reception waiting for IDLE event, disable also the IDLE IE interrupt source */
 							/* At end of Rx process, restore huart->RxState to Ready */
 							UartHandle.RxState = HAL_UART_STATE_READY;
 							UartHandle.ReceptionType = HAL_UART_RECEPTION_STANDARD;
-					}
-				//}
+						}
 						UartReady = RESET;
 					}	
+						if (DCF77_Status == SET){
+							RTC_AlarmConfig(); //Встановлюю поточні Дату і Час
+							RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
+							RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);		
+							curentTimeSecond = stimestructureget.Seconds;
+							RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
+							DCF77_Status = RESET;
+						}							
 						break;
 				case HAL_ERROR:
 						break;
 				case HAL_BUSY:
-					/*if (UartReady == SET)
-					{
-						// Reset transmission flag 
-						RTC_SECUpdate();
-						RTC_DateShow(10, 50); //, aShowDate);
-						RTC_TimeShow(10, 130); //Показати час з stimestructureget
-						UartReady = RESET;
-						break;
-					} */
-					//printf("Poll Uart: HAL_BUSY\n\r");
 					break;
 				case HAL_TIMEOUT:
 					//UartReady = RESET; //Ця подія в цій функції ніколи не настає
@@ -980,10 +984,10 @@ static void RTC_SECConfig(void)
  
  //##-1- Configure the Date #################################################
   // Set Date: 07.01.25
-  sdatestructure.Year = 0x25; //0x14;
+/*  sdatestructure.Year = 0x25; //0x14;
   sdatestructure.Month = 0x01; //RTC_MONTH_JANUARY; //01 = 0x10+01
   sdatestructure.Date = 0x07; //0x10+7
-  sdatestructure.WeekDay = 0x02; //RTC_WEEKDAY_TUESDAY; 02 = 0x10+02
+  sdatestructure.WeekDay = 0x02; //RTC_WEEKDAY_TUESDAY; 02 = 0x10+02 */
   
   if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
@@ -995,9 +999,9 @@ static void RTC_SECConfig(void)
   
   //##-2- Configure the Time #################################################
   // Set Time: 23:59:50 година.хвилина.секунда 
-  stimestructure.Hours = 0x23;
+/*  stimestructure.Hours = 0x23;
   stimestructure.Minutes = 0x59;
-  stimestructure.Seconds = 0x55;
+  stimestructure.Seconds = 0x55; */
   
   if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
@@ -1066,7 +1070,7 @@ static void RTC_SECUpdate(void)
   stimestructureget.Minutes = RTC_Data_Update(8);
   stimestructureget.Seconds = RTC_Data_Update(10);
   
-  if(HAL_RTC_SetTime(&RtcHandle, &stimestructureget,RTC_FORMAT_BCD) != HAL_OK) //Запис Часу з sdatestructure в RtcHandle
+  if(HAL_RTC_SetTime(&RtcHandle, &stimestructureget,RTC_FORMAT_BCD) != HAL_OK) //Запис Часу в лічильник часу RTC
   {
     // Initialization Error 
     char *myError = "HAL_RTC_SetTime";
