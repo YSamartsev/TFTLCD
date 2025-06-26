@@ -550,7 +550,7 @@ LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Fo
 				}
 #else
 
-/*				//Для відлагодження в форматі BCD
+	//Для відлагодження в форматі BCD
 
 	stimestructure.Hours   = 0x15; // 18 годин
 	stimestructure.Minutes   = 0x03;  //34 хвилини
@@ -580,7 +580,7 @@ LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Fo
   aRxBuffer[9] = (stimestructure.Minutes & 0x0F) | 0x30;
 
 	aRxBuffer[10] = (stimestructure.Seconds >> 4) | 0x30;
-  aRxBuffer[11] = (stimestructure.Seconds & 0x0F) | 0x30; */
+  aRxBuffer[11] = (stimestructure.Seconds & 0x0F) | 0x30; 
 #endif
 	
 	while (1)
