@@ -341,7 +341,7 @@ int main(void)
 
 RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
 
-	if (HAL_RTC_Init(&RtcHandle) != HAL_OK) 
+if (HAL_RTC_Init(&RtcHandle) != HAL_OK) //RtcHandle сконфігуровано на 01.01.2000
   {
     char *myError = "HAL_RTC_Init";
 		Error_Handler(myError);
@@ -556,11 +556,10 @@ LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Fo
 	stimestructure.Minutes   = 0x03;  //34 хвилини
 	stimestructure.Seconds   = 0x55;  //5 хвилин
  	
-
   sdatestructure.Date = 0x05; //6 число
 	sdatestructure.WeekDay = 0x04; //Четвертий день тижня
   sdatestructure.Month = 0x06;	//Шостий місяць
-	sdatestructure.Year = 0x25;  //25 рык
+	sdatestructure.Year = 0x25;  //25 рік
 
 //мобільний формує коригуючу послідовність байтів: 0x32 0x38 0x30 0x33 0x32 0x35 0x31 0x33	px35 0x38 0x30 0x35 == 28,03.2025 13:58:01
 // кожен байт - це 4-х розрядний код символа цифри	2    8    0    3     2    5    1    3    5     8    0    5		
@@ -581,14 +580,26 @@ LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Fo
 
 	aRxBuffer[10] = (stimestructure.Seconds >> 4) | 0x30;
   aRxBuffer[11] = (stimestructure.Seconds & 0x0F) | 0x30; 
+	DCF77_Status = SET;
 #endif
-	
+
+//Для відлагодження===========================
+RTC_SECConfig(); //Встановлюю дату з sdatestructure і stimestructure дату і секунди
+//============================================	
+
 	while (1)
 	{
 		//printf("Hours = %d Minutes = %d Seconds = %d\n\r", stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);	
+//Для відлагодження======================
+										//RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
 
+										//RTC_SECUpdate(); //Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
+										RTC_DateShow(10, 50); //Показати дату з stimestructureget
+										RTC_TimeShow(10, 130); //Показати час з stimestructureget
+										//HAL_Delay(1);
+//===================================================================	
 		  //обновлять Дату, пока myFlag_Show_Date = 1
-			tempTime = stimestructureget.Hours*60*60+stimestructureget.Minutes*60 + stimestructureget.Seconds;
+/*			tempTime = stimestructureget.Hours*60*60+stimestructureget.Minutes*60 + stimestructureget.Seconds;
 			if ((tempTime <  currentHours_Minutes_Seconds) && myFlag_Show_Date)
 			{
 			//RTC_DateShow(10, 50); //показати пока не зміниться поточна дата
@@ -596,31 +607,22 @@ LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Fo
 					RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100); //показати дату після 24:00;
 					currentHours_Minutes_Seconds = stimestructureget.Hours*60*60 + stimestructureget.Minutes*60 + stimestructureget.Seconds;
 					myFlag_Show_Date = 0; //Значить змінилася поточна дата
-			 }
+			 } */
 
 /*HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 Ця функція використовується, коли у потоці байтів може бути переривання(простой). Тоді виникае IDLE і можна перевірити
 кількість прийнятих байт і або продовжити приймання або зупинити прийом.
-Перриваняя виникае коли досягнуто Size, або виникла IDLE. Це можна перевірити в HAL_UARTEx_RxEventCallback
-*/
-			//switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
-			//switch (HAL_UARTEx_ReceiveToIdle(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer), (uint16_t*) &UartHandle.RxXferSize, 9000))
+Перриваняя виникае коли досягнуто Size, або виникла IDLE. Це можна перевірити в HAL_UARTEx_RxEventCallback */
 
-/*			if (HAL_UARTEx_ReceiveToIdle_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer)) == HAL_OK)
-			{
-				//printf("Code = %s", aRxBuffer[0]);
-				if (UartReady == SET)
-				{
-					RTC_SECUpdate(); //Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
-					RTC_DateShow(10, 50); //Показати дату з stimestructureget
-					RTC_TimeShow(10, 130); //Показати час з stimestructureget
-					UartReady = RESET;
-				}
-			} */
-			//USART_SR_RXNE - Це маска біта  SR_RXNE. Спочатку треба прочитати регистр SR
- 			switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))){ //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
-			
+	
+/* RtcHandle.State = HAL_RTC_STATE_BUSY;
+__HAL_LOCK(&RtcHandle); */
+
+HAL_NVIC_DisableIRQ(RTC_IRQn);
+	
+			switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) 
+			{  //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
 			//switch (HAL_UARTEx_ReceiveToIdle_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer)))
 			
 			
@@ -646,14 +648,14 @@ https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 						sprintf(&myTempD[0], "%x", dTemp);	
 						dTemp = (mycrc & 0x0f);
 						sprintf(&myTempD[1], "%x",  dTemp);
-printf("mycr1 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
+/*printf("mycr1 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
 						printf("aRxBufer:");
 						for(uint8_t ix = 0; ix < 14; ix++)
 						{	
 							printf("0x%x ", aRxBuffer[ix]);
 					
 						}	
-printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]); 
+printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);  */
 						//Ця функція заповнює регістри UART і переводить його в режим переривання. Без очікування Timeout
 						//ST7789_WriteString(10, 180, aRxBuffer, Font_16x26, RED, WHITE);
 						//printf("Code = %s", aRxBuffer[0]);
@@ -667,10 +669,10 @@ printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
 							//RTC_TimeShow(10, 130); //Показати час з stimestructureget
 							RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
 						}else	{
-						  /* Disable RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts */
+						 // Disable RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts 
   
-							/* In case of reception waiting for IDLE event, disable also the IDLE IE interrupt source */
-							/* At end of Rx process, restore huart->RxState to Ready */
+							// In case of reception waiting for IDLE event, disable also the IDLE IE interrupt source 
+							// At end of Rx process, restore huart->RxState to Ready 
 							UartHandle.RxState = HAL_UART_STATE_READY;
 							UartHandle.ReceptionType = HAL_UART_RECEPTION_STANDARD;
 						}
@@ -683,7 +685,7 @@ printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
 							curentTimeSecond = stimestructureget.Seconds;
 							RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
 							DCF77_Status = RESET;
-						}							
+						}	
 						break;
 				case HAL_ERROR:
 						break;
@@ -693,6 +695,12 @@ printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
 					//UartReady = RESET; //Ця подія в цій функції ніколи не настає
 					break;
 			} 
+			
+/*RtcHandle.State = HAL_RTC_STATE_BUSY;
+__HAL_LOCK(&RtcHandle);		*/
+			HAL_NVIC_EnableIRQ(RTC_IRQn);
+			HAL_Delay(100);	
+			//Для відлагодження=====================	
 	}
 }
 
@@ -1103,7 +1111,7 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	char temp1[11];
 
 	concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
-	printf("date = %s\n\r", temp1);
+	//printf("date = %s\n\r", temp1);
 		
 	LCD_WriteString(x, y, temp1, Font_Size, LCD_RED, LCD_WHITE);	 //& "." & realmonth
 	//free(temp1);
