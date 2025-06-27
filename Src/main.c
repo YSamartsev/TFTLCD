@@ -1112,7 +1112,7 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 
 	concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
 	//printf("date = %s\n\r", temp1);
-		
+	temp1[10] = 0x00;	
 	LCD_WriteString(x, y, temp1, Font_Size, LCD_RED, LCD_WHITE);	 //& "." & realmonth
 	//free(temp1);
 
@@ -1128,10 +1128,16 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 {
 #ifdef TFT_LCD_7789
 	FontDef Font_Size = Font_16x26;
+	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;	
 #elif defined (TFT_LCD_7735)
 	FontDef Font_Size = Font_11x18;
+	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
 #endif
 
+
+	
   //stimestructureget; //Структура Година, Хвилина, Секунда
  
  	HAL_RTC_GetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BIN); //З лічильника CNTH_CNTL RTC формується структура stimestructureget
@@ -1146,8 +1152,9 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	
 	char temp1[9];
 	concat_time(temp1, realhours, reatminutes, reatseconds); //соединить строки -> *temp2
+	temp1[8] = 0x00;
 	//printf("time = %s\n\r", temp1);
-			
+	
 	LCD_WriteString(x, y, temp1, Font_Size, LCD_RED, LCD_WHITE);	 //& "." & realmonth
 	//free(temp1);
 
