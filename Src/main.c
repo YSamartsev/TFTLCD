@@ -109,13 +109,13 @@ char* pDirectoryFiles[MAX_BMP_FILES];
 FATFS SD_FatFs;  /* File system object for SD card logical drive */
 char SD_Path[4]; /* SD card logical drive path */
 
-char realdate[2]; //Це масив, а не string, тобто не закінчується \0
-char realmonth[2];
-char realyear[2];
-char realhours[2];
-char reatminutes[2];
-char reatseconds[2];
-char realdatatime[20];
+//char realdate[2]; //Це масив, а не string, тобто не закінчується \0
+//char realmonth[2];
+//char realyear[2];
+//char realhours[2];
+//char reatminutes[2];
+//char reatseconds[2];
+//char realdatatime[20];
 
 ///* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -1090,6 +1090,10 @@ static void RTC_SECUpdate(void)
 
 static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Дати в точці х,у дисплея
 {
+	char realdate[2]; //Це масив, а не string, тобто не закінчується \0
+	char realmonth[2];
+	char realyear[2];
+	
 #ifdef TFT_LCD_7789
 	FontDef Font_Size = Font_16x26;
 #elif defined (TFT_LCD_7735)
@@ -1126,6 +1130,10 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	*/
 static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати початкової точки рядка дисплея 
 {
+	char realhours[2];
+	char reatminutes[2];
+	char reatseconds[2];
+	
 #ifdef TFT_LCD_7789
 	FontDef Font_Size = Font_16x26;
 	uint16_t	LCD_WIDTH = ST7789_WIDTH;
