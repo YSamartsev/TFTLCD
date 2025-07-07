@@ -600,8 +600,8 @@ RTC_SECConfig(); //Встановлюю дату з sdatestructure і stimestruc
 										//RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
 
 										//RTC_SECUpdate(); //Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
-										RTC_DateShow(10, 50); //Показати дату з stimestructureget
-										RTC_TimeShow(10, 130); //Показати час з stimestructureget
+										RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100); //показати дату 
+										RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100); //Показати час з stimestructureget
 										//HAL_Delay(1);
 //===================================================================	
 		  //обновлять Дату, пока myFlag_Show_Date = 1
@@ -670,10 +670,9 @@ printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);  */
 							//Контрольні суми співпадають
 							RTC_SECUpdate(); ////Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
 							//RTC_DateShow(10, 50); //, aShowDate);
-							RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
+							//RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
 	
-							//RTC_TimeShow(10, 130); //Показати час з stimestructureget
-							RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
+							//RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
 						}else	{
 						 // Disable RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts 
   
@@ -1223,8 +1222,7 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 
 	//RTC_TimeTypeDef stimestructureget; 
 	HAL_RTC_GetTime(hrtc, &stimestructureget, RTC_FORMAT_BIN); //Це потрібно, щоб в main було видно stimestructureget
-	//RTC_TimeShow(10, 130);  //, aShowTime);
-	RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
+	//RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
 	if (((stimestructureget.Hours*60*60) + stimestructureget.Minutes*60 + (stimestructureget.Seconds) > 86155) && myFlag_Show_Date == 0)
 		 {
 			 //Для цього зробив структуру stimestructureget публычною
