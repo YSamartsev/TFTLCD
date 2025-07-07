@@ -194,7 +194,7 @@ uint8_t BSP_LCD_Init(void)
 #elif defined (TFT_LCD_7789)
 
 	ST7789_Init(); //Конфігурація драйвера ST7789 LCD
-	LCD_Fill_Color(LCD_WHITE);
+	LCD_Fill_Color(LCD_BLACK);
 #endif
 	HAL_Delay(10);
 	
@@ -1671,16 +1671,16 @@ void LCD_Test(void)
 {
 	LCD_Fill_Color(LCD_WHITE);
 	HAL_Delay(100);
-	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_16x26, LCD_RED, LCD_WHITE);
+	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_16x26, LCD_GREEN, LCD_BLACK);
 	HAL_Delay(100);
 	LCD_Fill_Color(LCD_WHITE);
-	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_11x18, LCD_RED, LCD_WHITE);
+	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_11x18, LCD_GREEN, LCD_BLACK);
 	HAL_Delay(100);
 	LCD_Fill_Color(LCD_WHITE);
-	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_7x10, LCD_RED, LCD_WHITE);
+	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_7x10, LCD_GREEN, LCD_BLACK);
 	HAL_Delay(100);
 	LCD_Fill_Color(LCD_WHITE);
-	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_16x26, LCD_RED, LCD_WHITE);
+	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_16x26, LCD_GREEN, LCD_BLACK);
 	HAL_Delay(100);
 	LCD_Fill_Color(LCD_WHITE);
 	HAL_Delay(100);
@@ -1746,7 +1746,7 @@ void LCD_Test(void)
 	LCD_WriteString(10, 10, "Hello Steve", Font_16x26, LCD_GBLUE, LCD_WHITE);
 		HAL_Delay(100);
 	LCD_Fill_Color(LCD_RED);
-	LCD_WriteString(10, 50, "Hello Steve!", Font_7x10, LCD_RED, LCD_WHITE);
+	LCD_WriteString(10, 50, "Hello Steve!", Font_7x10, LCD_GREEN, LCD_BLACK);
 		HAL_Delay(100);
 	LCD_Fill_Color(LCD_RED);
 	LCD_WriteString(10, 75, "Hello Steve!", Font_11x18, LCD_YELLOW, LCD_WHITE);
