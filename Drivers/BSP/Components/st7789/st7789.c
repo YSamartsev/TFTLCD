@@ -6,10 +6,21 @@
 extern SPI_HandleTypeDef SpiHandle;
 
 
+//small fonts
 extern FontDef Font_7x10;
 extern FontDef Font_11x18;
 extern FontDef Font_16x26;
-extern const uint16_t saber;
+
+extern const uint16_t saber; //picture
+
+//big fonts
+extern sFontDef Font24;
+extern sFontDef Font20;
+extern sFontDef Font16;
+extern sFontDef Font12;
+extern sFontDef Font8;
+
+extern LCD_DrawPropTypeDef DrawProp;
 
 extern uint32_t bi;
 
@@ -514,17 +525,17 @@ void ST7789_InvertColors(uint8_t invert)
  * @param bgcolor -> background color of the char
  * @return  none
  */
-void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t color, uint16_t bgcolor)
+void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef Font, uint16_t color, uint16_t bgcolor)
 {
 	uint32_t i, j;
 	LCD_Select();
-	ST7789_SetAddressWindow(x, y, x + sfont.width - 1, y + sfont.height - 1);
+	ST7789_SetAddressWindow(x, y, x + Font.width - 1, y + Font.height - 1);
 	
-	for (i = 0; i < sfont.height; i++) {
+	for (i = 0; i < Font.height; i++) {
 		//b = font.data[(ch - 32) * font.height + i];
-		bi = sfont.data[(ch - 32) * sfont.height + i];
+		bi = Font.data[(ch - 32) * Font.height + i];
 		
-		for (j = 0; j < sfont.width; j++) {
+		for (j = 0; j < Font.width; j++) {
 			if ((bi << j) & 0x8000) {
 				uint8_t data[] = {color >> 8, color & 0xFF};
 				LCD_SendData(data, sizeof(data));

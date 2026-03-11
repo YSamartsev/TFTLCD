@@ -339,7 +339,7 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc)
   }
   else
   {
-    /* Clear Flags Bits */
+    /* Clear Flags Bits Скидання всіх прапорців переривання RTC*/
     CLEAR_BIT(hrtc->Instance->CRL, (RTC_FLAG_OW | RTC_FLAG_ALRAF | RTC_FLAG_SEC));
 
     if (hrtc->Init.OutPut != RTC_OUTPUTSOURCE_NONE)

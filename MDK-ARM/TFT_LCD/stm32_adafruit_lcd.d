@@ -52,9 +52,3 @@ tft_lcd\stm32_adafruit_lcd.o: ..\Middlewares\Third_Party\FatFs\src\drivers\sd_di
 tft_lcd\stm32_adafruit_lcd.o: ../Inc/fatfs_storage.h
 tft_lcd\stm32_adafruit_lcd.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 tft_lcd\stm32_adafruit_lcd.o: ../Inc/../Drivers/BSP/Adafruit_Shield/../Components/st7789/st7789.h
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/fonts.h
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font24.c
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font20.c
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font16.c
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font12.c
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font8.c

@@ -45,7 +45,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "../Components/st7735/st7735.h"
 #include "../Components/st7789/st7789.h"
-#include "../../Utilities/Fonts/fonts.h"
+//#include "../../Utilities/Fonts/fonts.h"
+#include "fonts.h"
+
+
 
 /** @addtogroup BSP
   * @{
@@ -63,17 +66,7 @@
 /** @defgroup STM32_ADAFRUIT_LCD_Exported_Types
   * @{
   */
-   
-/** 
-  * @brief  Draw Properties structures definition
-  */ 
-typedef struct 
-{ 
-  uint32_t TextColor;
-  uint32_t BackColor;
-  sFONT    *pFont; 
-
-}LCD_DrawPropTypeDef;
+ 
 
 /** 
   * @brief  Point structures definition
@@ -82,7 +75,6 @@ typedef struct
 {
   int16_t X;
   int16_t Y;
-
 }Point, * pPoint;
 
 /** 
@@ -93,7 +85,6 @@ typedef enum
   CENTER_MODE             = 0x01,    /*!< Center mode */
   RIGHT_MODE              = 0x02,    /*!< Right mode  */
   LEFT_MODE               = 0x03     /*!< Left mode   */
-
 }Line_ModeTypdef;
 
 /**
@@ -154,7 +145,7 @@ typedef enum
 /** 
   * @brief LCD default font 
   */ 
-#define LCD_DEFAULT_FONT         Font8
+#define LCD_DEFAULT_FONT         Font24
 
 /**
   * @}
@@ -171,8 +162,8 @@ uint16_t BSP_LCD_GetTextColor(void);
 uint16_t BSP_LCD_GetBackColor(void);
 void     BSP_LCD_SetTextColor(__IO uint16_t Color);
 void     BSP_LCD_SetBackColor(__IO uint16_t Color);
-void     BSP_LCD_SetFont(sFONT *fonts);
-sFONT    *BSP_LCD_GetFont(void);
+void     BSP_LCD_SetFont(sFontDef *fonts);
+sFontDef *BSP_LCD_GetFont(void);
 
 void     BSP_LCD_Clear(uint16_t Color);
 void     BSP_LCD_ClearStringLine(uint16_t Line);
@@ -199,10 +190,15 @@ void     BSP_LCD_DisplayOn(void);
 void 		 LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 void 		 LCD_Fill_Color(uint16_t color);
 void		 LCD_Test(void);
+
 void		 LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor);
-void 		 LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t color, uint16_t bgcolor);
-void 		 LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor);
+void 		 LCD_sWriteString(uint16_t x, uint16_t y, const char *str, sFontDef font, uint16_t color, uint16_t bgcolor);
+
+void 		 LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef Font, uint16_t color, uint16_t bgcolor);
+void 		 LCD_sWriteChar(uint16_t x, uint16_t y, char ch, sFontDef sFont, uint16_t color, uint16_t bgcolor);
+
 void 		 LCD_DrawFilledRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
+
 /**
   * @}
   */
