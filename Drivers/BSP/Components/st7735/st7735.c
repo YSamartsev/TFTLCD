@@ -41,6 +41,7 @@
 #include "stdlib.h"
 #include "st7735_cfg.h"
 #include "stm32f1xx_nucleo.h"
+#include "stm32_adafruit_lcd.h"
 
 //SPI_HandleTypeDef ST7735_SPI_PORT;
 extern SPI_HandleTypeDef SpiHandle;
@@ -92,7 +93,7 @@ extern SPI_HandleTypeDef SpiHandle;
 
 extern SPI_HandleTypeDef SpiHandle;
 
-LCD_DrvTypeDef   st7735_drv = 
+LCD_7735_DrvTypeDef   st7735_drv = 
 {
   st7735_Init,
   0,

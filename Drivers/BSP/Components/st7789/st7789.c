@@ -2,6 +2,7 @@
 #include "fonts.h"
 #include "stm32f1xx_nucleo.h"
 #include "main.h"
+#include "stm32_adafruit_lcd.h"
 
 extern SPI_HandleTypeDef SpiHandle;
 
@@ -23,6 +24,41 @@ extern sFontDef Font8;
 extern LCD_DrawPropTypeDef DrawProp;
 
 extern uint32_t bi;
+
+//Заповнюю структуру драйвера
+LCD_7789_DrvTypeDef   ST7789_drv = 
+{
+  ST7789_Init,
+  0,
+	ST7789_SetRotation,
+	ST7789_Fill_Color,
+	ST7789_DrawPixel,
+	ST7789_Fill,
+	ST7789_DrawPixel_4px,
+/* Graphical functions. */
+	ST7789_DrawLine,
+	ST7789_DrawRectangle,
+	ST7789_DrawCircle,
+	ST7789_DrawImage,
+	ST7789_InvertColors,
+/* Text functions. */
+	ST7789_WriteChar,
+	ST7789_WriteString,
+/* Extented Graphical functions. */
+	ST7789_DrawFilledRectangle,
+	ST7789_DrawTriangle,
+	ST7789_DrawFilledTriangle,
+	ST7789_DrawFilledCircle,
+  ST7789_GetLcdPixelWidth,
+  ST7789_GetLcdPixelHeight,
+	ST7789_DrawHLine,
+  ST7789_DrawVLine,
+	ST7789_DrawBitmap,
+	ST7789_SetDisplayWindow,
+
+};
+
+static uint16_t ArrayRGB[320] = {0};
 
 #ifdef USE_DMA
 #include <string.h>
@@ -183,37 +219,37 @@ void ST7789_Init(void)
 
 //while(1)
 //{	
-		LCD_SendCommand(ST7789_COLMOD);		//	Set color mode
+		LCD_SendCommand(ST7789_COLMOD);		//	Встановлення RGB режиму
 //}
 	
     //LCD_SendSmallData(ST7789_COLOR_MODE_16bit);
 	{
-		uint8_t data[] = {ST7789_COLOR_MODE_16bit};
+		uint8_t data[] = {ST7789_COLOR_MODE_16bit}; //0x55  16bit/pixel 65K RGB
 		LCD_SendData(data, sizeof(data));
 	}
-  	LCD_SendCommand(0xB2);				//	Porch control
+  	LCD_SendCommand(ST7789_PORCTRL);				//	0xB2 Porch control Керування інтервал гасіння
 	{
 		uint8_t data[] = {0x0C, 0x0C, 0x00, 0x33, 0x33};
 		LCD_SendData(data, sizeof(data));
 	}
-	ST7789_SetRotation(ST7789_ROTATION);	//	MADCTL (Display Rotation)
+	ST7789_SetRotation(ST7789_ROTATION);	//	MADCTL (Memory Data Access Control) (Display Rotation) 
 	
 	/* Internal LCD Voltage generator settings */
-    LCD_SendCommand(0XB7);				//	Gate Control
+    LCD_SendCommand(ST7789_GCTRL);				//	Gate Control
     //LCD_SendSmallData(0x35);			//	Default value
   {
 		uint8_t data[] = {0x35};
 		LCD_SendData(data, sizeof(data));
 	}		
 	
-		LCD_SendCommand(0xBB);				//	VCOM setting
+	LCD_SendCommand(ST7789_VCOMS);				//	VCOM setting керування напругою
     //LCD_SendSmallData(0x19);			//	0.725v (default 0.75v for 0x20)
 		{		
 			uint8_t data[] = {0x19};
 			LCD_SendData(data, sizeof(data)); 
 		}			
 	
-		LCD_SendCommand(0xC0);				//	LCMCTRL	
+		LCD_SendCommand(ST7789_LCMCTRL);				//	LCMCTRL	
     //LCD_SendSmallData (0x2C);			//	Default value
 		{		
 			uint8_t data[] = {0x2C};
@@ -358,6 +394,71 @@ void ST7789_DrawPixel_4px(uint16_t x, uint16_t y, uint16_t color)
 	LCD_Select();
 	ST7789_Fill(x - 1, y - 1, x + 1, y + 1, color);
 	LCD_UnSelect();
+}
+
+/**
+  * @brief  Draws horizontal line.
+  * @param  RGBCode: Specifies the RGB color   
+  * @param  Xpos: specifies the X position.
+  * @param  Ypos: specifies the Y position.
+  * @param  Length: specifies the line length.  
+  * @retval None
+  */
+void ST7789_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length)
+{
+  uint8_t counter = 0;
+  
+  if(Xpos + Length > ST7789_LCD_PIXEL_WIDTH) return;
+  
+  /* Set Cursor */
+  ST7789_SetCursor(Xpos, Ypos);
+  
+  for(counter = 0; counter < Length; counter++)
+  {
+    ArrayRGB[counter] = RGBCode;
+  }
+  LCD_SendMultipleData((uint8_t*)&ArrayRGB[0], Length * 2);
+}
+
+/**
+  * @brief  Draws vertical line.
+  * @param  RGBCode: Specifies the RGB color   
+  * @param  Xpos: specifies the X position.
+  * @param  Ypos: specifies the Y position.
+  * @param  Length: specifies the line length.  
+  * @retval None
+  */
+void ST7789_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length)
+{
+  uint8_t counter = 0;
+  
+  if(Ypos + Length > ST7789_LCD_PIXEL_HEIGHT) return;
+  for(counter = 0; counter < Length; counter++)
+  {
+    ST7789_WritePixel(Xpos, Ypos + counter, RGBCode);
+  }   
+}
+
+/**
+  * @brief  Sets Cursor position.
+  * @param  Xpos: specifies the X position.
+  * @param  Ypos: specifies the Y position.
+  * @retval None
+  */
+void ST7789_SetCursor(uint16_t Xpos, uint16_t Ypos)
+{
+  uint8_t data = 0;
+  LCD_SendCommand(ST7789_CASET);
+  data = (Xpos) >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = (Xpos) & 0xFF;
+  LCD_SendMultipleData(&data, 1);
+  LCD_SendCommand(ST7789_RASET); 
+  data = (Ypos) >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = (Ypos) & 0xFF;
+  LCD_SendMultipleData(&data, 1);
+  LCD_SendCommand(ST7789_RAMWR);
 }
 
 /**
@@ -744,6 +845,95 @@ void ST7789_DrawFilledCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
 
 
 /**
+  * @brief  Gets the LCD pixel Width.
+  * @param  None
+  * @retval The Lcd Pixel Width
+  */
+uint16_t ST7789_GetLcdPixelWidth(void)
+{
+  return ST7789_WIDTH;
+}
+
+/**
+  * @brief  Gets the LCD pixel Height.
+  * @param  None
+  * @retval The Lcd Pixel Height
+  */
+uint16_t ST7789_GetLcdPixelHeight(void)
+{                          
+  return  ST7789_HEIGHT;
+}
+
+/**
+  * @brief  Displays a bitmap picture loaded in the internal Flash.
+  * @param  BmpAddress: Bmp picture address in the internal Flash.
+  * @retval None
+  */
+void ST7789_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp)
+{
+  uint32_t index = 0, size = 0;
+  
+  /* Read bitmap size */
+  size = *(volatile uint16_t *) (pbmp + 2);
+  size |= (*(volatile uint16_t *) (pbmp + 4)) << 16;
+  /* Get bitmap data address offset */
+  index = *(volatile uint16_t *) (pbmp + 10);
+  index |= (*(volatile uint16_t *) (pbmp + 12)) << 16;
+  size = (size - index)/2;
+  pbmp += index;
+  
+  /* Set GRAM write direction and BGR = 0 */
+  /* Memory access control: MY = 0, MX = 1, MV = 0, ML = 0 */
+  ST7789_WriteReg(ST7789_MADCTL, 0x40);
+
+  /* Set Cursor */
+  ST7789_SetCursor(Xpos, Ypos);  
+ 
+  LCD_SendMultipleData((uint8_t*)pbmp, size*2);
+ 
+  /* Set GRAM write direction and BGR = 0 */
+  /* Memory access control: MY = 1, MX = 1, MV = 0, ML = 0 */
+  ST7789_WriteReg(ST7789_MADCTL, 0xC0);
+}
+
+
+/**
+  * @brief  Writes pixel.   
+  * @param  Xpos: specifies the X position.
+  * @param  Ypos: specifies the Y position.
+  * @param  RGBCode: the RGB pixel color
+  * @retval None
+  */
+void ST7789_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
+{
+  uint8_t data = 0;
+  if((Xpos >= ST7789_LCD_PIXEL_WIDTH) || (Ypos >= ST7789_LCD_PIXEL_HEIGHT)) 
+  {
+    return;
+  }
+  
+  /* Set Cursor */
+  ST7789_SetCursor(Xpos, Ypos);
+  
+  data = RGBCode >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = RGBCode;
+  LCD_SendMultipleData(&data, 1);
+} 
+
+/**
+  * @brief  Writes to the selected LCD register.
+  * @param  LCDReg: Address of the selected register.
+  * @param  LCDRegValue: value to write to the selected register.
+  * @retval None
+  */
+void ST7789_WriteReg(uint8_t LCDReg, uint8_t LCDRegValue)
+{
+  LCD_SendCommand(LCDReg);
+  LCD_SendMultipleData(&LCDRegValue, 1);
+}
+
+/**
  * @brief Open/Close tearing effect line
  * @param tear -> Whether to tear
  * @return none
@@ -755,5 +945,37 @@ void ST7789_TearEffect(uint8_t tear)
 	LCD_UnSelect();
 }
 
+/**
+  * @brief  Sets a display window
+  * @param  Xpos:   specifies the X bottom left position.
+  * @param  Ypos:   specifies the Y bottom left position.
+  * @param  Height: display window height.
+  * @param  Width:  display window width.
+  * @retval None
+  */
+void ST7789_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
+{
+  uint8_t data = 0;
+  /* Column addr set, 4 args, no delay: XSTART = Xpos, XEND = (Xpos + Width - 1) */
+  LCD_SendCommand(ST7789_CASET);
+  data = (Xpos) >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = (Xpos) & 0xFF;
+  LCD_SendMultipleData(&data, 1);
+  data = (Xpos + Width - 1) >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = (Xpos + Width - 1) & 0xFF;
+  LCD_SendMultipleData(&data, 1);
+  /* Row addr set, 4 args, no delay: YSTART = Ypos, YEND = (Ypos + Height - 1) */
+  LCD_SendCommand(ST7789_RASET);
+  data = (Ypos) >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = (Ypos) & 0xFF;
+  LCD_SendMultipleData(&data, 1);
+  data = (Ypos + Height - 1) >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = (Ypos + Height - 1) & 0xFF;
+  LCD_SendMultipleData(&data, 1);
+}
 
 

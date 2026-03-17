@@ -81,13 +81,13 @@ EndDependencies */
 */
 
 #include "stm32f1xx_hal_spi.h"
-#include "lcd.h"
 #include "stm32f1xx_nucleo.h"
 #include "fonts.h"
 
 
 extern SPI_HandleTypeDef SpiHandle;
-extern LCD_DrvTypeDef   st7735_drv;
+extern LCD_7735_DrvTypeDef   st7735_drv;
+extern LCD_7789_DrvTypeDef   ST7789_drv;
 
 extern FontDef Font_7x10;
 extern FontDef Font_11x18;
@@ -100,6 +100,7 @@ extern sFontDef Font20;
 extern sFontDef Font16;
 extern sFontDef Font12;
 extern sFontDef Font8;
+
 
 #define LINE(x) ((x) * (((sFontDef *)BSP_LCD_GetFont())->height))
 
@@ -151,9 +152,14 @@ uint32_t bi;
 /** @defgroup STM32_ADAFRUIT_LCD_Private_Variables
   * @{
   */ 
-	LCD_DrawPropTypeDef DrawProp;
+	LCD_DrawPropTypeDef DrawProp; //Екземпляр структури властивостей фонту: колір символа, колір фону, адреса таблиці кодів символів, ширина, висота зображення фонту 
 
-	LCD_DrvTypeDef  *lcd_drv; 
+	#ifdef TFT_LCD_7789
+		LCD_7789_DrvTypeDef  *lcd_drv;
+	#elif defined (TFT_LCD_7735)
+		LCD_7735_DrvTypeDef  *lcd_drv;
+#endif
+
 
 //SPI_HandleTypeDef LCD_SPI_PORT;
 
@@ -192,7 +198,7 @@ uint8_t BSP_LCD_Init(void)
   uint8_t ret = LCD_ERROR;
  
   /* Default value for draw propriety */
-  DrawProp.BackColor = 0xFFFF;
+  DrawProp.BackColor = 0xFFFF; //Заповнюю структуру DrawProp влістивостями фонту Font24
   DrawProp.pFont     = &Font24;
   DrawProp.TextColor = 0x0000;
 
@@ -207,16 +213,18 @@ uint8_t BSP_LCD_Init(void)
 	LCD_Fill_Color(LCD_WHITE);
 
 #elif defined (TFT_LCD_7789)
-
-	ST7789_Init(); //Конфігурація драйвера ST7789 LCD
-	LCD_Fill_Color(LCD_BLACK);
+	lcd_drv = &ST7789_drv;
+	
+	lcd_drv->Init(); //Послідовність кодів ініціалізації
+	//lcd_drv->ST7789_Init(); //Конфігурація драйвера ST7789 LCD
+	LCD_Fill_Color(LCD_BLACK); //вібувається швидко (240х240 RAM заповнюється двобайтовими кодами кольора)
 #endif
 	HAL_Delay(10);
 	
 	//LCD_Fill_Color(RED);
   
   /* Initialize the font */
-  BSP_LCD_SetFont(&LCD_DEFAULT_FONT);
+  BSP_LCD_SetFont(&LCD_DEFAULT_FONT); //Структура DrawProp заповнюється даними для обраного фонту
 
 
   ret = LCD_OK;
@@ -317,10 +325,10 @@ void BSP_LCD_Clear(uint16_t Color)
   uint32_t color_backup = DrawProp.TextColor; 
   DrawProp.TextColor = Color;
   
-  for(counter = 0; counter < 240; counter++) //T7789_WIDTH BSP_LCD_GetYSize(); counter++)
+  for(counter = 0; counter < BSP_LCD_GetYSize(); counter++) //ST7789_WIDTH BSP_LCD_GetYSize(); counter++)
 	{
-    //BSP_LCD_DrawHLine(0, counter, 240); //LCD_HEIGHT BSP_LCD_GetXSize());
-		LCD_DrawLine(0, counter, 239, counter, LCD_WHITE);
+    BSP_LCD_DrawHLine(0, counter, BSP_LCD_GetXSize()); //LCD_HEIGHT BSP_LCD_GetXSize());
+		//LCD_DrawHLine(0, counter, BSP_LCD_GetXSize());
   }
   DrawProp.TextColor = color_backup; 
   BSP_LCD_SetTextColor(DrawProp.TextColor);
@@ -378,7 +386,8 @@ void BSP_LCD_DisplayStringAt(uint16_t Xpos, uint16_t Ypos, uint8_t *Text, Line_M
   uint16_t refcolumn = 1, i = 0;
   uint32_t size = 0, xsize = 0; 
   uint8_t  *ptr = Text;
-  
+ 
+	LCD_CS_LOW();	
   /* Get the text size */
   while (*ptr++) size ++ ;
   
@@ -420,6 +429,7 @@ void BSP_LCD_DisplayStringAt(uint16_t Xpos, uint16_t Ypos, uint8_t *Text, Line_M
     Text++;
     i++;
   }
+	LCD_CS_HIGH();
 }
 
 /**
@@ -448,9 +458,9 @@ void BSP_LCD_DisplayStringAtLine(uint16_t Line, uint8_t *ptr)
   */
 void BSP_LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code)
 {
-  if(lcd_drv->WritePixel != NULL)
+  if(lcd_drv->DrawPixel != NULL)
   {
-    lcd_drv->WritePixel(Xpos, Ypos, RGB_Code);
+    lcd_drv->DrawPixel(Xpos, Ypos, RGB_Code);
   }
 }
   
@@ -460,7 +470,7 @@ void BSP_LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code)
   * @param  Ypos: Y position
   * @param  Length: Line length
   * @retval None
-  */
+*/
 void BSP_LCD_DrawHLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length)
 {
   uint32_t index = 0;
@@ -481,13 +491,14 @@ void BSP_LCD_DrawHLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length)
   }
 }
 
+
 /**
   * @brief  Draws a vertical line.
   * @param  Xpos: X position
   * @param  Ypos: Y position
   * @param  Length: Line length
   * @retval None
-  */
+*/
 void BSP_LCD_DrawVLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length)
 {
   uint32_t index = 0;
@@ -504,6 +515,7 @@ void BSP_LCD_DrawVLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length)
     }
   }
 }
+
 
 /**
   * @brief  Draws an uni-line (between two points).
@@ -716,24 +728,18 @@ void BSP_LCD_DrawEllipse(int Xpos, int Ypos, int XRadius, int YRadius)
   * @param  Ypos: Bmp Y position in the LCD
   * @param  pBmp: Pointer to Bmp picture address
   * @retval None
-  */
+*/
 void BSP_LCD_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pBmp)
 {
   uint32_t height = 0;
   uint32_t width  = 0;
   
-  /* Read bitmap width */
+
   width = pBmp[18] + (pBmp[19] << 8) + (pBmp[20] << 16)  + (pBmp[21] << 24);
 
-  /* Read bitmap height */
+
   height = pBmp[22] + (pBmp[23] << 8) + (pBmp[24] << 16)  + (pBmp[25] << 24);
   
-  /* Remap Ypos, st7735 works with inverted X in case of bitmap */
-  /* X = 0, cursor is on Top corner */
-/*  if(lcd_drv == &st7735_drv)
-  {
-    Ypos = BSP_LCD_GetYSize() - Ypos - height;
-  } */
   
   SetDisplayWindow(Xpos, Ypos, width, height);
   
@@ -743,6 +749,7 @@ void BSP_LCD_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pBmp)
   } 
   SetDisplayWindow(0, 0, BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
 }
+
 
 /**
   * @brief  Draws a full rectangle.
@@ -915,21 +922,23 @@ void BSP_LCD_FillEllipse(int Xpos, int Ypos, int XRadius, int YRadius)
   * @brief  Enables the display.
   * @param  None
   * @retval None
-  */
+
 void BSP_LCD_DisplayOn(void)
 {
   lcd_drv->DisplayOn();
 }
+*/
 
 /**
   * @brief  Disables the display.
   * @param  None
   * @retval None
-  */
+
 void BSP_LCD_DisplayOff(void)
 {
   lcd_drv->DisplayOff();
 }
+*/
 
 /*******************************************************************************
                             Static Functions
@@ -1091,7 +1100,7 @@ static void FillTriangle(uint16_t x1, uint16_t x2, uint16_t x3, uint16_t y1, uin
   * @param  Width: LCD window width
   * @param  Height: LCD window height  
   * @retval None
-  */
+*/
 static void SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
 {
   if(lcd_drv->SetDisplayWindow != NULL)
@@ -1102,8 +1111,8 @@ static void SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint1
 
 
 /**
- * @brief Fill the DisplayWindow with single color
- * @param color -> color to Fill with
+* @brief Заповнює DisplayWindow одним кольором with single color
+ * @param color -> color to Fill with 0xXX 0x00 (
  * @return none
  */
 void LCD_Fill_Color(uint16_t color)
@@ -1131,7 +1140,7 @@ void LCD_Fill_Color(uint16_t color)
 			{
 				for (j = 0; j < LCD_HEIGHT; j++) 
 				{
-					uint8_t data[] = {color >> 8, color & 0xFF};
+					uint8_t data[] = {color >> 8, color & 0xFF}; //Перетворення двобайтового кода в масив байт
 					LCD_SendData(data, sizeof(data));
 					z++;
 				}
@@ -1141,6 +1150,7 @@ void LCD_Fill_Color(uint16_t color)
 	LCD_CS_HIGH();
 }
 
+//Встановлення розмірів вікна виводу
 static void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {
 	LCD_CS_LOW();
@@ -1496,10 +1506,10 @@ void LCD_sWriteChar(uint16_t x, uint16_t y, char ch, sFontDef sFont, uint16_t co
 void LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef Font, uint16_t color, uint16_t bgcolor)
 {
 #ifdef TFT_LCD_7789
-	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_WIDTH = ST7789_WIDTH; //240x240
 	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
 #elif defined (TFT_LCD_7735)
-	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_WIDTH = ST7735_WIDTH; //128x128
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
 #endif
 	

@@ -27,7 +27,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include "fonts.h"
-
+#include "stm32_adafruit_lcd.h"
 
 //small fonts
 extern FontDef Font_7x10;
@@ -45,6 +45,7 @@ extern sFontDef Font8;
 
 extern LCD_DrawPropTypeDef DrawProp;
 
+Line_ModeTypdef Mode;
 
 //#include "stm32f1xx_nucleo.h"
 //#include "../HARDWARE/LCD/lcd.h"
@@ -269,6 +270,7 @@ int __backspace(FILE *f)
 	GPIO_PinState prevSensorValue = GPIO_PIN_RESET;
 	FlagStatus DCF77_Status = RESET;
 
+char *Text = "12:22";
 	
 int main(void)
 	//Початкова дата встановлюеться в  RTC_AlarmConfig
@@ -391,7 +393,7 @@ printf("==================Start RTC Watch===================\n\r");
 */
 
 /* Initialize the LCD */
-	BSP_LCD_Init(); //Спочатку через PA7 RESET, потім керується через Регістри
+BSP_LCD_Init(); //Ініціалізативна послідовність + структура фонту Font24
 
 		
 	//ВАЖЛИВО!!!! ST7789_SetRotation(ST7789_ROTATION) впливаэ на очищення через зміну координат x=0, 	y=0	екрану !!!!!!
@@ -399,7 +401,7 @@ printf("==================Start RTC Watch===================\n\r");
 	//Але при #define ST7789_ROTATION 2	 точка  x=0, 	y=0	знаходиться біля роз'єму справа!! 
 
 #ifdef TFT_LCD_7789
-	FontDef Font = Font_16x26;
+FontDef Font = Font_16x26; //Заповнюю структуру малих фонтів структурою фонта Font_16x26
 	
 	//sFontDef Font = Font24;
 		
@@ -612,7 +614,7 @@ RTC_SECConfig(); //Встановлюю дату з sdatestructure і stimestruc
 										//RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
 
 										//RTC_SECUpdate(); //Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
-			RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100); //показати дату 
+			RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100); //показати дату фонтом 16х26
 			RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100); //Показати час з stimestructureget
 	
 										//HAL_Delay(1);
@@ -1160,7 +1162,8 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	char reatseconds[2];
 	
 #ifdef TFT_LCD_7789
-	FontDef Font = Font_16x26;
+	//--FontDef Font = Font_16x26;
+	sFontDef Font = Font24;
 	uint16_t	LCD_WIDTH = ST7789_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;	
 #elif defined (TFT_LCD_7735)
@@ -1188,7 +1191,20 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	temp1[8] = 0x00;
 	//printf("time = %s\n\r", temp1);
 	
-	LCD_WriteString(x, y, temp1, Font, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth
+	//LCD_WriteString(x, y, temp1, Font, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth
+	BSP_LCD_Clear(LCD_WHITE);
+  
+  /* Set Touchscreen Demo description */
+  BSP_LCD_SetTextColor(LCD_BLACK);
+  BSP_LCD_SetBackColor(LCD_WHITE);
+
+  BSP_LCD_SetFont(&Font12);
+  BSP_LCD_DisplayStringAt((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, (uint8_t*)"12:28", CENTER_MODE);
+	//BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize()/2 - 27, (uint8_t*)"Before using the Touchscreen", CENTER_MODE);
+	
+	//BSP_LCD_DisplayStringAt(x, y, (uint8_t*)Text, Mode);
+	
+	
 	//free(temp1);
 
 } 

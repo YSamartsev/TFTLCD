@@ -5,6 +5,41 @@
 #include "fonts.h"
 #include "stm32f1xx_nucleo.h"
 
+/*
+typedef struct
+{  
+  void     (*Init)(void);
+	uint16_t (*ReadID)(void);
+	void (*SetRotation)(uint8_t m);
+	void (*Fill_Color)(uint16_t color);
+	void (*DrawPixel)(uint16_t x, uint16_t y, uint16_t color);
+	void (*Fill)(uint16_t xSta, uint16_t ySta, uint16_t xEnd, uint16_t yEnd, uint16_t color);
+	void (*DrawPixel_4px)(uint16_t x, uint16_t y, uint16_t color);
+
+
+	void (*DrawLine)(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+	void (*DrawRectangle)(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+	void (*DrawCircle)(uint16_t x0, uint16_t y0, uint8_t r, uint16_t color);
+	void (*DrawImage)(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t *data);
+	void (*InvertColors)(uint8_t invert);
+	
+
+	void (*WriteChar)(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor);
+	void (*WriteString)(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor);
+
+
+	void (*DrawFilledRectangle)(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
+	void (*DrawTriangle)(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color);
+	void (*DrawFilledTriangle)(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color);
+	void (*DrawFilledCircle)(int16_t x0, int16_t y0, int16_t r, uint16_t color);
+  uint16_t (*GetLcdPixelWidth)(void);
+  uint16_t (*GetLcdPixelHeight)(void);
+	void (*DrawHLine)(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
+	void (*DrawVLine)(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
+	void (*DrawBitmap)(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);	
+	void (*SetDisplayWindow)(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
+}LCD_7789_DrvTypeDef; 
+*/
 
 //#define SPI_HandleTypeDef ST7789_SPI_PORT
 
@@ -82,11 +117,14 @@
     #endif
 
 #endif
-
+ 
 #ifdef USING_240X240
 
-    #define ST7789_WIDTH 240
-    #define ST7789_HEIGHT 240
+    #define ST7789_WIDTH (uint16_t)240
+    #define ST7789_HEIGHT (uint16_t)240
+		
+#define  ST7789_LCD_PIXEL_WIDTH    ((uint16_t)240)
+#define  ST7789_LCD_PIXEL_HEIGHT   ((uint16_t)240)		
 
 		#if ST7789_ROTATION == 0
 			#define X_SHIFT 0
@@ -184,6 +222,13 @@
 #define ST7789_RASET   0x2B
 #define ST7789_RAMWR   0x2C
 #define ST7789_RAMRD   0x2E
+#define ST7789_PORCTRL 0xB2
+#define ST7789_GCTRL   0xB7
+#define ST7789_VCOMS   0xBB
+#define ST7789_LCMCTRL 0xC0
+
+
+
 
 #define ST7789_PTLAR   0x30
 #define ST7789_COLMOD  0x3A
@@ -287,9 +332,10 @@ void ST7789_DrawFilledRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, 
 void ST7789_DrawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color);
 void ST7789_DrawFilledTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color);
 void ST7789_DrawFilledCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
-
+void ST7789_SetCursor(uint16_t Xpos, uint16_t Ypos);
 /* Command functions */
 void ST7789_TearEffect(uint8_t tear);
+void ST7789_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
 
 /* Simple test function. */
 void ST7789_Test(void);
@@ -304,7 +350,14 @@ void 		LCD_Clear(uint16_t Color);
 void 		LCD_SetWindows(uint16_t xStar, uint16_t yStar, uint16_t xEnd, uint16_t yEnd);
 void 		LCD_WriteRAM_Prepare(void);
 
-
+uint16_t ST7789_GetLcdPixelWidth(void);
+uint16_t ST7789_GetLcdPixelHeight(void);
+void     ST7789_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
+void     ST7789_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
+void     ST7789_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);
+void 		 ST7789_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode);
+void 		 ST7789_WriteReg(uint8_t LCDReg, uint8_t LCDRegValue);
+	
 #ifndef ST7789_ROTATION
     #error You should at least choose a display rotation!
 #endif

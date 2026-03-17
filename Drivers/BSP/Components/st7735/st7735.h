@@ -45,7 +45,6 @@
 #endif 
 
 /* Includes ------------------------------------------------------------------*/
-#include "../Common/lcd.h"
 #include "fonts.h"
 
 /** @addtogroup BSP
@@ -78,7 +77,26 @@
 #define  ST7735_LCD_PIXEL_WIDTH    ((uint16_t)128)
 #define  ST7735_LCD_PIXEL_HEIGHT   ((uint16_t)128)
 
+/*
+typedef struct
+{
+  void     (*Init)(void);
+  uint16_t (*ReadID)(void);
+  void     (*DisplayOn)(void);
+  void     (*DisplayOff)(void);
+  void     (*SetCursor)(uint16_t, uint16_t);
+  void     (*WritePixel)(uint16_t, uint16_t, uint16_t);
+  uint16_t (*ReadPixel)(uint16_t, uint16_t);
+  void     (*SetDisplayWindow)(uint16_t, uint16_t, uint16_t, uint16_t);
+  void     (*DrawHLine)(uint16_t, uint16_t, uint16_t, uint16_t);
+  void     (*DrawVLine)(uint16_t, uint16_t, uint16_t, uint16_t);
+  uint16_t (*GetLcdPixelWidth)(void);
+  uint16_t (*GetLcdPixelHeight)(void);
+  void     (*DrawBitmap)(uint16_t, uint16_t, uint8_t*);
+  void     (*DrawRGBImage)(uint16_t, uint16_t, uint16_t, uint16_t, uint8_t*);
+}LCD_7735_DrvTypeDef;  
 
+*/
 /** 
   * @brief  ST7735 Registers  
   */ 
@@ -327,6 +345,7 @@ void ST7735_SetRotation(uint8_t m);
 uint8_t ST7735_GetRotation(void);
 int16_t ST7735_GetHeight(void);
 int16_t ST7735_GetWidth(void);
+
 #endif /* ST7735_H_ */
 
 

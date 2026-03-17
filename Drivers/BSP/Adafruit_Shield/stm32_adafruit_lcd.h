@@ -71,6 +71,59 @@
 /** 
   * @brief  Point structures definition
   */ 
+
+typedef struct
+{
+  void     (*Init)(void);
+  uint16_t (*ReadID)(void);
+  void     (*DisplayOn)(void);
+  void     (*DisplayOff)(void);
+  void     (*SetCursor)(uint16_t, uint16_t);
+  void     (*WritePixel)(uint16_t, uint16_t, uint16_t);
+  uint16_t (*ReadPixel)(uint16_t, uint16_t);
+  void     (*SetDisplayWindow)(uint16_t, uint16_t, uint16_t, uint16_t);
+  void     (*DrawHLine)(uint16_t, uint16_t, uint16_t, uint16_t);
+  void     (*DrawVLine)(uint16_t, uint16_t, uint16_t, uint16_t);
+  uint16_t (*GetLcdPixelWidth)(void);
+  uint16_t (*GetLcdPixelHeight)(void);
+  void     (*DrawBitmap)(uint16_t, uint16_t, uint8_t*);
+  void     (*DrawRGBImage)(uint16_t, uint16_t, uint16_t, uint16_t, uint8_t*);
+}LCD_7735_DrvTypeDef;  
+
+typedef struct
+{  
+  void     (*Init)(void);
+	uint16_t (*ReadID)(void);
+	void (*SetRotation)(uint8_t m);
+	void (*Fill_Color)(uint16_t color);
+	void (*DrawPixel)(uint16_t x, uint16_t y, uint16_t color);
+	void (*Fill)(uint16_t xSta, uint16_t ySta, uint16_t xEnd, uint16_t yEnd, uint16_t color);
+	void (*DrawPixel_4px)(uint16_t x, uint16_t y, uint16_t color);
+
+/* Graphical functions. */
+	void (*DrawLine)(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+	void (*DrawRectangle)(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+	void (*DrawCircle)(uint16_t x0, uint16_t y0, uint8_t r, uint16_t color);
+	void (*DrawImage)(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t *data);
+	void (*InvertColors)(uint8_t invert);
+	
+/* Text functions. */
+	void (*WriteChar)(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor);
+	void (*WriteString)(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor);
+
+/* Extented Graphical functions. */
+	void (*DrawFilledRectangle)(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
+	void (*DrawTriangle)(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color);
+	void (*DrawFilledTriangle)(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color);
+	void (*DrawFilledCircle)(int16_t x0, int16_t y0, int16_t r, uint16_t color);
+  uint16_t (*GetLcdPixelWidth)(void);
+  uint16_t (*GetLcdPixelHeight)(void);
+	void (*DrawHLine)(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
+	void (*DrawVLine)(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
+	void (*DrawBitmap)(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);	
+	void (*SetDisplayWindow)(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
+}LCD_7789_DrvTypeDef; 
+
 typedef struct 
 {
   int16_t X;
