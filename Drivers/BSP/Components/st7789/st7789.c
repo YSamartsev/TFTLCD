@@ -58,7 +58,7 @@ LCD_7789_DrvTypeDef   ST7789_drv =
 
 };
 
-static uint16_t ArrayRGB[320] = {0};
+static uint16_t ArrayRGB[480] = {0};
 
 #ifdef USE_DMA
 #include <string.h>

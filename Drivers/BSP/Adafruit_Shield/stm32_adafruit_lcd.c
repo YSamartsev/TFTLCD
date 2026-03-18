@@ -327,7 +327,7 @@ void BSP_LCD_Clear(uint16_t Color)
   
   for(counter = 0; counter < BSP_LCD_GetYSize(); counter++) //ST7789_WIDTH BSP_LCD_GetYSize(); counter++)
 	{
-    BSP_LCD_DrawHLine(0, counter, BSP_LCD_GetXSize()); //LCD_HEIGHT BSP_LCD_GetXSize());
+    BSP_LCD_DrawHLine(0, counter, 240); // BSP_LCD_GetXSize()); //LCD_HEIGHT BSP_LCD_GetXSize());
 		//LCD_DrawHLine(0, counter, BSP_LCD_GetXSize());
   }
   DrawProp.TextColor = color_backup; 

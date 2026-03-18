@@ -395,7 +395,6 @@ printf("==================Start RTC Watch===================\n\r");
 /* Initialize the LCD */
 BSP_LCD_Init(); //Ініціалізативна послідовність + структура фонту Font24
 
-		
 	//ВАЖЛИВО!!!! ST7789_SetRotation(ST7789_ROTATION) впливаэ на очищення через зміну координат x=0, 	y=0	екрану !!!!!!
 	//Для 1.44 128x128  x=0, 	y=0 знаходиться навпроти роз'єму в кінці зліва. Це відповідає для st7789: #define ST7789_ROTATION 2	
 	//Але при #define ST7789_ROTATION 2	 точка  x=0, 	y=0	знаходиться біля роз'єму справа!! 
@@ -412,7 +411,20 @@ FontDef Font = Font_16x26; //Заповнюю структуру малих фо
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
 #endif
-	
+
+//Порівнюю LCD_* і BSP_LCD_*  функції
+LCD_DrawFilledRectangle(50, 50, 50, 50, LCD_WHITE);
+ST7789_SetCursor(50, 50); //встановити курсор в позиціє 50ч50
+
+DrawProp.TextColor = LCD_GREEN;
+BSP_LCD_DrawRect(50, 50, 50, 50); //малює контур прямокутника кольором
+BSP_LCD_FillRect(50, 50, 50, 50); //Заповнює кольором DrawProp.TextColor прямокутник
+
+BSP_LCD_Clear(LCD_GREEN);
+
+LCD_DrawFilledRectangle(0, 0, LCD_WIDTH, LCD_HEIGHT, LCD_GREEN); //Заповнюю екран чорним кольором
+BSP_LCD_Clear(LCD_WHITE);
+
 if (Bluetooth_present == SHIELD_DETECTED)
 	{
 		if (myExchange(myCommandAT.ATstring, myAnswerAT.ATresponse) != HAL_OK)
@@ -1198,9 +1210,9 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
   BSP_LCD_SetTextColor(LCD_BLACK);
   BSP_LCD_SetBackColor(LCD_WHITE);
 
-  BSP_LCD_SetFont(&Font12);
-  BSP_LCD_DisplayStringAt((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, (uint8_t*)"12:28", CENTER_MODE);
-	//BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize()/2 - 27, (uint8_t*)"Before using the Touchscreen", CENTER_MODE);
+  BSP_LCD_SetFont(&Font24);
+  //BSP_LCD_DisplayStringAt((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, (uint8_t*)"12:28", CENTER_MODE);
+	BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize()/2 - 27, (uint8_t*)"Before using the Touchscreen", CENTER_MODE);
 	
 	//BSP_LCD_DisplayStringAt(x, y, (uint8_t*)Text, Mode);
 	
