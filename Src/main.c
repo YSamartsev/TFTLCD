@@ -270,7 +270,7 @@ int __backspace(FILE *f)
 	GPIO_PinState prevSensorValue = GPIO_PIN_RESET;
 	FlagStatus DCF77_Status = RESET;
 
-char *Text = "12:22";
+//char *Text = "12:22";
 	
 int main(void)
 	//Початкова дата встановлюеться в  RTC_AlarmConfig
@@ -412,6 +412,8 @@ FontDef Font = Font_16x26; //Заповнюю структуру малих фо
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
 #endif
 
+/*
+//======Відлагодження===================
 //Порівнюю LCD_* і BSP_LCD_*  функції
 LCD_DrawFilledRectangle(50, 50, 50, 50, LCD_WHITE);
 ST7789_SetCursor(50, 50); //встановити курсор в позиціє 50ч50
@@ -424,6 +426,9 @@ BSP_LCD_Clear(LCD_GREEN);
 
 LCD_DrawFilledRectangle(0, 0, LCD_WIDTH, LCD_HEIGHT, LCD_GREEN); //Заповнюю екран чорним кольором
 BSP_LCD_Clear(LCD_WHITE);
+//=================================
+*/
+
 
 if (Bluetooth_present == SHIELD_DETECTED)
 	{
@@ -492,7 +497,7 @@ if (Bluetooth_present == SHIELD_DETECTED)
 		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:", Font, LCD_GREEN, LCD_BLACK);
 	
 		//LCD_WriteString(10, 100, "Real Time:", Font_16x26, LCD_GREEN, LCD_BLACK);
-		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Font, LCD_GREEN, LCD_BLACK);	
+		//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Font, LCD_GREEN, LCD_BLACK);	
 	  /* Configure RTC Alarm */
 
 #ifdef DCF77
@@ -626,7 +631,9 @@ RTC_SECConfig(); //Встановлюю дату з sdatestructure і stimestruc
 										//RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
 
 										//RTC_SECUpdate(); //Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
-			RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100); //показати дату фонтом 16х26
+			//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:", Font, LCD_GREEN, LCD_BLACK);
+			RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100); //показати дату фонтом 16х26
+			//RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100); //показати дату фонтом 16х26
 			RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100); //Показати час з stimestructureget
 	
 										//HAL_Delay(1);
@@ -713,7 +720,7 @@ printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);  */
 					}	
 						if (DCF77_Status == SET){
 							//RTC_AlarmConfig(); //Встановлюю поточні Дату і Час
-							RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
+							RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100);
 							RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);		
 							curentTimeSecond = stimestructureget.Seconds;
 							RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
@@ -1174,8 +1181,8 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	char reatseconds[2];
 	
 #ifdef TFT_LCD_7789
-	//--FontDef Font = Font_16x26;
-	sFontDef Font = Font24;
+	FontDef Font = Font_16x26;
+	//sFontDef Font = Font24;
 	uint16_t	LCD_WIDTH = ST7789_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;	
 #elif defined (TFT_LCD_7735)
@@ -1203,16 +1210,16 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	temp1[8] = 0x00;
 	//printf("time = %s\n\r", temp1);
 	
-	//LCD_WriteString(x, y, temp1, Font, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth
-	BSP_LCD_Clear(LCD_WHITE);
+	LCD_WriteString(x, y, temp1, Font, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth
+	//BSP_LCD_Clear(LCD_WHITE);
   
   /* Set Touchscreen Demo description */
-  BSP_LCD_SetTextColor(LCD_BLACK);
-  BSP_LCD_SetBackColor(LCD_WHITE);
+  //BSP_LCD_SetTextColor(LCD_BLACK);
+  //BSP_LCD_SetBackColor(LCD_WHITE);
 
-  BSP_LCD_SetFont(&Font24);
+  //BSP_LCD_SetFont(&Font24);
   //BSP_LCD_DisplayStringAt((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, (uint8_t*)"12:28", CENTER_MODE);
-	BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize()/2 - 27, (uint8_t*)"Before using the Touchscreen", CENTER_MODE);
+	//BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize()/2 - 27, (uint8_t*)"Before using the Touchscreen", CENTER_MODE);
 	
 	//BSP_LCD_DisplayStringAt(x, y, (uint8_t*)Text, Mode);
 	
