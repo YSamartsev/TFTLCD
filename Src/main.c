@@ -43,6 +43,9 @@ extern sFontDef Font16;
 extern sFontDef Font12;
 extern sFontDef Font8;
 
+extern uint8_t myGoriz;
+extern uint8_t myVert;
+
 extern LCD_DrawPropTypeDef DrawProp;
 
 Line_ModeTypdef Mode;
@@ -270,6 +273,7 @@ int __backspace(FILE *f)
 	GPIO_PinState prevSensorValue = GPIO_PIN_RESET;
 	FlagStatus DCF77_Status = RESET;
 
+  uint8_t		TIME_LCD_Coordinates[4] = {2, 100, 76, 156}; //координати виводу часу
 //char *Text = "12:22";
 	
 int main(void)
@@ -1160,7 +1164,7 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
 	//printf("date = %s\n\r", temp1);
 	temp1[10] = 0x00;	
-	LCD_WriteString(x, y, temp1, Font, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth
+	LCD_WriteString(x, y, temp1, Font, LCD_WHITE, LCD_BLACK);	 //& "." & realmonth
 	//LCD_sWriteString(x, y, temp1, Font, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth
 	
 	
@@ -1179,6 +1183,9 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	char realhours[2];
 	char reatminutes[2];
 	char reatseconds[2];
+	uint8_t Xpos;
+	uint8_t xy_temp[2];
+	uint8_t Hours_temp, Minutes_temp, Seconds_temp;
 	
 #ifdef TFT_LCD_7789
 	FontDef Font = Font_16x26;
@@ -1194,6 +1201,11 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 
 	
   //stimestructureget; //Структура Година, Хвилина, Секунда
+	//Перед виконанням цієї процедури stimestructureget зберігає 
+	//попередні значення Hours, Minutes, Seconds
+	Hours_temp = stimestructureget.Hours;
+	Minutes_temp = stimestructureget.Minutes;
+	Seconds_temp = stimestructureget.Seconds;
  
  	HAL_RTC_GetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BIN); //З лічильника CNTH_CNTL RTC формується структура stimestructureget
  
@@ -1209,8 +1221,40 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	concat_time(temp1, realhours, reatminutes, reatseconds); //соединить строки -> *temp2
 	temp1[8] = 0x00;
 	//printf("time = %s\n\r", temp1);
+
+	//ST7789_DrawFilledRectangle(*TIME_LCD_Coordinates, *(TIME_LCD_Coordinates + 1), *(TIME_LCD_Coordinates + 2), *(TIME_LCD_Coordinates + 3), LCD_BLACK);
+	//ST7789_Fill(TIME_LCD_Coordinates[0], TIME_LCD_Coordinates[1], TIME_LCD_Coordinates[0] + 237,  TIME_LCD_Coordinates[1] + 56, LCD_BLACK);
 	
-	LCD_WriteString(x, y, temp1, Font, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth
+	if (Hours_temp != stimestructureget.Hours)
+	{
+		//Очистити прямокутник з годиною
+		ST7789_Fill(TIME_LCD_Coordinates[0], TIME_LCD_Coordinates[1], TIME_LCD_Coordinates[0] + 74,  TIME_LCD_Coordinates[1] + 56, LCD_BLACK);
+		GUI_Text1(TIME_LCD_Coordinates, (char *) realhours, 5);	//Годин, для огромных цифр, 
+		xy_temp[0] = *TIME_LCD_Coordinates +  (2*myGoriz);
+		xy_temp[1] = *(TIME_LCD_Coordinates + 1);
+		//показ ":"
+		LCD_WriteString(xy_temp[0], xy_temp[1] + myVert/3, ":", Font, LCD_WHITE, LCD_BLACK);	// ":"
+	}
+	
+	if (Minutes_temp != stimestructureget.Minutes)
+	{	
+		xy_temp[0] = TIME_LCD_Coordinates[0] + 74 + 16;
+		xy_temp[1] = TIME_LCD_Coordinates[1];
+		
+		//Очистити хвилини
+		ST7789_Fill(xy_temp[0], xy_temp[1], xy_temp[0] + 74,  xy_temp[1] + 56, LCD_BLACK);
+		GUI_Text1(xy_temp, (char *) reatminutes, 5);	//Хвилин, для огромных цифр, 
+		xy_temp[0] = xy_temp[0] +  (2*myGoriz);
+	  LCD_WriteString(xy_temp[0], xy_temp[1] + myVert/3, ":", Font, LCD_WHITE, LCD_BLACK);	
+	}
+	
+	xy_temp[0] = TIME_LCD_Coordinates[0] + 74 + 16 + 74 + 16;
+	xy_temp[1] = TIME_LCD_Coordinates[1];
+	//GUI_Text1(xy_temp, (char *) reatseconds, 5);	//Хвилин, для огромных цифр,
+	LCD_WriteString(xy_temp[0], xy_temp[1], reatseconds, Font, LCD_WHITE, LCD_BLACK);	
+	
+	
+	//LCD_WriteString(x, y, temp1, Font, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth
 	//BSP_LCD_Clear(LCD_WHITE);
   
   /* Set Touchscreen Demo description */

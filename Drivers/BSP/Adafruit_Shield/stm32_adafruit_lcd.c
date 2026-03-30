@@ -198,9 +198,9 @@ uint8_t BSP_LCD_Init(void)
   uint8_t ret = LCD_ERROR;
  
   /* Default value for draw propriety */
-  DrawProp.BackColor = 0xFFFF; //Заповнюю структуру DrawProp влістивостями фонту Font24
+  DrawProp.BackColor = LCD_BLACK; //Заповнюю структуру DrawProp влістивостями фонту Font24
   DrawProp.pFont     = &Font24;
-  DrawProp.TextColor = 0x0000;
+  DrawProp.TextColor = LCD_WHITE;
 
 #ifdef TFT_LCD_7735	
 	

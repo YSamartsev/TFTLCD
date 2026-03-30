@@ -41,8 +41,12 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_nucleo.h"
+#include "../Drivers/BSP/Adafruit_Shield/stm32_adafruit_lcd.h"
+#include "fonts.h"
 
 extern SPI_HandleTypeDef SpiHandle;
+extern 	LCD_DrawPropTypeDef DrawProp;
+
 
 /** @addtogroup BSP
   * @{
@@ -811,6 +815,8 @@ JOYState_TypeDef BSP_JOY_GetState(void)
   /* Return the code of the Joystick key pressed*/
   return state;
 }
+
+
 
 
 /**

@@ -78,6 +78,9 @@ typedef struct
 /* Choose a type you are using */
 //#define USING_135X240
 #define USING_240X240
+#define  MAX_X  240
+#define  MAX_Y  240 
+
 //#define USING_170X320
 
 /* Choose a display rotation you want to use: (0-3) */
@@ -340,7 +343,7 @@ void ST7789_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint1
 /* Simple test function. */
 void ST7789_Test(void);
 
-
+/*
 void 		LCD_WR_REG(uint8_t data);
 void 		LCD_WR_DATA(uint8_t data);
 uint8_t SPI_WriteByte(SPI_HandleTypeDef* hspi, uint8_t Byte);
@@ -349,6 +352,7 @@ void 		LCD_direction(uint8_t direction);
 void 		LCD_Clear(uint16_t Color);
 void 		LCD_SetWindows(uint16_t xStar, uint16_t yStar, uint16_t xEnd, uint16_t yEnd);
 void 		LCD_WriteRAM_Prepare(void);
+*/
 
 uint16_t ST7789_GetLcdPixelWidth(void);
 uint16_t ST7789_GetLcdPixelHeight(void);
@@ -357,7 +361,9 @@ void     ST7789_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16
 void     ST7789_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);
 void 		 ST7789_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode);
 void 		 ST7789_WriteReg(uint8_t LCDReg, uint8_t LCDRegValue);
-	
+
+void GUI_Text1(uint8_t* mycoordinates, char *str, uint8_t mySize);
+
 #ifndef ST7789_ROTATION
     #error You should at least choose a display rotation!
 #endif
