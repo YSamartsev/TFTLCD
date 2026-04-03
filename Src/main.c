@@ -37,11 +37,11 @@ extern FontDef Font_16x26;
 extern const uint16_t saber; //picture
 
 //big fonts
-extern sFontDef Font24;
-extern sFontDef Font20;
-extern sFontDef Font16;
-extern sFontDef Font12;
-extern sFontDef Font8;
+extern bFontDef Font24;
+extern bFontDef Font20;
+extern bFontDef Font16;
+extern bFontDef Font12;
+extern bFontDef Font8;
 
 extern uint8_t myGoriz;
 extern uint8_t myVert;
@@ -295,7 +295,7 @@ int main(void)
 						SysTick = 4, 0
 						UART - 2? 2 (Обмін з HC-06)																																																																																																																																									КЕС
 */																																																																																																																																														
-     HAL_Init();  //Тут встановлюється пріорітет і група пріорітетів
+  HAL_Init();  //Тут встановлюється пріорітет і група пріорітетів
   
   /* Configure the system clock = 64 MHz */
   SystemClock_Config();
@@ -1229,11 +1229,11 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	{
 		//Очистити прямокутник з годиною
 		ST7789_Fill(TIME_LCD_Coordinates[0], TIME_LCD_Coordinates[1], TIME_LCD_Coordinates[0] + 74,  TIME_LCD_Coordinates[1] + 56, LCD_BLACK);
-		GUI_Text1(TIME_LCD_Coordinates, (char *) realhours, 5);	//Годин, для огромных цифр, 
-		xy_temp[0] = *TIME_LCD_Coordinates +  (2*myGoriz);
+		GUI_Text(TIME_LCD_Coordinates, (char *) realhours, 7);	//Годин, для огромных цифр, 
+		xy_temp[0] = *TIME_LCD_Coordinates +  (2*DrawProp.width);
 		xy_temp[1] = *(TIME_LCD_Coordinates + 1);
 		//показ ":"
-		LCD_WriteString(xy_temp[0], xy_temp[1] + myVert/3, ":", Font, LCD_WHITE, LCD_BLACK);	// ":"
+		LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp.height/3, ":", Font, LCD_WHITE, LCD_BLACK);	// ":"
 	}
 	
 	if (Minutes_temp != stimestructureget.Minutes)
@@ -1243,15 +1243,15 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 		
 		//Очистити хвилини
 		ST7789_Fill(xy_temp[0], xy_temp[1], xy_temp[0] + 74,  xy_temp[1] + 56, LCD_BLACK);
-		GUI_Text1(xy_temp, (char *) reatminutes, 5);	//Хвилин, для огромных цифр, 
-		xy_temp[0] = xy_temp[0] +  (2*myGoriz);
-	  LCD_WriteString(xy_temp[0], xy_temp[1] + myVert/3, ":", Font, LCD_WHITE, LCD_BLACK);	
+		GUI_Text(xy_temp, (char *) reatminutes, 7);	//Хвилин, для огромных цифр, 
+		xy_temp[0] = xy_temp[0] +  (2*DrawProp.width);
+	  LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp.height/3, ":", Font, LCD_WHITE, LCD_BLACK);	
 	}
 	
 	xy_temp[0] = TIME_LCD_Coordinates[0] + 74 + 16 + 74 + 16;
 	xy_temp[1] = TIME_LCD_Coordinates[1];
-	//GUI_Text1(xy_temp, (char *) reatseconds, 5);	//Хвилин, для огромных цифр,
-	LCD_WriteString(xy_temp[0], xy_temp[1], reatseconds, Font, LCD_WHITE, LCD_BLACK);	
+	//GUI_Text(xy_temp, (char *) reatseconds, 5);	//Хвилин, для огромных цифр,
+	LCD_WriteString(xy_temp[0], xy_temp[1], reatseconds, Font, LCD_WHITE, LCD_BLACK); //Секунди показую в кожному циклі маленьким шрифтом (16ч26)
 	
 	
 	//LCD_WriteString(x, y, temp1, Font, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth

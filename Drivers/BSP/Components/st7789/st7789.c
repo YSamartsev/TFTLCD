@@ -4,8 +4,13 @@
 #include "main.h"
 #include "stm32_adafruit_lcd.h"
 
-extern SPI_HandleTypeDef SpiHandle;
 
+/*
+Використовується 16-бітний RGB формат
+|xxxxxxxx xxxxxxxx xxxxxxxx
+*/
+
+extern SPI_HandleTypeDef SpiHandle;
 
 //small fonts
 extern FontDef Font_7x10;
@@ -20,6 +25,8 @@ extern sFontDef Font20;
 extern sFontDef Font16;
 extern sFontDef Font12;
 extern sFontDef Font8;
+
+extern uint8_t* DigitalsBigBig[];
 
 extern LCD_DrawPropTypeDef DrawProp;
 
@@ -278,7 +285,7 @@ void ST7789_Init(void)
 	ST7789_SetRotation(ST7789_ROTATION);	//	MADCTL (Memory Data Access Control) (Display Rotation) 
 	
 	/* Internal LCD Voltage generator settings */
-    LCD_SendCommand(ST7789_GCTRL);				//	Gate Control
+	LCD_SendCommand(ST7789_GCTRL);				//	Gate Control
     //LCD_SendSmallData(0x35);			//	Default value
   {
 		uint8_t data[] = {0x35};
@@ -342,7 +349,7 @@ void ST7789_Init(void)
 		LCD_SendData(data, sizeof(data));
 	}
 
-    LCD_SendCommand(0xE1);
+  LCD_SendCommand(0xE1);
 	{
 		uint8_t data[] = {0xD0, 0x04, 0x0C, 0x11, 0x13, 0x2C, 0x3F, 0x44, 0x51, 0x2F, 0x1F, 0x1F, 0x20, 0x23};
 		LCD_SendData(data, sizeof(data));
@@ -396,7 +403,11 @@ void ST7789_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
 {
 	if ((x >= ST7789_WIDTH) || (y >= ST7789_HEIGHT))	return;
 	
-	ST7789_SetAddressWindow(x, y, x, y);
+	ST7789_SetAddressWindow(x, y, x, y); //Встановлюю адреси рядка і колонки для точки
+	//В Ініціалізації вказав COLMOD (3Ah) = 55h
+	//Стор.  71 of 317 перший байт R4_R3_R2_R1_R0_G5_G4_G3 другий байт G2_G1_G0_B4_B3_B2_B1_B0
+	//G5_G4_G3_G2_G1_G0 Глибина зеленого, R4_R3_R2_R1_R0 Глибина червоного, B4_B3_B2_B1_B0 Глибина синього 
+	//Наприклад для LCD_GREEN першим байтом треба передати 0000`0111 другим 1110'0000
 	uint8_t data[] = {color >> 8, color & 0xFF};
 	LCD_Select();
 	LCD_SendData(data, sizeof(data));
@@ -1162,27 +1173,27 @@ void PutChar( uint16_t Xpos, uint16_t Ypos, uint8_t ASCI, uint8_t mySize)
 		{
 			i_LCD = 3;
 		}
-		else if (mySize == 3)
+		else if (mySize == 4)
 		{
 		//		i_LCD = 4; //для DigitalsBig[10][81]
 //			i_LCD = 7; //для DigitalsBig[10][260]
 //			i_LCD = 5; //для DigitalsMidle[10][171]
 			i_LCD = 4; //для DigitalsMidle[10][73]
 		}	
-		else if (mySize == 4)
+		else if (mySize == 5)
 		{
 			i_LCD = 5; //Кількість стовпчиків для DigitalsBig[10][131]
 		}
-		else if (mySize == 5)
+		else if (mySize == 7)
 		{
 			i_LCD = 7; //для для DigitalsBigBig[10][260]
 		}
 		
 		for(jq = 0; jq < (buffer[0] * i_LCD); jq = jq + i_LCD)
 		{	
-			//Цикл по групам з 5-ти байтів поточного символа
-			//jq = 0  від 0-го до 4-го
-			//jq = 5  від 5-го до 9-го
+			//Цикл по групам з 7-ьи байтів поточного символа
+			//jq = 0  від 0-го до 6-го
+			//jq = 7  від 7-го до 13-го
 //			Ypos_temp = Ypos;
 //k - вертикальная часть колонки битов
 			for(kq = 0; kq < i_LCD; kq++)
@@ -1248,7 +1259,7 @@ void PutChar( uint16_t Xpos, uint16_t Ypos, uint8_t ASCI, uint8_t mySize)
 *  *mycoordinates Координати X, Y початку роміщення рядка символів
 * mySize індекс  таблиці символів
 *******************************************************************************/
-void GUI_Text1(uint8_t* mycoordinates, char *str, uint8_t mySize)
+void GUI_Text(uint8_t* mycoordinates, char *str, uint8_t mySize)
 {
 //	uint8_t TempChar;
 	
@@ -1284,18 +1295,19 @@ else if (mySize == 0x03) //
 	myGoriz= 18; //кол-во горизонтальных точек в знаке
 }		
  
-else if (mySize == 0x04) //
+else if (mySize == 0x05) //
 {
 	myfont = 1;
 	myVert = 34; //кол-во вертикальных точек в знаке
 	myGoriz= 26; //кол-во горизонтальных точек в знаке
 }		
 
-else if (mySize == 0x05) //
+else if (mySize == 0x07) //
 {
 	myfont = 1;
-	myVert = 56; //кол-во вертикальных точек в знаке 8*7
-	myGoriz= 37; //кол-во горизонтальных точек в знаке 256/7
+	DrawProp.pFont = DigitalsBigBig[0];
+	DrawProp.height = 56; //кол-во вертикальных точек в знаке 8*7
+	DrawProp.width = 37; //кол-во горизонтальных точек в знаке 259/7
 }
 	do
 	{
@@ -1309,11 +1321,11 @@ else if (mySize == 0x05) //
 		if (myfont == 1)	
 		{
 			//Развертывание по вертикали
-			if( Xpos + myGoriz < MAX_X)
+			if( Xpos + DrawProp.width < MAX_X)
         {
-            Xpos += myGoriz;
+            Xpos += DrawProp.width;
         } 
-        else if (Ypos + myVert < MAX_Y)
+        else if (Ypos + DrawProp.height < MAX_Y)
         {
             Xpos = 0;
             Ypos += myVert;
@@ -1328,14 +1340,14 @@ else if (mySize == 0x05) //
 			else if (myfont == 0)
 			{
 //Развертывание по горизонтали
-				if( Xpos + myGoriz < MAX_X / 8)
+				if( Xpos + DrawProp.width < MAX_X / 8)
         {
-            Xpos += myGoriz;
+            Xpos += DrawProp.width;
         } 
-        else if (Ypos + myVert < MAX_Y)
+        else if (Ypos + DrawProp.height < MAX_Y)
         {
             Xpos = 0;
-            Ypos += myVert;
+            Ypos += DrawProp.height;
         }   
         else
         {

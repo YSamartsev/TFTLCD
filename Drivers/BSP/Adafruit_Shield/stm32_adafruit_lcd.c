@@ -95,14 +95,15 @@ extern FontDef Font_16x26;
 extern const uint16_t saber; //picture
 
 //big fonts
-extern sFontDef Font24;
-extern sFontDef Font20;
-extern sFontDef Font16;
-extern sFontDef Font12;
-extern sFontDef Font8;
+extern bFontDef Font24;
+extern bFontDef Font20;
+extern bFontDef Font16;
+extern bFontDef Font12;
+extern bFontDef Font8;
 
+extern LCD_DrawPropTypeDef DrawProp;
 
-#define LINE(x) ((x) * (((sFontDef *)BSP_LCD_GetFont())->height))
+#define LINE(x) ((x) * (((bFontDef *)BSP_LCD_GetFont())->height))
 
 uint32_t bi;
 
@@ -199,7 +200,7 @@ uint8_t BSP_LCD_Init(void)
  
   /* Default value for draw propriety */
   DrawProp.BackColor = LCD_BLACK; //Заповнюю структуру DrawProp влістивостями фонту Font24
-  DrawProp.pFont     = &Font24;
+  //DrawProp.pFont     = Font24;
   DrawProp.TextColor = LCD_WHITE;
 
 #ifdef TFT_LCD_7735	
@@ -299,9 +300,9 @@ void BSP_LCD_SetBackColor(uint16_t Color)
   * @param  fonts: Font to be used
   * @retval None
   */
-void BSP_LCD_SetFont(sFontDef *pFonts)
+void BSP_LCD_SetFont(bFontDef *pFonts)
 {
-  DrawProp.pFont = pFonts;
+  //DrawProp.pFont = pFonts;
 }
 
 /**
@@ -309,7 +310,7 @@ void BSP_LCD_SetFont(sFontDef *pFonts)
   * @param  None
   * @retval Used font
   */
-sFontDef *BSP_LCD_GetFont(void)
+uint8_t *BSP_LCD_GetFont(void)
 {
   return DrawProp.pFont;
 }
@@ -349,7 +350,7 @@ void BSP_LCD_ClearStringLine(uint16_t Line)
   DrawProp.TextColor = DrawProp.BackColor;;
     
   /* Draw a rectangle with background color */
-  BSP_LCD_FillRect(0, (Line * DrawProp.pFont->height), BSP_LCD_GetXSize(), DrawProp.pFont->height);
+  BSP_LCD_FillRect(0, (Line * DrawProp.height), BSP_LCD_GetXSize(), (uint8_t) DrawProp.height);
   
   DrawProp.TextColor = color_backup;
   BSP_LCD_SetTextColor(DrawProp.TextColor);
@@ -365,8 +366,8 @@ void BSP_LCD_ClearStringLine(uint16_t Line)
   */
 void BSP_LCD_DisplayChar(uint16_t Xpos, uint16_t Ypos, uint8_t Ascii)
 {
-  DrawChar(Xpos, Ypos, &DrawProp.pFont->table[(Ascii-' ') *\
-    DrawProp.pFont->height * ((DrawProp.pFont->width + 7) / 8)]);
+  DrawChar(Xpos, Ypos, &DrawProp.pFont[(Ascii-' ') *\
+    DrawProp.height * ((DrawProp.width + 7) / 8)]);
 }
 
 /**
@@ -392,13 +393,13 @@ void BSP_LCD_DisplayStringAt(uint16_t Xpos, uint16_t Ypos, uint8_t *Text, Line_M
   while (*ptr++) size ++ ;
   
   /* Characters number per line */
-  xsize = (BSP_LCD_GetXSize()/DrawProp.pFont->width);
+  xsize = (BSP_LCD_GetXSize()/DrawProp.width);
   
   switch (Mode)
   {
   case CENTER_MODE:
     {
-      refcolumn = Xpos + ((xsize - size)* DrawProp.pFont->width) / 2;
+      refcolumn = Xpos + ((xsize - size)* DrawProp.width) / 2;
       break;
     }
   case LEFT_MODE:
@@ -408,7 +409,7 @@ void BSP_LCD_DisplayStringAt(uint16_t Xpos, uint16_t Ypos, uint8_t *Text, Line_M
     }
   case RIGHT_MODE:
     {
-      refcolumn =  - Xpos + ((xsize - size)*DrawProp.pFont->width);
+      refcolumn =  - Xpos + ((xsize - size)*DrawProp.width);
       break;
     }    
   default:
@@ -419,12 +420,12 @@ void BSP_LCD_DisplayStringAt(uint16_t Xpos, uint16_t Ypos, uint8_t *Text, Line_M
   }
   
   /* Send the string character by character on lCD */
-  while ((*Text != 0) & (((BSP_LCD_GetXSize() - (i*DrawProp.pFont->width)) & 0xFFFF) >= DrawProp.pFont->width))
+  while ((*Text != 0) & (((BSP_LCD_GetXSize() - (i*DrawProp.width)) & 0xFFFF) >= DrawProp.width))
   {
     /* Display one character on LCD */
     BSP_LCD_DisplayChar(refcolumn, Ypos, *Text);
     /* Decrement the column position by 16 */
-    refcolumn += DrawProp.pFont->width;
+    refcolumn += DrawProp.width;
     /* Point on the next character */
     Text++;
     i++;
@@ -959,8 +960,8 @@ static void DrawChar(uint16_t Xpos, uint16_t Ypos, const uint8_t *pChar)
   uint8_t *pchar = NULL;
   uint32_t line = 0;
   
-  height = DrawProp.pFont->height;
-  width  = DrawProp.pFont->width;
+  height = DrawProp.height;
+  width  = DrawProp.width;
   
   /* Fill bitmap header*/
   *(uint16_t *) (bitmap + 2) = (uint16_t)(height*width*2+OFFSET_BITMAP);
@@ -1470,17 +1471,17 @@ void LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef Font, uint16_t color
 	LCD_CS_HIGH();
 }
 
-void LCD_sWriteChar(uint16_t x, uint16_t y, char ch, sFontDef sFont, uint16_t color, uint16_t bgcolor)
+void LCD_sWriteChar(uint16_t x, uint16_t y, char ch, bFontDef bFont, uint16_t color, uint16_t bgcolor)
 {
 	uint32_t i, b, j;
 	LCD_CS_LOW();
-	LCD_SetAddressWindow(x, y, x + sFont.width - 1, y + sFont.height - 1);
+	LCD_SetAddressWindow(x, y, x + bFont.width - 1, y + bFont.height - 1);
 	
-	for (i = 0; i < sFont.height; i++) {
+	for (i = 0; i < bFont.height; i++) {
 		//b = font.data[(ch - 32) * font.height + i];
-		bi = sFont.table[(ch - 32) * sFont.height + i];
+		bi = bFont.data[(ch - 32) * bFont.height + i];
 		
-		for (j = 0; j < sFont.width; j++) {
+		for (j = 0; j < bFont.width; j++) {
 			if ((bi << j) & 0x8000) {
 				uint8_t data[] = {color >> 8, color & 0xFF};
 				LCD_SendData(data, sizeof(data));
@@ -1535,7 +1536,7 @@ void LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef Font, uint
 	LCD_CS_HIGH();
 }
 
-void LCD_sWriteString(uint16_t x, uint16_t y, const char *str, sFontDef Font, uint16_t color, uint16_t bgcolor)
+void LCD_sWriteString(uint16_t x, uint16_t y, const char *str, bFontDef Font, uint16_t color, uint16_t bgcolor)
 {
 #ifdef TFT_LCD_7789
 	uint16_t	LCD_WIDTH = ST7789_WIDTH;

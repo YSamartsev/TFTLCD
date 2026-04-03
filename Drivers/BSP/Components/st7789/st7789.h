@@ -362,7 +362,7 @@ void     ST7789_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);
 void 		 ST7789_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode);
 void 		 ST7789_WriteReg(uint8_t LCDReg, uint8_t LCDRegValue);
 
-void GUI_Text1(uint8_t* mycoordinates, char *str, uint8_t mySize);
+void GUI_Text(uint8_t* mycoordinates, char *str, uint8_t mySize);
 
 #ifndef ST7789_ROTATION
     #error You should at least choose a display rotation!

@@ -208,15 +208,15 @@ typedef enum
   * @{
   */   
 uint8_t  BSP_LCD_Init(void);
-uint32_t BSP_LCD_GetXSize(void);
+uint32_t BSP_LCD_GetXSize(void); 
 uint32_t BSP_LCD_GetYSize(void);
  
 uint16_t BSP_LCD_GetTextColor(void);
 uint16_t BSP_LCD_GetBackColor(void);
 void     BSP_LCD_SetTextColor(__IO uint16_t Color);
 void     BSP_LCD_SetBackColor(__IO uint16_t Color);
-void     BSP_LCD_SetFont(sFontDef *fonts);
-sFontDef *BSP_LCD_GetFont(void);
+void     BSP_LCD_SetFont(bFontDef *fonts);
+uint8_t  *BSP_LCD_GetFont(void);
 
 void     BSP_LCD_Clear(uint16_t Color);
 void     BSP_LCD_ClearStringLine(uint16_t Line);
@@ -245,10 +245,10 @@ void 		 LCD_Fill_Color(uint16_t color);
 void		 LCD_Test(void);
 
 void		 LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor);
-void 		 LCD_sWriteString(uint16_t x, uint16_t y, const char *str, sFontDef font, uint16_t color, uint16_t bgcolor);
+void 		 LCD_sWriteString(uint16_t x, uint16_t y, const char *str, bFontDef font, uint16_t color, uint16_t bgcolor);
 
 void 		 LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef Font, uint16_t color, uint16_t bgcolor);
-void 		 LCD_sWriteChar(uint16_t x, uint16_t y, char ch, sFontDef sFont, uint16_t color, uint16_t bgcolor);
+void 		 LCD_sWriteChar(uint16_t x, uint16_t y, char ch, bFontDef bFont, uint16_t color, uint16_t bgcolor);
 
 void 		 LCD_DrawFilledRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
 
