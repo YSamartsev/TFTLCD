@@ -1932,6 +1932,7 @@ static uint8_t RTC_WeekDayNum(uint32_t nYear, uint8_t nMonth, uint8_t nDay)
   return (uint8_t)weekday;
 }
 
+
 /**
   * @}
   */

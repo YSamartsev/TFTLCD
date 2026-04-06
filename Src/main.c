@@ -273,7 +273,10 @@ int __backspace(FILE *f)
 	GPIO_PinState prevSensorValue = GPIO_PIN_RESET;
 	FlagStatus DCF77_Status = RESET;
 
-  uint8_t		TIME_LCD_Coordinates[4] = {2, 100, 76, 156}; //координати виводу часу
+  uint8_t Hours_temp, Minutes_temp, Seconds_temp;
+	uint8_t Weekday_temp; 
+	float Date_temp;
+	uint8_t		TIME_LCD_Coordinates[4] = {2, 100, 76, 156}; //координати виводу часу
 //char *Text = "12:22";
 	
 int main(void)
@@ -1138,13 +1141,20 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	char realdate[2]; //Це масив, а не string, тобто не закінчується \0
 	char realmonth[2];
 	char realyear[2];
+	char realweekday[2];
+	char *strweekday;
+	uint8_t xy_temp[2];
 	
 #ifdef TFT_LCD_7789
 	FontDef Font = Font_16x26;
+	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
 	//sFontDef Font = Font24;  //!!!!!!!!
 	
 #elif defined (TFT_LCD_7735)
 	FontDef Font = Font_11x18;
+	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
 #endif
 
  //RTC_DateTypeDef sdatestructureget;
@@ -1155,17 +1165,33 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	
 	//snprintf(realdate, sizeof realdate, "%s", &sdatestructureget.Date);
 	
+	sprintf(realweekday, "%02d", sdatestructureget.WeekDay);
 	sprintf(realdate, "%02d", sdatestructureget.Date);
 	sprintf(realmonth, "%02d", sdatestructureget.Month);
 	sprintf(realyear, "%02d", sdatestructureget.Year);
-		
+			
 	char temp1[11];
 
-	concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
-	//printf("date = %s\n\r", temp1);
-	temp1[10] = 0x00;	
-	LCD_WriteString(x, y, temp1, Font, LCD_WHITE, LCD_BLACK);	 //& "." & realmonth
-	//LCD_sWriteString(x, y, temp1, Font, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth
+	if (Date_temp != (float)(sdatestructureget.Year * sdatestructureget.Month * sdatestructureget.Date))
+	{
+		Date_temp = (float)(sdatestructureget.Year * sdatestructureget.Month * sdatestructureget.Date);
+		//printf("date = %s\n\r", temp1);
+		concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
+		temp1[10] = 0x00;	//останній код для string повинен бути 0x00
+		LCD_DrawFilledRectangle(x, y, 10*Font.width, Font.height, LCD_BLACK);
+		LCD_WriteString(x, y, temp1, Font, LCD_WHITE, LCD_BLACK);	 //& "." & realmonth
+	}	
+		
+	
+	if (Weekday_temp != sdatestructureget.WeekDay)
+	{
+		Weekday_temp = sdatestructureget.WeekDay;	
+		xy_temp[0] = (LCD_WIDTH * 4) / 100;
+		xy_temp[1] = (LCD_HEIGHT * 25) / 100;
+		LCD_DrawFilledRectangle(xy_temp[0], xy_temp[1], 10*Font.width, Font.height, LCD_BLACK); 
+		strweekday = get_WeekDay(sdatestructureget.WeekDay);
+		LCD_WriteString(xy_temp[0], xy_temp[1], strweekday, Font, LCD_WHITE, LCD_BLACK);
+	}
 	
 	
 	//free(temp1);
@@ -1183,9 +1209,10 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	char realhours[2];
 	char reatminutes[2];
 	char reatseconds[2];
+	char realweekday[2];
 	uint8_t Xpos;
 	uint8_t xy_temp[2];
-	uint8_t Hours_temp, Minutes_temp, Seconds_temp;
+	
 	
 #ifdef TFT_LCD_7789
 	FontDef Font = Font_16x26;
@@ -1197,12 +1224,11 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
 #endif
-
-
 	
   //stimestructureget; //Структура Година, Хвилина, Секунда
 	//Перед виконанням цієї процедури stimestructureget зберігає 
 	//попередні значення Hours, Minutes, Seconds
+	
 	Hours_temp = stimestructureget.Hours;
 	Minutes_temp = stimestructureget.Minutes;
 	Seconds_temp = stimestructureget.Seconds;
@@ -1224,9 +1250,12 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 
 	//ST7789_DrawFilledRectangle(*TIME_LCD_Coordinates, *(TIME_LCD_Coordinates + 1), *(TIME_LCD_Coordinates + 2), *(TIME_LCD_Coordinates + 3), LCD_BLACK);
 	//ST7789_Fill(TIME_LCD_Coordinates[0], TIME_LCD_Coordinates[1], TIME_LCD_Coordinates[0] + 237,  TIME_LCD_Coordinates[1] + 56, LCD_BLACK);
+				
+
 	
 	if (Hours_temp != stimestructureget.Hours)
 	{
+		Hours_temp = stimestructureget.Hours;
 		//Очистити прямокутник з годиною
 		ST7789_Fill(TIME_LCD_Coordinates[0], TIME_LCD_Coordinates[1], TIME_LCD_Coordinates[0] + 74,  TIME_LCD_Coordinates[1] + 56, LCD_BLACK);
 		GUI_Text(TIME_LCD_Coordinates, (char *) realhours, 7);	//Годин, для огромных цифр, 
@@ -1238,6 +1267,7 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	
 	if (Minutes_temp != stimestructureget.Minutes)
 	{	
+		Minutes_temp = stimestructureget.Minutes;
 		xy_temp[0] = TIME_LCD_Coordinates[0] + 74 + 16;
 		xy_temp[1] = TIME_LCD_Coordinates[1];
 		
@@ -1451,6 +1481,28 @@ void Error_Handler(char *myError)
     HAL_Delay(100);
 		
   }
+}
+
+char * get_WeekDay(uint8_t nday)
+{
+	switch (nday)
+	{
+		case 01:
+			return "Monday";
+		case 02:
+			return "Tuesday";
+		case 03:
+			return "Wednesday";
+		case 04: 
+			return "Thursday";
+		case 05:
+			return "Friday";
+		case 6:
+			return "Saturday";
+		case 07:
+			return "Sunday";	
+		
+	}
 }
 
 #ifdef  USE_FULL_ASSERT

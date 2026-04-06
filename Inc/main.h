@@ -215,7 +215,7 @@ static void RTC_SECUpdate(void);
 char calcModulo256(char *aRxBuffer, uint16_t BufferLength);
 //HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77, uint8_t lineLength);
 HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77);
-
+char* get_WeekDay(uint8_t nday);
 
 #endif /* __MAIN_H */
 
