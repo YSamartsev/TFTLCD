@@ -33,6 +33,8 @@
 extern FontDef Font_7x10;
 extern FontDef Font_11x18;
 extern FontDef Font_16x26;
+extern uint16_t TempChar;
+extern uint16_t char_16;
 
 extern const uint16_t saber; //picture
 
@@ -47,6 +49,7 @@ extern uint8_t myGoriz;
 extern uint8_t myVert;
 
 extern LCD_DrawPropTypeDef DrawProp;
+LCD_DrawPropTypeDef DrawProp_ukr;
 
 Line_ModeTypdef Mode;
 
@@ -126,8 +129,8 @@ char SD_Path[4]; /* SD card logical drive path */
 //char realmonth[2];
 //char realyear[2];
 //char realhours[2];
-//char reatminutes[2];
-//char reatseconds[2];
+//char realminutes[2];
+//char realseconds[2];
 //char realdatatime[20];
 
 ///* Private function prototypes -----------------------------------------------*/
@@ -277,7 +280,11 @@ int __backspace(FILE *f)
 	uint8_t Weekday_temp; 
 	float Date_temp;
 	uint8_t		TIME_LCD_Coordinates[4] = {2, 100, 76, 156}; //координати виводу часу
-//char *Text = "12:22";
+
+	//char *Text = "12:22";
+	uint16_t sUNICODE;
+	char *str1 = "П'ятниця";
+	uint8_t cbyte;
 	
 int main(void)
 	//Початкова дата встановлюеться в  RTC_AlarmConfig
@@ -407,8 +414,8 @@ BSP_LCD_Init(); //Ініціалізативна послідовність + с
 	//Але при #define ST7789_ROTATION 2	 точка  x=0, 	y=0	знаходиться біля роз'єму справа!! 
 
 #ifdef TFT_LCD_7789
-FontDef Font = Font_16x26; //Заповнюю структуру малих фонтів структурою фонта Font_16x26
-	
+	FontDef Font = Font_16x26; //Заповнюю структуру малих фонтів структурою фонта Font_16x26
+	DrawProp_ukr.TextColor = LCD_WHITE; //Для української мови
 	//sFontDef Font = Font24;
 		
 	uint16_t	LCD_WIDTH = ST7789_WIDTH;
@@ -422,20 +429,25 @@ FontDef Font = Font_16x26; //Заповнюю структуру малих фо
 /*
 //======Відлагодження===================
 //Порівнюю LCD_* і BSP_LCD_*  функції
-LCD_DrawFilledRectangle(50, 50, 50, 50, LCD_WHITE);
-ST7789_SetCursor(50, 50); //встановити курсор в позиціє 50ч50
+//LCD_DrawFilledRectangle(50, 50, 50, 50, LCD_WHITE); //Малюю квадрат
 
-DrawProp.TextColor = LCD_GREEN;
-BSP_LCD_DrawRect(50, 50, 50, 50); //малює контур прямокутника кольором
-BSP_LCD_FillRect(50, 50, 50, 50); //Заповнює кольором DrawProp.TextColor прямокутник
+//Вивід символыв через *str = "А" відбувається в UTF 8
+//Наприклад UTF код кирилицкої "А" це 0xD0D9, а 0x0410 - номер символа "А" в таблиці UNICODE (UTF 8)
+//char *locale = setlocale(LC_ALL, "");
+//Кирилиця "А" 0xD090, Апостроф "҅" код 0xD285, 
+//українська "І"  0хD086, Українська "і" Код 0хD196
+//українська "Ї"  0хD087, Українська "ї" Код 0хD197
+//Розмір (ширина х висота) прямокутника фонту 20х27
+//DrawProp_ukr.height = 27; //кількість вертикальных точок в символі
+//DrawProp_ukr.width = 3; //20; //кількість байтів ширини символа 3*8 = 24
+//; //"ІЇАБВГДПятниця"; //ЇїАБААВГДЕФ"; //ІЇАБВГА"; //іАБВГіІЇї"; //҅ятниця"; //"҅"; 
 
-BSP_LCD_Clear(LCD_GREEN);
+		GUI_Text_ukr(TIME_LCD_Coordinates, str1, 8);	
 
-LCD_DrawFilledRectangle(0, 0, LCD_WIDTH, LCD_HEIGHT, LCD_GREEN); //Заповнюю екран чорним кольором
-BSP_LCD_Clear(LCD_WHITE);
+		TempChar = ((sUNICODE - 0x0406)); //4 + 8); // порядковий номер символу в масиві Arial45x39 (по 4 байти в позиційному вказівнику на масиві символу)
+
 //=================================
 */
-
 
 if (Bluetooth_present == SHIELD_DETECTED)
 	{
@@ -1190,12 +1202,10 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 		xy_temp[1] = (LCD_HEIGHT * 25) / 100;
 		LCD_DrawFilledRectangle(xy_temp[0], xy_temp[1], 10*Font.width, Font.height, LCD_BLACK); 
 		strweekday = get_WeekDay(sdatestructureget.WeekDay);
-		LCD_WriteString(xy_temp[0], xy_temp[1], strweekday, Font, LCD_WHITE, LCD_BLACK);
+		GUI_Text_ukr(xy_temp, strweekday, 8);
+		
+		//LCD_WriteString(xy_temp[0], xy_temp[1], strweekday, Font, LCD_WHITE, LCD_BLACK);
 	}
-	
-	
-	//free(temp1);
-
 } 
 
 /**
@@ -1207,8 +1217,8 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати початкової точки рядка дисплея 
 {
 	char realhours[2];
-	char reatminutes[2];
-	char reatseconds[2];
+	char realminutes[2];
+	char realseconds[2];
 	char realweekday[2];
 	uint8_t Xpos;
 	uint8_t xy_temp[2];
@@ -1240,11 +1250,11 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	//snprintf(realdate, sizeof realdate, "%s", &sdatestructureget.Date);
 	
 	sprintf(realhours, "%02d", stimestructureget.Hours);
-	sprintf(reatminutes, "%02d", stimestructureget.Minutes);
-	sprintf(reatseconds, "%02d", stimestructureget.Seconds);
+	sprintf(realminutes, "%02d", stimestructureget.Minutes);
+	sprintf(realseconds, "%02d", stimestructureget.Seconds);
 	
 	char temp1[9];
-	concat_time(temp1, realhours, reatminutes, reatseconds); //соединить строки -> *temp2
+	concat_time(temp1, realhours, realminutes, realseconds); //соединить строки -> *temp2
 	temp1[8] = 0x00;
 	//printf("time = %s\n\r", temp1);
 
@@ -1273,15 +1283,15 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 		
 		//Очистити хвилини
 		ST7789_Fill(xy_temp[0], xy_temp[1], xy_temp[0] + 74,  xy_temp[1] + 56, LCD_BLACK);
-		GUI_Text(xy_temp, (char *) reatminutes, 7);	//Хвилин, для огромных цифр, 
+		GUI_Text(xy_temp, (char *) realminutes, 7);	//Хвилин, для огромных цифр, 
 		xy_temp[0] = xy_temp[0] +  (2*DrawProp.width);
 	  LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp.height/3, ":", Font, LCD_WHITE, LCD_BLACK);	
 	}
 	
 	xy_temp[0] = TIME_LCD_Coordinates[0] + 74 + 16 + 74 + 16;
 	xy_temp[1] = TIME_LCD_Coordinates[1];
-	//GUI_Text(xy_temp, (char *) reatseconds, 5);	//Хвилин, для огромных цифр,
-	LCD_WriteString(xy_temp[0], xy_temp[1], reatseconds, Font, LCD_WHITE, LCD_BLACK); //Секунди показую в кожному циклі маленьким шрифтом (16ч26)
+	//GUI_Text(xy_temp, (char *) realseconds, 5);	//Хвилин, для огромных цифр,
+	LCD_WriteString(xy_temp[0], xy_temp[1], realseconds, Font, LCD_WHITE, LCD_BLACK); //Секунди показую в кожному циклі маленьким шрифтом (16ч26)
 	
 	
 	//LCD_WriteString(x, y, temp1, Font, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth
@@ -1469,6 +1479,58 @@ static char calcModulo256(char *myString, uint16_t BufferLength)
 			return mymod;
 		}   
 
+uint32_t utf8_to_unicode(const char *str_utf8,  uint8_t *length) //** вказівник на вказівник
+{
+		unsigned char *s = (unsigned char *)str_utf8;
+    
+    // 1-byte
+    if (s[0] < 0x80) {
+        *length = 1;
+        return s[0];
+    }
+    // 2-bytes
+    if ((s[0] & 0xE0) == 0xC0) {
+        *length = 2;
+        return ((s[0] & 0x1F) << 6) | (s[1] & 0x3F);
+    }
+    // 3-bytes
+    if ((s[0] & 0xF0) == 0xE0) {
+//        *length = 3;
+        return ((s[0] & 0x0F) << 12) | ((s[1] & 0x3F) << 6) | (s[2] & 0x3F);
+    }
+    // 4-bytes
+    if ((s[0] & 0xF8) == 0xF0) {
+        *length = 4;
+        return ((s[0] & 0x07) << 18) | ((s[1] & 0x3F) << 12) | ((s[2] & 0x3F) << 6) | (s[3] & 0x3F);
+    }
+    
+    *length = 0;
+    return 0; // Ошибка
+}
+		
+char * get_WeekDay(uint8_t nday)
+{
+	switch (nday)
+	{
+		case 01:
+			return "Понеділок"; //"Monday";
+		case 02:
+			return "Вівторок";  //"Tuesday";
+		case 03:
+			return "Середа";  //"Wednesday";
+		case 04: 
+			return "Четвер";  //"Thursday";
+		case 05:
+			return "П'ятниця";  //"Friday";
+		case 6:
+			return "Субота";  //"Saturday";
+		case 07:
+			return "Неділя";  //"Sunday";	
+		
+	}
+}
+
+
 //==============================================================================
 
 void Error_Handler(char *myError)
@@ -1483,27 +1545,9 @@ void Error_Handler(char *myError)
   }
 }
 
-char * get_WeekDay(uint8_t nday)
-{
-	switch (nday)
-	{
-		case 01:
-			return "Monday";
-		case 02:
-			return "Tuesday";
-		case 03:
-			return "Wednesday";
-		case 04: 
-			return "Thursday";
-		case 05:
-			return "Friday";
-		case 6:
-			return "Saturday";
-		case 07:
-			return "Sunday";	
-		
-	}
-}
+
+
+
 
 #ifdef  USE_FULL_ASSERT
 /**

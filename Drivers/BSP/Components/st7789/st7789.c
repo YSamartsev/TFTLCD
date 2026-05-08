@@ -27,18 +27,23 @@ extern sFontDef Font12;
 extern sFontDef Font8;
 
 extern uint8_t* DigitalsBigBig[];
-
+extern uint8_t* Arial45x39[];
+extern LCD_DrawPropTypeDef DrawProp_ukr;
 extern LCD_DrawPropTypeDef DrawProp;
+
+uint8_t byte_width;
+extern uint8_t cbyte;
 
 extern uint32_t bi;
 
 uint8_t data_LCD;
 uint16_t i_LCD;
 uint16_t j_LCD;
-uint8_t TempChar;
+uint16_t TempChar;
 uint16_t i, j, k;
 uint16_t iq, jq, kq;
 uint8_t tmp_char;
+uint16_t char_16;
 
 //Для разворачивания кода шрифта по горизонтали ASCII_8X8_System
 //int myfont = 0;
@@ -1040,7 +1045,7 @@ void ST7789_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint1
 *				           - ASCI:
 *				           - mySize індекс таблиці симолів
 *******************************************************************************/
-void PutChar( uint16_t Xpos, uint16_t Ypos, uint8_t ASCI, uint8_t mySize)
+void PutChar( uint16_t Xpos, uint16_t Ypos, uint16_t ofset_ASCII, uint8_t mySize)
 {
 //	uint8_t data_LCD;
 //  uint8_t PutChar_command_LCD;
@@ -1053,7 +1058,7 @@ void PutChar( uint16_t Xpos, uint16_t Ypos, uint8_t ASCI, uint8_t mySize)
 //i = Xpos;
 //j = Ypos;
 
-	GetASCIICode(buffer, ASCI, mySize); //, myVert); //Заполенние буфера buffer точками изображения символа с кодом ASCI
+	GetASCIICode(buffer, ofset_ASCII, mySize); //, myVert); //Заполенние буфера buffer точками изображения символа с кодом ASCI
 
 	Xpos_temp = Xpos;
 	Ypos_temp = Ypos;
@@ -1186,36 +1191,41 @@ void PutChar( uint16_t Xpos, uint16_t Ypos, uint8_t ASCI, uint8_t mySize)
 		}
 		else if (mySize == 7)
 		{
-			i_LCD = 7; //для для DigitalsBigBig[10][260]
+			i_LCD = 7; //для DigitalsBigBig[10][260]
 		}
-		
+		else if (mySize == 8)
+		{
+			i_LCD = byte_width; //для Arial45x39 3
+		}		
+if (mySize < 8)
+	{ //Рогортка по вертикалі символа	
+		//i_LCD - кількість байт в ширині одного символу
 		for(jq = 0; jq < (buffer[0] * i_LCD); jq = jq + i_LCD)
 		{	
-			//Цикл по групам з 7-ьи байтів поточного символа
-			//jq = 0  від 0-го до 6-го
-			//jq = 7  від 7-го до 13-го
-//			Ypos_temp = Ypos;
-//k - вертикальная часть колонки битов
+			//Цикл по групам з buffer[0] байтів поточного символа
+			//jq = 0  від 0-го до buffer[0]-1 включно
+			//jq = buffer[0]  від buffer[0] до 2*buffer[0]-1
+//k - горизонтальна частина колонки битов
 			for(kq = 0; kq < i_LCD; kq++)
 			{
-				//Цикл всередині групи з п'яти байтів
+				//Цикл всередині групи з i_LCD байтів
 				if (kq > 0)
 				{
-					Ypos_temp = Ypos_temp + 8; //смещение на следующий байт
+					Ypos_temp = Ypos_temp + 8; //зміщення на наступний байт
 				}					
 				tmp_char = (uint8_t) buffer[jq + 1 + kq]; //поточний байт горизонтальної лінії
 				for( iq = 0; iq < 8; iq++ )
 				{
-//Если текущий бит = 1, ставить точку, если 0 - пропускать
+					//Якщо поточний біт = 1, замальовувати піксель, якщо 0 - пропустити або замальовувати фоном
 				//TempChar = (uint8_t)(((buffer[jq+1+kq] >> iq) & 0x01) << 7);
-				//----------Значение текущего бита----------------------
+				//----------Значення поточного біту----------------------
 				if ((uint8_t) ((((uint8_t) buffer[jq + 1 + kq] >> iq) & 0x01) << 7) > 0x00 )
 				{
-					//цикл по поточному вертикальному стовпчику
+					//цикл по поточній вертикалі символа
 					//поточний біт ,якщо = 1.ставити Point
 					//LCD_SetPoint(Xpos_temp, Ypos_temp + iq);
 					//LCD_WritePixel(Xpos_temp, Ypos_temp + iq);
-					BSP_LCD_DrawPixel((Xpos_temp), Ypos_temp + iq, DrawProp.TextColor);
+					BSP_LCD_DrawPixel(Xpos_temp, Ypos_temp + iq, DrawProp.TextColor);
 				}
 					
 					
@@ -1242,7 +1252,44 @@ void PutChar( uint16_t Xpos, uint16_t Ypos, uint8_t ASCI, uint8_t mySize)
 			Xpos_temp = Xpos_temp + 1;
 			Ypos_temp = Ypos;			
 		}
-  //}
+	} else if(mySize == 8)
+	{ //Розгортка по горизонталі символу
+		//DrawProp_ukr.height кількість пікселів в стовпчику одного символу (27)
+		//i_LCD - кількість байтів, що тримають ширину пікселів символа
+		for(jq = 0; jq < (buffer[0] * DrawProp_ukr.height); jq = jq + i_LCD) //jq = 0, 3, 6, 9, ...,  27
+		{	
+			//Цикл по групам з buffer[0] байтів поточного символа
+			//jq = 0  від 0-го до buffer[0]
+			//jq = buffer[0]  від buffer[0] до 2*buffer[0]
+//			Xpos_temp = Xpos;
+//k - горизонтальна частина символа
+			for(kq = 0; kq < i_LCD; kq++)
+			{
+				//Цикл всередині групи з i_LCD байтів
+				if (kq > 0)
+				{
+					Xpos_temp = Xpos_temp + 8; //смещение на следующий байт
+				}					
+				tmp_char = (uint8_t) buffer[jq + 1 + kq]; //поточний байт горизонтальної лінії
+				for( iq = 0; iq < 8; iq++ )
+				{
+//Если текущий бит = 1, ставить точку, если 0 - пропускать
+				//TempChar = (uint8_t)(((buffer[jq+1+kq] >> iq) & 0x01) << 7);
+				//----------Значение текущего бита----------------------
+					if ((uint8_t) ((((uint8_t) buffer[jq + 1 + kq] >> iq) & 0x01) << 7) > 0x00 )
+					{
+						//цикл по поточному вертикальному стовпчику
+						//поточний біт ,якщо = 1.ставити Point
+						//LCD_SetPoint(Xpos_temp, Ypos_temp + iq);
+						//LCD_WritePixel(Xpos_temp, Ypos_temp + iq);
+						BSP_LCD_DrawPixel(Xpos_temp + iq, Ypos_temp, DrawProp_ukr.TextColor);
+					}
+				}
+			}
+			Xpos_temp = Xpos;
+			Ypos_temp = Ypos_temp + 1;			
+		}		
+	}
 }
 
 /******************************************************************************
@@ -1363,3 +1410,60 @@ else if (mySize == 0x07) //
   while ( *str != 0 );
 }
 
+void GUI_Text_ukr(uint8_t* mycoordinates, char *str, uint8_t mySize)
+{
+//	uint8_t TempChar;
+	
+//i = Xpos;
+//j = Ypos;
+	uint8_t Xpos, Ypos;
+	Xpos = *mycoordinates;
+	Ypos = *(mycoordinates + 1);
+	if (mySize == 0x08) //
+	{
+		myfont = 1;
+		//DrawProp_ukr.pFont = Arial45x39[0];
+		//DrawProp_ukr.height = 27; //кол-во вертикальных точек в знаке 8*4
+		//DrawProp_ukr.width = 20; //кол-во горизонтальных точек в знаке 54/4
+
+	}
+
+	do
+	{
+		//size_t *cbyte;
+
+		char_16 = utf8_to_unicode(str, &cbyte); //utf8_to_codepoint(str3, cbyte); 
+		if (cbyte == 1 && char_16 == 0x27)
+		{
+			char_16 = 0x0485;
+		}
+		
+		/*!!!!Не можна використовувати віднімання 16-х кодів, тому що вони не послідовні на відміну від порядкових номерів таблиці кодів
+		Наприклад для кодів кирилиці п->0xD0BF[UTF8] / 0x43F[UNICODE] /1087[Десятковий]
+		                             р->0xD180[UTF8] / 0x440[UNICODE] /1088[Десятковий] !!!!
+		Перед відніманням тре перетворити UTF8 в UNICODE !!!!		
+		*/
+		TempChar = ((char_16 - 0x0406)); //*4 + 8); // порядковий номер символу в масиві Arial45x39 (по 4 байти в позиційному вказівнику на масиві символу)
+		if (cbyte == 1 && char_16 == 0x0485)  
+				 {
+					 Xpos += (DrawProp_ukr.width / 2);
+				 }
+		PutChar( Xpos, Ypos, TempChar, mySize); //mySize індекс таблиці символів
+		str = str + cbyte;
+		if( Xpos + DrawProp_ukr.width < MAX_X)
+       {
+ 					  Xpos += DrawProp_ukr.width;
+	
+       }else if (Ypos + DrawProp_ukr.height < MAX_Y)
+       {
+            Xpos = 0;
+            Ypos += myVert;
+        }else
+        {
+						BSP_LCD_Clear(0x00);
+						Xpos = 0;
+            Ypos = 0;
+        } 
+	}
+  while ( *str != 0 );
+}

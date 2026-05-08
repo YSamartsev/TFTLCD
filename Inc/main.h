@@ -216,6 +216,7 @@ char calcModulo256(char *aRxBuffer, uint16_t BufferLength);
 //HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77, uint8_t lineLength);
 HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77);
 char* get_WeekDay(uint8_t nday);
+uint32_t utf8_to_unicode(const char *str_utf8,  uint8_t *length);
 
 #endif /* __MAIN_H */
 
