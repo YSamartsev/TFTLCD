@@ -1,4 +1,4 @@
-tft_lcd\retarget_io.o: C:\Keil_v5\ARM\PACK\Keil\ARM_Compiler\1.6.3\Source\retarget_io.c
+tft_lcd\retarget_io.o: C:/Keil_v5/ARM/PACK/Keil/ARM_Compiler/1.7.2/Source/retarget_io.c
 tft_lcd\retarget_io.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 tft_lcd\retarget_io.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 tft_lcd\retarget_io.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

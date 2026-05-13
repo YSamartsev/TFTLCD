@@ -67,13 +67,13 @@
 /** 
   * @brief  Draw Properties structures definition
   */ 
-typedef struct 
+/*typedef struct 
 { 
   uint32_t TextColor;
   uint32_t BackColor;
   sFONT    *pFont; 
 
-}LCD_DrawPropTypeDef;
+}LCD_DrawPropTypeDef; */
 
 /** 
   * @brief  Point structures definition
