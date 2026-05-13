@@ -134,7 +134,7 @@ char SD_Path[4]; /* SD card logical drive path */
 //char realdatatime[20];
 
 ///* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
+/*void SystemClock_Config(void);
 
 static void MX_UART2_Init(void);
 //static void MX_SPI_Init(void);
@@ -143,7 +143,7 @@ static void RTC_AlarmConfig(void);
 static void RTC_SECConfig(void);
 
 static void RTC_DateShow(uint16_t x, uint16_t y); //, uint8_t* showdate);
-static void RTC_TimeShow(uint16_t x, uint16_t y); //, uint8_t* showtime);
+static void RTC_TimeShow(uint16_t x, uint16_t y); //, uint8_t* showtime); */
 
 //static void LED0_Blink(void);
 //static ShieldStatus TFT_ShieldDetect(void);
@@ -280,10 +280,11 @@ int __backspace(FILE *f)
 	uint8_t Weekday_temp; 
 	float Date_temp;
 	uint8_t		TIME_LCD_Coordinates[4] = {2, 100, 76, 156}; //координати виводу часу
+	uint8_t		Weekday_LCD_Coordinates[4] = {2, 40, 156, 60}; //координати виводу часу
 
 	//char *Text = "12:22";
 	uint16_t sUNICODE;
-	char *str1 = "П'ятниця";
+	//char *str1 = "П'ятниця";
 	uint8_t cbyte;
 	
 int main(void)
@@ -442,7 +443,8 @@ BSP_LCD_Init(); //Ініціалізативна послідовність + с
 //DrawProp_ukr.width = 3; //20; //кількість байтів ширини символа 3*8 = 24
 //; //"ІЇАБВГДПятниця"; //ЇїАБААВГДЕФ"; //ІЇАБВГА"; //іАБВГіІЇї"; //҅ятниця"; //"҅"; 
 
-		GUI_Text_ukr(TIME_LCD_Coordinates, str1, 8);	
+    char *str1 = "П'ятниця";
+		GUI_Text_ukr(Weekday_LCD_Coordinates, str1, 8);	
 
 		TempChar = ((sUNICODE - 0x0406)); //4 + 8); // порядковий номер символу в масиві Arial45x39 (по 4 байти в позиційному вказівнику на масиві символу)
 
@@ -1190,22 +1192,34 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 		//printf("date = %s\n\r", temp1);
 		concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
 		temp1[10] = 0x00;	//останній код для string повинен бути 0x00
+		//Очистити прямокутник дати
 		LCD_DrawFilledRectangle(x, y, 10*Font.width, Font.height, LCD_BLACK);
+		//Вивести дату
 		LCD_WriteString(x, y, temp1, Font, LCD_WHITE, LCD_BLACK);	 //& "." & realmonth
-	}	
-		
 	
-	if (Weekday_temp != sdatestructureget.WeekDay)
+		//Отримати день тижня
+		strweekday = get_WeekDay(sdatestructureget.WeekDay);
+		//Очистити прямокутник дня тижня
+		LCD_DrawFilledRectangle(Weekday_LCD_Coordinates[0], Weekday_LCD_Coordinates[1], Weekday_LCD_Coordinates[2], Weekday_LCD_Coordinates[3], LCD_BLACK); 
+		//Вивести день тижня
+		GUI_Text_ukr(Weekday_LCD_Coordinates, strweekday, 8);	
+	}	
+	
+/*	if (Weekday_temp != sdatestructureget.WeekDay)
 	{
 		Weekday_temp = sdatestructureget.WeekDay;	
 		xy_temp[0] = (LCD_WIDTH * 4) / 100;
 		xy_temp[1] = (LCD_HEIGHT * 25) / 100;
+		//Очистити прямокутник дати
 		LCD_DrawFilledRectangle(xy_temp[0], xy_temp[1], 10*Font.width, Font.height, LCD_BLACK); 
 		strweekday = get_WeekDay(sdatestructureget.WeekDay);
-		GUI_Text_ukr(xy_temp, strweekday, 8);
+		//Очистити прямокутник дня тижня
+		LCD_DrawFilledRectangle(Weekday_LCD_Coordinates[0], Weekday_LCD_Coordinates[1], Weekday_LCD_Coordinates[2], Weekday_LCD_Coordinates[3], LCD_BLACK); 
+		
+		GUI_Text_ukr(Weekday_LCD_Coordinates, strweekday, 8);
 		
 		//LCD_WriteString(xy_temp[0], xy_temp[1], strweekday, Font, LCD_WHITE, LCD_BLACK);
-	}
+	}*/
 } 
 
 /**
@@ -1239,8 +1253,8 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	//Перед виконанням цієї процедури stimestructureget зберігає 
 	//попередні значення Hours, Minutes, Seconds
 	
-	Hours_temp = stimestructureget.Hours;
-	Minutes_temp = stimestructureget.Minutes;
+	//Hours_temp = stimestructureget.Hours;
+	//Minutes_temp = stimestructureget.Minutes;
 	Seconds_temp = stimestructureget.Seconds;
  
  	HAL_RTC_GetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BIN); //З лічильника CNTH_CNTL RTC формується структура stimestructureget

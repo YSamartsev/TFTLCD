@@ -213,6 +213,12 @@ static int Buffercmp(uint8_t * pBuffer1, uint8_t * pBuffer2, uint16_t BufferLeng
 uint8_t RTC_Data_Update(uint8_t index);
 static void RTC_SECUpdate(void);
 char calcModulo256(char *aRxBuffer, uint16_t BufferLength);
+void SystemClock_Config(void);
+static void MX_UART2_Init(void);
+static void RTC_AlarmConfig(void);
+static void RTC_SECConfig(void);
+static void RTC_DateShow(uint16_t x, uint16_t y); //, uint8_t* showdate);
+static void RTC_TimeShow(uint16_t x, uint16_t y); //, uint8_t* showtime);
 //HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77, uint8_t lineLength);
 HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77);
 char* get_WeekDay(uint8_t nday);
