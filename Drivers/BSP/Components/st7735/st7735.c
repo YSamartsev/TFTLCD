@@ -141,11 +141,11 @@ void st7735_Init(void)
   /* Out of sleep mode, 0 args, no delay */
 	HAL_Delay(10);
   LCD_RESET_SET(); //Скинути і встановити
-while(1)
-{
+//while(1)
+//{
 	LCD_SendCommand(ST7735_SWRESET); 
 HAL_Delay(150);
-}
+//}
 	LCD_SendCommand(ST7735_SLPOUT); 
 HAL_Delay(255);
 
