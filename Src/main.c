@@ -32,7 +32,7 @@
 extern FontDef Font_7x10;
 extern FontDef Font_11x18;
 extern FontDef Font_16x26;
-extern const uint16_t saber;
+//extern const uint16_t saber;
 
 
 
@@ -354,24 +354,24 @@ if (Bluetooth_present == SHIELD_DETECTED)
 		{
 			Error_Handler();
 		}
-		//LCD_WriteString(10, 180, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
-		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATstring, Font_Size, LCD_RED, LCD_WHITE);
+		//LCD_WriteString(10, 180, myCommandAT.ATstring, Font_Size, LCD_WHITE, LCD_BLACK);
+		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATstring, Font_Size, LCD_WHITE, LCD_BLACK);
 
-		//LCD_WriteString(10, 206, myAnswerAT.ATresponse, Font_Size, LCD_RED, LCD_WHITE);
-		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.ATresponse, Font_Size, LCD_RED, LCD_WHITE);
+		//LCD_WriteString(10, 206, myAnswerAT.ATresponse, Font_Size, LCD_WHITE, LCD_BLACK);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.ATresponse, Font_Size, LCD_WHITE, LCD_BLACK);
 		HAL_Delay(500);
 
 		if (myExchange(myCommandAT.ATversion, myAnswerAT.VESIONresponse) != SUCCESS)
 		{
 			Error_Handler();
 		}
-		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
+		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_BLACK); //Заповнюю екран білим кольором
 	
 		//LCD_WriteString(10, 180, myCommandAT.ATversion, Font_16x26, LCD_RED, LCD_WHITE); 
-		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATversion, Font_Size, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATversion, Font_Size, LCD_WHITE, LCD_BLACK);
 		
 		//LCD_WriteString(10, 206, myAnswerAT.VESIONresponse, Font_16x26, LCD_RED, LCD_WHITE);
-		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.VESIONresponse, Font_Size, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.VESIONresponse, Font_Size, LCD_WHITE, LCD_BLACK);
 		HAL_Delay(500);
 
 		if (myExchange(myCommandAT.ATname, myAnswerAT.NAMEresponse) != SUCCESS)
@@ -379,26 +379,26 @@ if (Bluetooth_present == SHIELD_DETECTED)
 			Error_Handler();
 		}	
 		
-		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
+		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_BLACK); //Заповнюю екран білим кольором
 				
 		//LCD_WriteString(10, 180, myCommandAT.ATname, Font_16x26, LCD_RED, LCD_WHITE);
-		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATname, Font_Size, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATname, Font_Size, LCD_WHITE, LCD_BLACK);
 		
 		
 		//LCD_WriteString(10, 206, myAnswerAT.NAMEresponse, Font_16x26, LCD_RED, LCD_WHITE);
-		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.NAMEresponse, Font_Size, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.NAMEresponse, Font_Size, LCD_WHITE, LCD_BLACK);
 		
 		HAL_Delay(500);
-		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_WHITE); //Заповнюю екран білим кольором
+		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_BLACK); //Заповнюю екран білим кольором
 		
 		myAnswerAT.BLUETOOTH_shield = "BL present";
 		//LCD_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_RED, LCD_WHITE);
-		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield, Font_Size, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield, Font_Size, LCD_WHITE, LCD_BLACK);
 	}else
 	{
 		myAnswerAT.BLUETOOTH_shield = "BL not present";
 		//LCD_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_RED, LCD_WHITE);
-		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield, Font_Size, LCD_RED, LCD_WHITE);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield, Font_Size, LCD_WHITE, LCD_BLACK);
 	}
  
 	*aRxBuffer = 0x00;
@@ -409,10 +409,10 @@ if (Bluetooth_present == SHIELD_DETECTED)
 		printf("===========AAAAAAAAAAAAA==============\n\r");
 
 		//LCD_WriteString(10, 20, "Real Date:", Font_16x26, LCD_RED, LCD_WHITE);	
-LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:", Font_Size, LCD_RED, LCD_WHITE);
+LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:", Font_Size, LCD_WHITE, LCD_BLACK);
 	
 		//LCD_WriteString(10, 100, "Real Time:", Font_16x26, LCD_RED, LCD_WHITE);
-LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Font_Size, LCD_RED, LCD_WHITE);	
+LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Font_Size, LCD_WHITE, LCD_BLACK);	
 	  /* Configure RTC Alarm */
 		RTC_AlarmConfig(); //Для переривання через інтервал часу 
 
@@ -824,7 +824,7 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
 	printf("date = %s\n\r", temp1);
 		
-	LCD_WriteString(x, y, temp1, Font_Size, LCD_RED, LCD_WHITE);	 //& "." & realmonth
+	LCD_WriteString(x, y, temp1, Font_Size, LCD_WHITE, LCD_BLACK);	 //& "." & realmonth
 	//free(temp1);
 
 } 
@@ -859,7 +859,7 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	concat_time(temp1, realhours, reatminutes, reatseconds); //соединить строки -> *temp2
 	printf("time = %s\n\r", temp1);
 			
-	LCD_WriteString(x, y, temp1, Font_Size, LCD_RED, LCD_WHITE);	 //& "." & realmonth
+	LCD_WriteString(x, y, temp1, Font_Size, LCD_WHITE, LCD_BLACK);	 //& "." & realmonth
 	//free(temp1);
 
 } 

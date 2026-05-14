@@ -85,7 +85,7 @@ extern LCD_DrvTypeDef   st7735_drv;
 extern FontDef Font_7x10;
 extern FontDef Font_11x18;
 extern FontDef Font_16x26;
-extern const uint16_t saber;
+//extern const uint16_t saber;
 
 uint32_t bi;
 
@@ -176,9 +176,9 @@ uint8_t BSP_LCD_Init(void)
   uint8_t ret = LCD_ERROR;
   
   /* Default value for draw propriety */
-  DrawProp.BackColor = 0xFFFF;
+  DrawProp.BackColor = LCD_BLACK;
   DrawProp.pFont     = &Font24;
-  DrawProp.TextColor = 0x0000;
+  DrawProp.TextColor = LCD_WHITE;
 
 #ifdef TFT_LCD_7735	
 	
@@ -188,12 +188,12 @@ uint8_t BSP_LCD_Init(void)
   lcd_drv->Init();
 	//ST7735_Init(); //Конфігурація драйвера ST7789 LCD
 	//ST7735_FillScreen(WHITE);
-	LCD_Fill_Color(LCD_WHITE);
+	LCD_Fill_Color(LCD_BLACK);
 
 #elif defined (TFT_LCD_7789)
 
 	ST7789_Init(); //Конфігурація драйвера ST7789 LCD
-	LCD_Fill_Color(LCD_WHITE);
+	LCD_Fill_Color(LCD_BLACK);
 #endif
 	HAL_Delay(10);
 	
@@ -1753,7 +1753,7 @@ void LCD_Test(void)
 
 	//	If FLASH cannot storage anymore datas, please delete codes below.
 	LCD_Fill_Color(LCD_WHITE);
-	LCD_DrawImage(0, 0, 128, 128, &saber);
+	//LCD_DrawImage(0, 0, 128, 128, &saber);
 	HAL_Delay(1000);
 }
 
