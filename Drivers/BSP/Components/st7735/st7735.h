@@ -327,6 +327,7 @@ void ST7735_SetRotation(uint8_t m);
 uint8_t ST7735_GetRotation(void);
 int16_t ST7735_GetHeight(void);
 int16_t ST7735_GetWidth(void);
+void st7735_Init_Arduino(void);
 #endif /* ST7735_H_ */
 
 

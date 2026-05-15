@@ -186,6 +186,7 @@ uint8_t BSP_LCD_Init(void)
   //lcd_drv = &LCD_drv;
   /* LCD Init */   
   lcd_drv->Init();
+	//st7735_Init_Arduino();
 	//ST7735_Init(); //Конфігурація драйвера ST7789 LCD
 	//ST7735_FillScreen(WHITE);
 	LCD_Fill_Color(LCD_BLACK);
@@ -1128,10 +1129,11 @@ void LCD_Fill_Color(uint16_t color)
 static void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {
 	LCD_CS_LOW();
-	uint16_t x_start = x0 + X_SHIFT, x_end = x1 + X_SHIFT;
-	uint16_t y_start = y0 + Y_SHIFT, y_end = y1 + Y_SHIFT;
-
+	uint16_t x_start, x_end;
+	uint16_t y_start, y_end;
 #ifdef TFT_LCD_7789	
+	x_start = x0 + X_SHIFT, x_end = x1 + X_SHIFT;
+	y_start = y0 + Y_SHIFT, y_end = y1 + Y_SHIFT;
 	/* Column Address set */
 	LCD_SendCommand(ST7789_CASET); 
 	{
@@ -1148,6 +1150,8 @@ static void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t
 	/* Write to RAM */
 	LCD_SendCommand(ST7789_RAMWR);
 #elif defined TFT_LCD_7735
+	x_start = x0, x_end = x1;
+	y_start = y0, y_end = y1;
 		/* Column Address set */
 	LCD_SendCommand(ST7735_CASET); 
 	{

@@ -345,7 +345,7 @@ printf("==================Start RTC Watch===================\n\r");
 	uint16_t	LCD_WIDTH = ST7789_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;	
 #elif defined (TFT_LCD_7735)
-	FontDef Font_Size = Font_11x18;
+	FontDef Font_Size = Font_7x10; //Font_11x18;
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
 #endif
