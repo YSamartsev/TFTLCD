@@ -188,7 +188,8 @@ uint8_t BSP_LCD_Init(void)
   lcd_drv->Init();
 	//st7735_Init_Arduino();
 	//ST7735_Init(); //Конфігурація драйвера ST7789 LCD
-	//ST7735_FillScreen(WHITE);
+	//ST7735_FillScreen(LCD_BLACK);
+	//st7735_DisplayOn();
 	LCD_Fill_Color(LCD_BLACK);
 
 #elif defined (TFT_LCD_7789)

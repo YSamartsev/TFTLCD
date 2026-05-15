@@ -146,6 +146,7 @@ void st7735_Init(void)
 	LCD_SendCommand(ST7735_SWRESET); //  1: Software reset, 0 args, w/delay
 HAL_Delay(50);
 //}
+	
 	LCD_SendCommand(ST7735_SLPOUT); //  2: Out of sleep mode, 0 args, w/delay
 HAL_Delay(255); //     500 ms delay
 
@@ -579,7 +580,7 @@ init_cmds1[] = {                // Init for 7735R, part 1 (red or green tab)
     2,                  //  2 commands in list:
     ST7735_CASET, 4,    //  1: Column addr set, 4 args, no delay:
     0x00, 0x00,         //     XSTART = 0
-    0x00, 0x7F,         //     XEND = 127
+    0x0, 0x7F,         //     XEND = 127
     ST7735_RASET, 4,    //  2: Row addr set, 4 args, no delay:
     0x00, 0x00,         //     XSTART = 0
     0x00, 0x7F },       //     XEND = 127
@@ -759,7 +760,7 @@ void ST7735_FillRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16
     
 		LCD_CS_LOW();
 		
-	ST7735_SetAddressWindow(x, y, x+w-1, y+h-1);
+	ST7735_SetAddressWindow(x, y, x + w -1, y + h - 1);
     uint8_t data[] = { color >> 8, color & 0xFF };
     //LCD_DC_Set();
 		LCD_DC_H();
