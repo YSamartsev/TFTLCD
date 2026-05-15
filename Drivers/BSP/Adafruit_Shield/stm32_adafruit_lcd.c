@@ -190,7 +190,10 @@ uint8_t BSP_LCD_Init(void)
 	//ST7735_Init(); //Конфігурація драйвера ST7789 LCD
 	//ST7735_FillScreen(LCD_BLACK);
 	//st7735_DisplayOn();
-	LCD_Fill_Color(LCD_BLACK);
+	LCD_Fill_Color(LCD_BLACK); 
+	//Позбутися зшлселей справавгорі і зліва внизу допомогло 
+	////ST7735_FillScreen(LCD_BLACK);
+	//ST7735_FillRectangle(0, 0, _width, _height, color);
 
 #elif defined (TFT_LCD_7789)
 
