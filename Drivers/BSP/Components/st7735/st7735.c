@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    st7735.c
+  * @file    ST7735.c
   * @author  MCD Application Team
   * @version V1.1.1
   * @date    24-November-2014
@@ -93,21 +93,21 @@ extern SPI_HandleTypeDef SpiHandle;
 
 extern SPI_HandleTypeDef SpiHandle;
 
-LCD_7735_DrvTypeDef   st7735_drv = 
+LCD_7735_DrvTypeDef   ST7735_drv = 
 {
-  st7735_Init,
+  ST7735_Init,
   0,
-  st7735_DisplayOn,
-  st7735_DisplayOff,
-  st7735_SetCursor,
-  st7735_WritePixel,
-  0,
-  st7735_SetDisplayWindow,
-  st7735_DrawHLine,
-  st7735_DrawVLine,
-  st7735_GetLcdPixelWidth,
-  st7735_GetLcdPixelHeight,
-  st7735_DrawBitmap,
+  ST7735_DisplayOn,
+  ST7735_DisplayOff,
+  ST7735_SetCursor,
+  ST7735_DrawPixel,
+  ST7735_ReadPixel,
+  ST7735_SetDisplayWindow,
+  ST7735_DrawHLine,
+  ST7735_DrawVLine,
+  ST7735_GetLcdPixelWidth,
+  ST7735_GetLcdPixelHeight,
+  ST7735_DrawBitmap,
 
 };
 
@@ -136,7 +136,7 @@ static uint16_t ArrayRGB[320] = {0};
   * @retval None
   */
 
-void st7735_Init(void)
+void ST7735_Init(void)
 {    
   uint8_t data = 0;
   
@@ -263,7 +263,7 @@ HAL_Delay(100);
   * @param  None
   * @retval None
   */
-void st7735_DisplayOn(void)
+void ST7735_DisplayOn(void)
 {
   uint8_t data = 0;
   LCD_SendCommand(LCD_REG_19);
@@ -280,7 +280,7 @@ void st7735_DisplayOn(void)
   * @param  None
   * @retval None
   */
-void st7735_DisplayOff(void)
+void ST7735_DisplayOff(void)
 {
   uint8_t data = 0;
   LCD_SendCommand(LCD_REG_19);
@@ -298,7 +298,7 @@ void st7735_DisplayOff(void)
   * @param  Ypos: specifies the Y position.
   * @retval None
   */
-void st7735_SetCursor(uint16_t Xpos, uint16_t Ypos)
+void ST7735_SetCursor(uint16_t Xpos, uint16_t Ypos)
 {
   uint8_t data = 0;
   LCD_SendCommand(LCD_REG_42);
@@ -321,7 +321,7 @@ void st7735_SetCursor(uint16_t Xpos, uint16_t Ypos)
   * @param  RGBCode: the RGB pixel color
   * @retval None
   */
-void st7735_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
+void ST7735_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
 {
   uint8_t data = 0;
   if((Xpos >= ST7735_LCD_PIXEL_WIDTH) || (Ypos >= ST7735_LCD_PIXEL_HEIGHT)) 
@@ -330,7 +330,7 @@ void st7735_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
   }
   
   /* Set Cursor */
-  st7735_SetCursor(Xpos, Ypos);
+  ST7735_SetCursor(Xpos, Ypos);
   
   data = RGBCode >> 8;
   LCD_SendMultipleData(&data, 1);
@@ -345,7 +345,7 @@ void st7735_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
   * @param  LCDRegValue: value to write to the selected register.
   * @retval None
   */
-void st7735_WriteReg(uint8_t LCDReg, uint8_t LCDRegValue)
+void ST7735_WriteReg(uint8_t LCDReg, uint8_t LCDRegValue)
 {
   LCD_SendCommand(LCDReg);
   LCD_SendMultipleData(&LCDRegValue, 1);
@@ -359,7 +359,7 @@ void st7735_WriteReg(uint8_t LCDReg, uint8_t LCDRegValue)
   * @param  Width:  display window width.
   * @retval None
   */
-void st7735_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
+void ST7735_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
 {
   uint8_t data = 0;
   /* Column addr set, 4 args, no delay: XSTART = Xpos, XEND = (Xpos + Width - 1) */
@@ -392,14 +392,14 @@ void st7735_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint1
   * @param  Length: specifies the line length.  
   * @retval None
   */
-void st7735_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length)
+void ST7735_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length)
 {
   uint8_t counter = 0;
   
   if(Xpos + Length > ST7735_LCD_PIXEL_WIDTH) return;
   
   /* Set Cursor */
-  st7735_SetCursor(Xpos, Ypos);
+  ST7735_SetCursor(Xpos, Ypos);
   
   for(counter = 0; counter < Length; counter++)
   {
@@ -416,14 +416,14 @@ void st7735_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t L
   * @param  Length: specifies the line length.  
   * @retval None
   */
-void st7735_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length)
+void ST7735_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length)
 {
   uint8_t counter = 0;
   
   if(Ypos + Length > ST7735_LCD_PIXEL_HEIGHT) return;
   for(counter = 0; counter < Length; counter++)
   {
-    st7735_WritePixel(Xpos, Ypos + counter, RGBCode);
+    ST7735_WritePixel(Xpos, Ypos + counter, RGBCode);
   }   
 }
 
@@ -432,7 +432,7 @@ void st7735_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t L
   * @param  None
   * @retval The Lcd Pixel Width
   */
-uint16_t st7735_GetLcdPixelWidth(void)
+uint16_t ST7735_GetLcdPixelWidth(void)
 {
   return ST7735_LCD_PIXEL_WIDTH;
 }
@@ -442,7 +442,7 @@ uint16_t st7735_GetLcdPixelWidth(void)
   * @param  None
   * @retval The Lcd Pixel Height
   */
-uint16_t st7735_GetLcdPixelHeight(void)
+uint16_t ST7735_GetLcdPixelHeight(void)
 {                          
   return ST7735_LCD_PIXEL_HEIGHT;
 }
@@ -452,7 +452,7 @@ uint16_t st7735_GetLcdPixelHeight(void)
   * @param  BmpAddress: Bmp picture address in the internal Flash.
   * @retval None
   */
-void st7735_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp)
+void ST7735_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp)
 {
   uint32_t index = 0, size = 0;
   
@@ -467,16 +467,16 @@ void st7735_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp)
   
   /* Set GRAM write direction and BGR = 0 */
   /* Memory access control: MY = 0, MX = 1, MV = 0, ML = 0 */
-  st7735_WriteReg(LCD_REG_54, 0x40);
+  ST7735_WriteReg(LCD_REG_54, 0x40);
 
   /* Set Cursor */
-  st7735_SetCursor(Xpos, Ypos);  
+  ST7735_SetCursor(Xpos, Ypos);  
  
   LCD_SendMultipleData((uint8_t*)pbmp, size*2);
  
   /* Set GRAM write direction and BGR = 0 */
   /* Memory access control: MY = 1, MX = 1, MV = 0, ML = 0 */
-  st7735_WriteReg(LCD_REG_54, 0xC0);
+  ST7735_WriteReg(LCD_REG_54, 0xC0);
 }
 //========================================================================
 /* ST773.c
@@ -672,7 +672,7 @@ static void ST7735_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint
     }
 }
 
-void st7735_Init_Arduino(void)
+void ST7735_Init_Arduino(void)
 {
   LCD_CS_LOW();
 	LCD_RESET_SET();
@@ -692,6 +692,12 @@ void ST7735_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
     ST7735_WriteData(data, sizeof(data));
     LCD_CS_HIGH();
 }
+
+uint16_t* ST7735_ReadPixel(uint16_t x, uint16_t y)
+{
+	//не використовую
+}
+
 void ST7735_DrawString(uint16_t x, uint16_t y, const char* str, FontDef font, uint16_t color, uint16_t bgcolor)
 {
   LCD_CS_LOW();

@@ -362,9 +362,6 @@ void     ST7789_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);
 void 		 ST7789_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode);
 void 		 ST7789_WriteReg(uint8_t LCDReg, uint8_t LCDRegValue);
 
-void GUI_Text(uint8_t* mycoordinates, char *str, uint8_t mySize);
-void GUI_Text_ukr(uint8_t* mycoordinates, char *str, uint8_t mySize);
-void PutChar( uint16_t Xpos, uint16_t Ypos, uint16_t ASCI, uint8_t mySize);
 uint32_t utf8_to_codepoint(const char *utf8, size_t *len);
 
 #ifndef ST7789_ROTATION

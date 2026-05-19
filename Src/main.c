@@ -36,20 +36,20 @@ extern FontDef Font_16x26;
 extern uint16_t TempChar;
 extern uint16_t char_16;
 
-extern const uint16_t saber; //picture
+//extern const uint16_t saber; //picture
 
 //big fonts
-extern bFontDef Font24;
+/*extern bFontDef Font24;
 extern bFontDef Font20;
 extern bFontDef Font16;
 extern bFontDef Font12;
 extern bFontDef Font8;
-
-extern uint8_t myGoriz;
-extern uint8_t myVert;
+*/
+//extern uint8_t myGoriz;
+//extern uint8_t myVert;
 
 extern LCD_DrawPropTypeDef DrawProp;
-LCD_DrawPropTypeDef DrawProp_ukr;
+extern LCD_DrawPropTypeDef DrawProp_ukr;
 
 Line_ModeTypdef Mode;
 
@@ -279,8 +279,14 @@ int __backspace(FILE *f)
   uint8_t Hours_temp, Minutes_temp, Seconds_temp;
 	uint8_t Weekday_temp; 
 	float Date_temp;
-	uint8_t		TIME_LCD_Coordinates[4] = {2, 100, 76, 156}; //координати виводу часу
+
+#ifdef TFT_LCD_1_3
 	uint8_t		Weekday_LCD_Coordinates[4] = {2, 40, 156, 60}; //координати виводу часу
+	uint8_t		TIME_LCD_Coordinates[4] = {2, 100, 76, 156}; //координати виводу часу
+#elif defined TFT_LCD_1_44
+	uint8_t		Weekday_LCD_Coordinates[4] = {2, 20, 126, 60}; //координати виводу часу	
+	uint8_t		TIME_LCD_Coordinates[4] = {0, 60, 127, 100}; //координати виводу часу
+#endif
 
 	//char *Text = "12:22";
 	uint16_t sUNICODE;
@@ -415,14 +421,15 @@ BSP_LCD_Init(); //Ініціалізативна послідовність + с
 	//Але при #define ST7789_ROTATION 2	 точка  x=0, 	y=0	знаходиться біля роз'єму справа!! 
 
 #ifdef TFT_LCD_7789
-	FontDef Font = Font_16x26; //Заповнюю структуру малих фонтів структурою фонта Font_16x26
+	FontDef Font_Size = Font_16x26; //Заповнюю структуру малих фонтів структурою фонта Font_16x26
 	DrawProp_ukr.TextColor = LCD_WHITE; //Для української мови
 	//sFontDef Font = Font24;
-		
 	uint16_t	LCD_WIDTH = ST7789_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;	
+	
 #elif defined (TFT_LCD_7735)
-	FontDef Font = Font_11x18;
+	DrawProp_ukr.TextColor = LCD_WHITE; //Для української мови
+	FontDef Font_Size = Font_7x10;
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
 #endif
@@ -442,14 +449,14 @@ BSP_LCD_Init(); //Ініціалізативна послідовність + с
 //DrawProp_ukr.height = 27; //кількість вертикальных точок в символі
 //DrawProp_ukr.width = 3; //20; //кількість байтів ширини символа 3*8 = 24
 //; //"ІЇАБВГДПятниця"; //ЇїАБААВГДЕФ"; //ІЇАБВГА"; //іАБВГіІЇї"; //҅ятниця"; //"҅"; 
-
-    char *str1 = "П'ятниця";
-		GUI_Text_ukr(Weekday_LCD_Coordinates, str1, 8);	
-
-		TempChar = ((sUNICODE - 0x0406)); //4 + 8); // порядковий номер символу в масиві Arial45x39 (по 4 байти в позиційному вказівнику на масиві символу)
-
-//=================================
 */
+   char *str1 = "П'ятниця";
+ 	 GUI_Text_ukr(Weekday_LCD_Coordinates, str1, 8, 0);
+	 //Для TFT_LCD_1_44 Використовую шрифт  Arial36x33[]	 
+	 //Для TFT_LCD_1_3 Використовую шрифт  Arial45x39[]	
+		
+//=================================
+
 
 if (Bluetooth_present == SHIELD_DETECTED)
 	{
@@ -458,11 +465,11 @@ if (Bluetooth_present == SHIELD_DETECTED)
 			char *myError = "myExchange";
 			Error_Handler(myError);
 		}
-		//LCD_WriteString(10, 180, myCommandAT.ATstring, Font, LCD_GREEN, LCD_BLACK);
-		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATstring, Font, LCD_GREEN, LCD_BLACK);
+		//LCD_WriteString(10, 180, myCommandAT.ATstring,Font_Size, LCD_GREEN, LCD_BLACK);
+		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATstring, Font_Size, LCD_GREEN, LCD_BLACK);
 
-		//LCD_WriteString(10, 206, myAnswerAT.ATresponse, Font, LCD_GREEN, LCD_BLACK);
-		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.ATresponse, Font, LCD_GREEN, LCD_BLACK);
+		//LCD_WriteString(10, 206, myAnswerAT.ATresponse,Font_Size, LCD_GREEN, LCD_BLACK);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.ATresponse, Font_Size, LCD_GREEN, LCD_BLACK);
 		HAL_Delay(500);
 
 		if (myExchange(myCommandAT.ATversion, myAnswerAT.VESIONresponse) != SUCCESS)
@@ -473,10 +480,10 @@ if (Bluetooth_present == SHIELD_DETECTED)
 		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_BLACK); //Заповнюю екран чорним кольором
 	
 		//LCD_WriteString(10, 180, myCommandAT.ATversion, Font_16x26, LCD_GREEN, LCD_BLACK); 
-		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATversion, Font, LCD_GREEN, LCD_BLACK);
+		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATversion,Font_Size, LCD_GREEN, LCD_BLACK);
 		
 		//LCD_WriteString(10, 206, myAnswerAT.VESIONresponse, Font_16x26, LCD_GREEN, LCD_BLACK);
-		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.VESIONresponse, Font, LCD_GREEN, LCD_BLACK);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.VESIONresponse,Font_Size, LCD_GREEN, LCD_BLACK);
 		HAL_Delay(500);
 
 		if (myExchange(myCommandAT.ATname, myAnswerAT.NAMEresponse) != SUCCESS)
@@ -488,23 +495,23 @@ if (Bluetooth_present == SHIELD_DETECTED)
 		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_BLACK); //Заповнюю екран чорним кольором
 				
 		//LCD_WriteString(10, 180, myCommandAT.ATname, Font_16x26, LCD_GREEN, LCD_BLACK);
-		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATname, Font, LCD_GREEN, LCD_BLACK);
+		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, myCommandAT.ATname,Font_Size, LCD_GREEN, LCD_BLACK);
 		
 		
 		//LCD_WriteString(10, 206, myAnswerAT.NAMEresponse, Font_16x26, LCD_GREEN, LCD_BLACK);
-		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.NAMEresponse, Font, LCD_GREEN, LCD_BLACK);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.NAMEresponse,Font_Size, LCD_GREEN, LCD_BLACK);
 		
 		HAL_Delay(500);
 		LCD_DrawFilledRectangle(0, (LCD_HEIGHT * 70) / 100, LCD_WIDTH, LCD_HEIGHT, LCD_BLACK); //Заповнюю екран чорним кольором
 		
 		myAnswerAT.BLUETOOTH_shield = "BL present";
 		//LCD_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_GREEN, LCD_BLACK);
-		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield, Font, LCD_GREEN, LCD_BLACK);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield,Font_Size, LCD_GREEN, LCD_BLACK);
 	}else
 	{
 		myAnswerAT.BLUETOOTH_shield = "BL not present";
 		//LCD_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_GREEN, LCD_BLACK);
-		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield, Font, LCD_GREEN, LCD_BLACK);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield,Font_Size, LCD_GREEN, LCD_BLACK);
 	}
  
 	*aRxBuffer = 0x00;
@@ -515,10 +522,10 @@ if (Bluetooth_present == SHIELD_DETECTED)
 		printf("===========AAAAAAAAAAAAA==============\n\r");
 
 		//LCD_WriteString(10, 20, "Real Date:", Font_16x26, LCD_GREEN, LCD_BLACK);	
-		LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:", Font, LCD_GREEN, LCD_BLACK);
+		//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:",Font_Size, LCD_GREEN, LCD_BLACK);
 	
 		//LCD_WriteString(10, 100, "Real Time:", Font_16x26, LCD_GREEN, LCD_BLACK);
-		//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:", Font, LCD_GREEN, LCD_BLACK);	
+		//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 40) / 100, "Real Time:",Font_Size, LCD_GREEN, LCD_BLACK);	
 	  /* Configure RTC Alarm */
 
 #ifdef DCF77
@@ -529,7 +536,7 @@ if (Bluetooth_present == SHIELD_DETECTED)
 #ifdef DCF77 
 					if (DCF77_Status == RESET){
 						printf("0ms       100ms     200ms     300ms     400ms     500ms     600ms     700ms     800ms     900ms     1000ms    1100ms    1200ms\n\r");  
-						//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, ". . . . . . .", Font, LCD_GREEN, LCD_BLACK);	 
+						//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, ". . . . . . .",Font_Size, LCD_GREEN, LCD_BLACK);	 
 
 						do {
 							//Частота прийому рівня sensorValue визначається HAL_Delay(10)
@@ -652,7 +659,7 @@ RTC_SECConfig(); //Встановлюю дату з sdatestructure і stimestruc
 										//RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
 
 										//RTC_SECUpdate(); //Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
-			//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:", Font, LCD_GREEN, LCD_BLACK);
+			//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:",Font_Size, LCD_GREEN, LCD_BLACK);
 			RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100); //показати дату фонтом 16х26
 			//RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100); //показати дату фонтом 16х26
 			RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100); //Показати час з stimestructureget
@@ -1160,13 +1167,13 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	uint8_t xy_temp[2];
 	
 #ifdef TFT_LCD_7789
-	FontDef Font = Font_16x26;
+	FontDef Font_Size = Font_16x26;
 	uint16_t	LCD_WIDTH = ST7789_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
 	//sFontDef Font = Font24;  //!!!!!!!!
 	
 #elif defined (TFT_LCD_7735)
-	FontDef Font = Font_11x18;
+	FontDef Font_Size = Font_11x18;
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
 #endif
@@ -1193,16 +1200,16 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 		concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
 		temp1[10] = 0x00;	//останній код для string повинен бути 0x00
 		//Очистити прямокутник дати
-		LCD_DrawFilledRectangle(x, y, 10*Font.width, Font.height, LCD_BLACK);
+		LCD_DrawFilledRectangle(x, y, 10*Font_Size.width, Font_Size.height, LCD_BLACK);
 		//Вивести дату
-		LCD_WriteString(x, y, temp1, Font, LCD_WHITE, LCD_BLACK);	 //& "." & realmonth
+		LCD_WriteString(x, y, temp1, Font_Size, LCD_WHITE, LCD_BLACK);	 //& "." & realmonth
 	
 		//Отримати день тижня
 		strweekday = get_WeekDay(sdatestructureget.WeekDay);
 		//Очистити прямокутник дня тижня
 		LCD_DrawFilledRectangle(Weekday_LCD_Coordinates[0], Weekday_LCD_Coordinates[1], Weekday_LCD_Coordinates[2], Weekday_LCD_Coordinates[3], LCD_BLACK); 
 		//Вивести день тижня
-		GUI_Text_ukr(Weekday_LCD_Coordinates, strweekday, 8);	
+		GUI_Text_ukr(Weekday_LCD_Coordinates, strweekday, 8, 0);	
 	}	
 	
 /*	if (Weekday_temp != sdatestructureget.WeekDay)
@@ -1218,7 +1225,7 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 		
 		GUI_Text_ukr(Weekday_LCD_Coordinates, strweekday, 8);
 		
-		//LCD_WriteString(xy_temp[0], xy_temp[1], strweekday, Font, LCD_WHITE, LCD_BLACK);
+		//LCD_WriteString(xy_temp[0], xy_temp[1], strweekday,Font_Size, LCD_WHITE, LCD_BLACK);
 	}*/
 } 
 
@@ -1239,12 +1246,12 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	
 	
 #ifdef TFT_LCD_7789
-	FontDef Font = Font_16x26;
+	FontDef Font_Size = Font_16x26;
 	//sFontDef Font = Font24;
 	uint16_t	LCD_WIDTH = ST7789_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;	
 #elif defined (TFT_LCD_7735)
-	FontDef Font = Font_11x18;
+	FontDef Font_Size = Font_11x18; //Для знаків ":"
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
 #endif
@@ -1281,34 +1288,55 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	{
 		Hours_temp = stimestructureget.Hours;
 		//Очистити прямокутник з годиною
-		ST7789_Fill(TIME_LCD_Coordinates[0], TIME_LCD_Coordinates[1], TIME_LCD_Coordinates[0] + 74,  TIME_LCD_Coordinates[1] + 56, LCD_BLACK);
+
+#ifdef TFT_LCD_1_3	
+		ST7789_Fill(TIME_LCD_Coordinates[0], TIME_LCD_Coordinates[1], TIME_LCD_Coordinates[0] + 74,  TIME_LCD_Coordinates[1] + 56, LCD_BLACK);		
 		GUI_Text(TIME_LCD_Coordinates, (char *) realhours, 7);	//Годин, для огромных цифр, 
+#elif defined TFT_LCD_1_44	
+	  ST7789_Fill(TIME_LCD_Coordinates[0], TIME_LCD_Coordinates[1], TIME_LCD_Coordinates[0] + 74,  TIME_LCD_Coordinates[1] + 56, LCD_BLACK);
+		//GUI_Text(TIME_LCD_Coordinates, (char *) realhours, 5);	//Годин, для огромных цифр, 
+    GUI_Text_ukr(TIME_LCD_Coordinates, realhours, 8, 1); //Друкую великі цифри
+		
+#endif		
 		xy_temp[0] = *TIME_LCD_Coordinates +  (2*DrawProp.width);
 		xy_temp[1] = *(TIME_LCD_Coordinates + 1);
 		//показ ":"
-		LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp.height/3, ":", Font, LCD_WHITE, LCD_BLACK);	// ":"
+		LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp.height/3, ":", Font_Size, LCD_WHITE, LCD_BLACK);	// ":"
 	}
 	
 	if (Minutes_temp != stimestructureget.Minutes)
 	{	
 		Minutes_temp = stimestructureget.Minutes;
+#ifdef TFT_LCD_1_3	
 		xy_temp[0] = TIME_LCD_Coordinates[0] + 74 + 16;
-		xy_temp[1] = TIME_LCD_Coordinates[1];
-		
+		xy_temp[1] = TIME_LCD_Coordinates[1];		
 		//Очистити хвилини
 		ST7789_Fill(xy_temp[0], xy_temp[1], xy_temp[0] + 74,  xy_temp[1] + 56, LCD_BLACK);
-		GUI_Text(xy_temp, (char *) realminutes, 7);	//Хвилин, для огромных цифр, 
+		GUI_Text(TIME_LCD_Coordinates, (char *) realminutes, 7);	//Хвилин, для огромных цифр, 
+#elif defined TFT_LCD_1_44	
+		xy_temp[0] = TIME_LCD_Coordinates[0] + 2*DrawProp.width - 2 + 8;
+		xy_temp[1] = TIME_LCD_Coordinates[1];		
+		//Очистити хвилини
+		ST7789_Fill(xy_temp[0], xy_temp[1], xy_temp[0] + 2*DrawProp.width - 2,  xy_temp[1] + 40, LCD_BLACK);
+		GUI_Text(xy_temp, (char *) realminutes, 5);	//Хвилин, для огромных цифр, 
+#endif
 		xy_temp[0] = xy_temp[0] +  (2*DrawProp.width);
-	  LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp.height/3, ":", Font, LCD_WHITE, LCD_BLACK);	
+	  LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp.height/3, ":",Font_Size, LCD_WHITE, LCD_BLACK);	
 	}
-	
-	xy_temp[0] = TIME_LCD_Coordinates[0] + 74 + 16 + 74 + 16;
-	xy_temp[1] = TIME_LCD_Coordinates[1];
+
+#ifdef TFT_LCD_1_3	
+	xy_temp[0] = TIME_LCD_Coordinates[0] + 52 + 8 + 52 + 8;
+	xy_temp[1] = TIME_LCD_Coordinates[1];	
+#elif defined TFT_LCD_1_44
+	Font_Size = Font_7x10;
+	xy_temp[0] = xy_temp[0] + 8;
+	//xy_temp[1] = TIME_LCD_Coordinates[1];
+#endif	
 	//GUI_Text(xy_temp, (char *) realseconds, 5);	//Хвилин, для огромных цифр,
-	LCD_WriteString(xy_temp[0], xy_temp[1], realseconds, Font, LCD_WHITE, LCD_BLACK); //Секунди показую в кожному циклі маленьким шрифтом (16ч26)
+	LCD_WriteString(xy_temp[0], xy_temp[1], realseconds, Font_Size, LCD_WHITE, LCD_BLACK); //Секунди показую в кожному циклі маленьким шрифтом (16ч26)
 	
 	
-	//LCD_WriteString(x, y, temp1, Font, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth
+	//LCD_WriteString(x, y, temp1,Font_Size, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth
 	//BSP_LCD_Clear(LCD_WHITE);
   
   /* Set Touchscreen Demo description */
@@ -1363,11 +1391,11 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 {
 
 #ifdef TFT_LCD_7789
-	FontDef Font = Font_16x26;
+	FontDef Font_Size = Font_16x26;
 	uint16_t	LCD_WIDTH = ST7789_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;	
 #elif defined (TFT_LCD_7735)
-	FontDef Font = Font_11x18;
+	FontDef Font_Size = Font_11x18;
 	uint16_t	LCD_WIDTH = ST7735_WIDTH;
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
 #endif

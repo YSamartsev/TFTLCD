@@ -39,7 +39,7 @@
                                    User NOTES
 1. How To use this driver:
 --------------------------
-   - The LCD st7735 component driver MUST be included with this driver.  
+   - The LCD ST7735 component driver MUST be included with this driver.  
 
 2. Driver description:
 ---------------------
@@ -65,17 +65,34 @@
 #include "stm32f1xx_hal_spi.h"
 #include "stm32f1xx_nucleo.h"
 #include "fonts.h"
+#include "ST7789.h"
 
+
+uint8_t Xpos, Ypos, myfont, myVert, myGoriz;
+uint16_t TempChar;
+uint8_t data_LCD;
+uint16_t i_LCD;
+uint16_t j_LCD;
+uint16_t i, j, k;
+uint16_t iq, jq, kq;
+uint8_t tmp_char;
+uint16_t char_16;
+uint8_t byte_width;
 
 extern SPI_HandleTypeDef SpiHandle;
-extern LCD_7735_DrvTypeDef   st7735_drv;
+extern LCD_7735_DrvTypeDef   ST7735_drv;
 extern LCD_7789_DrvTypeDef   ST7789_drv;
 
 //extern FontDef Font_7x10;
 //extern FontDef Font_11x18;
 extern FontDef Font_16x26; //Для маленьких символів
 
-extern LCD_DrawPropTypeDef DrawProp; //Для великих символів
+LCD_DrawPropTypeDef DrawProp; //Для великих символів
+LCD_DrawPropTypeDef DrawProp_ukr; //Українські
+LCD_DrawPropTypeDef DrawProp_Big_Digit; //Українські; //Українські
+extern uint8_t* DigitalsBig[];
+extern uint8_t* DigitalsBigBig[];
+extern uint8_t* Arial45x39[];
 
 #define LINE(x) ((x) * (((bFontDef *)BSP_LCD_GetFont())->height))
 
@@ -108,9 +125,8 @@ uint32_t bi;
 /** @defgroup STM32_ADAFRUIT_LCD_Private_Variables
   * @{
   */ 
-	LCD_DrawPropTypeDef DrawProp; //Екземпляр структури властивостей фонту: колір символа, колір фону, адреса таблиці кодів символів, ширина, висота зображення фонту 
-
-	#ifdef TFT_LCD_7789
+	
+#ifdef TFT_LCD_7789
 		LCD_7789_DrvTypeDef  *lcd_drv;
 	#elif defined (TFT_LCD_7735)
 		LCD_7735_DrvTypeDef  *lcd_drv;
@@ -131,19 +147,23 @@ uint8_t BSP_LCD_Init(void)
  
   /* Default value for draw propriety */
   DrawProp.BackColor = LCD_BLACK; //Заповнюю структуру DrawProp влістивостями фонту Font24
-  //DrawProp.pFont     = Font24;
   DrawProp.TextColor = LCD_WHITE;
-
+	//Для української мови
+	DrawProp_ukr.BackColor = LCD_BLACK; //Заповнюю структуру DrawProp влістивостями фонту Font24
+  DrawProp_ukr.TextColor = LCD_WHITE;
+	
 #ifdef TFT_LCD_7735	
 	
-	lcd_drv = &st7735_drv;
+	lcd_drv = &ST7735_drv;
   //lcd_drv = &LCD_drv;
   /* LCD Init */   
   lcd_drv->Init();
 	//ST7735_Init(); //Конфігурація драйвера ST7789 LCD
 	//ST7735_FillScreen(WHITE);
-	LCD_Fill_Color(LCD_WHITE);
+	LCD_Fill_Color(LCD_BLACK);
 
+	//LCD_DrawFilledRectangle(0, 0, 127, 127, LCD_BLACK);//Заповнити квадрат
+	//LCD_DrawRectangle(0, 0, 127, 127, LCD_GREEN); //намалювани лініями квадрат
 #elif defined (TFT_LCD_7789)
 	lcd_drv = &ST7789_drv;
 	
@@ -706,5 +726,473 @@ void LCD_DrawFilledRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uin
 	}
 	LCD_CS_HIGH();
 }
+
+/******************************************************************************
+* Function Name  : GUI_Text
+* Description    : 
+* Input          : - Xpos: 
+*                  - Ypos: 
+*				           - str:
+*				           - charColor:
+*				           - bkColor:
+* Output         : None
+* Return         : None
+* Attention		 : None
+*  *mycoordinates Координати X, Y початку роміщення рядка символів
+* mySize індекс  таблиці символів
+*******************************************************************************/
+void GUI_Text(uint8_t* mycoordinates, char *str, uint8_t mySize)
+{
+//	uint8_t TempChar;
+	
+//i = Xpos;
+//j = Ypos;
+	Xpos = *mycoordinates;
+	Ypos = *(mycoordinates + 1);
+if (mySize == 0x00) //8x14
+{
+	myfont = 0;
+	myVert = 14; 
+	myGoriz= 8;
+}	
+else if (mySize == 0x01) //10x20
+{
+	myfont = 1;
+	myVert = 20; //кол-во вертикальных точек в знаке (Три байта) 
+	myGoriz= 10; //кол-во горизонтальных точек в знаке (10 груп по 3 байта)
+}	
+
+else if (mySize == 0x02) // x24
+{
+	myfont = 1;
+	myVert = 24; //кол-во вертикальных точек в знаке
+	myGoriz= 19; //кол-во горизонтальных точек в знаке
+}	
+
+else if (mySize == 0x03) //
+{
+	myfont = 1;
+	myVert = 26; //кол-во вертикальных точек в знаке
+	myGoriz= 18; //кол-во горизонтальных точек в знаке
+}		
+ 
+else if (mySize == 0x05) //
+{
+	myfont = 1;
+	DrawProp.pFont = DigitalsBig[0];
+	DrawProp.height = 40; //кол-во вертикальных точек в знаке 8*5
+	DrawProp.width = 26; //кол-во горизонтальных точек в знаке 130/5
+}		
+
+else if (mySize == 0x07) //
+{
+	myfont = 1;
+	DrawProp.pFont = DigitalsBigBig[0];
+	DrawProp.height = 56; //кол-во вертикальных точек в знаке 8*7
+	DrawProp.width = 37; //кол-во горизонтальных точек в знаке 259/7
+}
+	do
+	{
+				TempChar = *str++;  //ASCI код символа
+ 
+//i = Xpos;
+//j = Ypos;
+		
+		PutChar( Xpos, Ypos, TempChar, mySize, 0); //mySize індекс таблиці символів
+			
+		if (myfont == 1)	
+		{
+			//Развертывание по вертикали
+			if( Xpos + DrawProp.width < MAX_X)
+        {
+            Xpos += DrawProp.width;
+        } 
+        else if (Ypos + DrawProp.height < MAX_Y)
+        {
+            Xpos = 0;
+            Ypos += myVert;
+        }   
+        else
+        {
+						BSP_LCD_Clear(0x00);
+						Xpos = 0;
+            Ypos = 0;
+        } 
+			}
+			else if (myfont == 0)
+			{
+//Развертывание по горизонтали
+				if( Xpos + DrawProp.width < MAX_X / 8)
+        {
+            Xpos += DrawProp.width;
+        } 
+        else if (Ypos + DrawProp.height < MAX_Y)
+        {
+            Xpos = 0;
+            Ypos += DrawProp.height;
+        }   
+        else
+        {
+						BSP_LCD_Clear(0x00);
+						Xpos = 0;
+            Ypos = 0;
+        } 
+			}
+				
+//i = Xpos;
+//j = Ypos;
+	}
+  while ( *str != 0 );
+}
+
+void GUI_Text_ukr(uint8_t* mycoordinates, char *str, uint8_t mySize, uint8_t myFont)
+{
+//	uint8_t TempChar;
+	
+//i = Xpos;
+//j = Ypos;
+	uint16_t TempChar, char_16;
+	uint8_t Xpos, Ypos, cbyte;
+	Xpos = *mycoordinates;
+	Ypos = *(mycoordinates + 1);
+	
+	do
+	{
+		//size_t *cbyte;
+		if (myFont == 0) //Друкую день тижня українською
+		{
+			char_16 = utf8_to_unicode(str, &cbyte); //utf8_to_codepoint(str3, cbyte); 
+			if (cbyte == 1 && char_16 == 0x27)
+			{
+				char_16 = 0x0485;
+			}
+
+		/*!!!!Не можна використовувати віднімання 16-х кодів, тому що вони не послідовні на відміну від порядкових номерів таблиці кодів
+		Наприклад для кодів кирилиці п->0xD0BF[UTF8] / 0x43F[UNICODE] /1087[Десятковий]
+		                             р->0xD180[UTF8] / 0x440[UNICODE] /1088[Десятковий] !!!!
+		Перед відніманням тре перетворити UTF8 в UNICODE !!!!		
+		*/
+			TempChar = ((char_16 - 0x0406)); //*4 + 8); // порядковий номер символу в масиві myFont_ukr (по 4 байти в позиційному вказівнику на масиві символу)
+			if (cbyte == 1 && char_16 == 0x0485)  
+				 {
+					 Xpos += (DrawProp_ukr.width / 2);
+				 }
+			PutChar( Xpos, Ypos, TempChar, mySize, myFont); //mySize індекс таблиці символів
+			str = str + cbyte;
+			if( Xpos + DrawProp_ukr.width < MAX_X)
+       {
+ 					  Xpos += DrawProp_ukr.width;
+	
+       }else if (Ypos + DrawProp_ukr.height < MAX_Y)
+       {
+            Xpos = 0;
+            Ypos += myVert;
+        }else
+        {
+						BSP_LCD_Clear(0x00);
+						Xpos = 0;
+            Ypos = 0;
+        } 
+		}else if(myFont == 1) //Друкую час великими цифрами
+		{
+		char_16 = utf8_to_unicode(str, &cbyte); //utf8_to_codepoint(str3, cbyte); 
+		//if (cbyte == 1 && char_16 == 0x27)
+		//{
+		//	char_16 = 0x0485;
+		//}
+
+		/*!!!!Не можна використовувати віднімання 16-х кодів, тому що вони не послідовні на відміну від порядкових номерів таблиці кодів
+		Наприклад для кодів кирилиці п->0xD0BF[UTF8] / 0x43F[UNICODE] /1087[Десятковий]
+		                             р->0xD180[UTF8] / 0x440[UNICODE] /1088[Десятковий] !!!!
+		Перед відніманням тре перетворити UTF8 в UNICODE !!!!		
+		*/
+				TempChar = (char_16 - 48); //порядковий номер символу в масиві myFont_Big_Digit
+				//TempChar = *str - 48; //порядковий номер символу в масиві myFont_Big_Digit
+				PutChar( Xpos, Ypos, TempChar, mySize, 1); //mySize індекс таблиці символів
+		    str = str + cbyte;
+				if( Xpos + DrawProp_Big_Digit.width < MAX_X)
+        {
+ 					  Xpos += DrawProp_Big_Digit.width;
+	
+        }else if (Ypos + DrawProp_Big_Digit.height < MAX_Y)
+        {
+            Xpos = 0;
+            Ypos += myVert;
+        }else
+        {
+						BSP_LCD_Clear(0x00);
+						Xpos = 0;
+            Ypos = 0;
+        } 
+		}
+
+	} while ( *str != 0 );
+}
+
+/******************************************************************************
+* Function Name  : PutChar
+* Description    : 
+* Input          : - Xpos:
+*                  - Ypos:
+*				           - ASCI:
+*				           - mySize індекс таблиці симолів
+*******************************************************************************/
+void PutChar( uint16_t Xpos, uint16_t Ypos, uint16_t ofset_ASCII, uint8_t mySize, uint8_t myFont)
+{
+//	uint8_t data_LCD;
+//  uint8_t PutChar_command_LCD;
+//	uint8_t Status_LCD;
+//	uint8_t iq, jq, kq;
+	uint8_t Xpos_temp, Ypos_temp;
+	uint8_t buffer[260]; //Буфер для хранения байтов символа
+	uint8_t size_con;
+//	uint8_t i, j, k;
+//i = Xpos;
+//j = Ypos;
+
+	GetASCIICode(buffer, ofset_ASCII, mySize, myFont); //, myVert); //Заполенние буфера buffer точками изображения символа с кодом ASCI
+
+	Xpos_temp = Xpos;
+	Ypos_temp = Ypos;
+/*
+	if(myfont == 0)
+{
+	if (myGoriz == 1)
+	{	
+		for( iq=0; iq < myVert; iq++ )
+    {
+//      tmp_char = buffer[iq];
+			LCD_SetAddressPointer( Xpos_temp, Ypos_temp +iq);
+			if (buffer[iq] > 0x00 )
+			{	
+					do
+					{
+						Status_LCD = LCD_ReadStatus();	
+					}while ((Status_LCD & 0x03) != 0x03);
+					FMC_BANK1_WriteData(buffer[iq]);
+//----	
+					command_LCD = 0xC4; //запись без Autoincrement
+//					command_LCD = 0xC0; //запись с Autoincrement
+					do
+					{
+						Status_LCD = LCD_ReadStatus();	
+					}while ((Status_LCD & 0x03) != 0x03);
+					FMC_BANK1_WriteCommand(command_LCD); //RS=1		
+			}
+		}
+	}
+	else if (myGoriz == 2)
+	{
+		kq = 0; //каждый симол  - два байта массива, первый -правая половина символа
+		//второй - левая половина символа
+		for( iq=0; iq < myVert; iq++ ) //iq - индекс строки симола
+		{
+			for (jq = 0; jq < myGoriz; jq++) //jq - левая или правая половина символа
+			{			
+				switch (jq)
+				{
+					case 0:
+//позиция левой половины	myGoriz - 1					
+//					  tmp_char = buffer[iq + kq + 1]; //байт правой половины
+						LCD_SetAddressPointer( Xpos + jq, Ypos + iq); //  myGoriz - 2
+						if (buffer[iq + kq + 1] > 0x00 )
+						{	
+							do
+							{
+								Status_LCD = LCD_ReadStatus();	
+							}while ((Status_LCD & 0x03) != 0x03);
+							FMC_BANK1_WriteData(buffer[iq + kq + 1]);
+//----	
+							command_LCD = 0xC4; //запись без Autoincrement
+							do
+							{
+								Status_LCD = LCD_ReadStatus();	
+							}while ((Status_LCD & 0x03) != 0x03);
+							FMC_BANK1_WriteCommand(command_LCD); //RS=1		
+						}
+						break;
+					case 1:
+//позиция правой половины
+//  					tmp_char = buffer[iq + kq]; //байт левой половины
+						LCD_SetAddressPointer( Xpos_temp + jq, Ypos_temp + iq); //  myGoriz - 2
+
+//					LCD_SetAddressPointer( Xpos + jq + kq + myGoriz - 2, Ypos + iq);
+						if (buffer[iq + kq] > 0x00 )
+						{	
+							do
+							{
+								Status_LCD = LCD_ReadStatus();	
+							}while ((Status_LCD & 0x03) != 0x03);
+							FMC_BANK1_WriteData(buffer[iq + kq]);
+//----	
+							command_LCD = 0xC4; //запись без Autoincrement
+							do
+							{
+								Status_LCD = LCD_ReadStatus();	
+							}while ((Status_LCD & 0x03) != 0x03);
+							FMC_BANK1_WriteCommand(command_LCD); //RS=1		
+						}
+						break;
+					case 2:
+//						tmp_char = buffer[iq + jq + kq + myGoriz - 4];
+						LCD_SetAddressPointer( Xpos + jq + kq + myGoriz - 4, Ypos + iq - 2);
+						if (buffer[iq + jq + kq + myGoriz - 4] > 0x00 )
+						{	
+							do
+							{
+								Status_LCD = LCD_ReadStatus();	
+							}while ((Status_LCD & 0x03) != 0x03);
+							FMC_BANK1_WriteData(buffer[iq + jq + kq + myGoriz - 4]);
+//----	
+							command_LCD = 0xC4; //запись без Autoincrement
+							do
+							{
+								Status_LCD = LCD_ReadStatus();	
+							}while ((Status_LCD & 0x03) != 0x03);
+							FMC_BANK1_WriteCommand(command_LCD); //RS=1		
+						}
+						break;
+				}	
+
+			}
+			kq = kq + 1;
+			Ypos_temp = Ypos;
+		}
+	}		
+	
+	}
+	else
+	{
+*/
+//buffer[0] содержит кол-во колонок символа, j - текущая колонка
+//каждая колонка описывается тремя или 4 байтами хххххххх хххххххх хх
+		if (mySize == 0 || mySize == 1 || mySize == 2)
+		{
+			i_LCD = 3;
+		}
+		else if (mySize == 4)
+		{
+		//		i_LCD = 4; //для DigitalsBig[10][81]
+//			i_LCD = 7; //для DigitalsBig[10][260]
+//			i_LCD = 5; //для DigitalsMidle[10][171]
+			i_LCD = 4; //для DigitalsMidle[10][73]
+		}	
+		else if (mySize == 5)
+		{
+			i_LCD = 5; //Кількість байтів на один стовпчик для DigitalsBig[10][131]
+		}
+		else if (mySize == 7)
+		{
+			i_LCD = 7; //кількість байтів на один стовпчик для DigitalsBigBig[10][260]
+		}
+		else if (mySize == 8)
+		{
+			i_LCD = byte_width; //для myFont_ukr 3
+		}		
+if (mySize < 8)
+	{ //Розгортка по вертикалі символа	
+		//i_LCD - кількість байт в ширині одного символу
+		for(jq = 0; jq < (buffer[0] * i_LCD); jq = jq + i_LCD)
+		{	
+			//Цикл по групам з buffer[0] байтів поточного символа
+			//jq = 0  від 0-го до buffer[0]-1 включно
+			//jq = buffer[0]  від buffer[0] до 2*buffer[0]-1
+//k - горизонтальна частина колонки битов
+			for(kq = 0; kq < i_LCD; kq++)
+			{
+				//Цикл всередині групи з i_LCD байтів
+				if (kq > 0)
+				{
+					Ypos_temp = Ypos_temp + 8; //зміщення на наступний байт
+				}					
+				tmp_char = (uint8_t) buffer[jq + 1 + kq]; //поточний байт горизонтальної лінії
+				for( iq = 0; iq < 8; iq++ )
+				{
+					//Якщо поточний біт = 1, замальовувати піксель, якщо 0 - пропустити або замальовувати фоном
+				//TempChar = (uint8_t)(((buffer[jq+1+kq] >> iq) & 0x01) << 7);
+				//----------Значення поточного біту----------------------
+				if ((uint8_t) ((((uint8_t) buffer[jq + 1 + kq] >> iq) & 0x01) << 7) > 0x00 )
+				{
+					//цикл по поточній вертикалі символа
+					//поточний біт ,якщо = 1.ставити Point
+					//LCD_SetPoint(Xpos_temp, Ypos_temp + iq);
+					//LCD_WritePixel(Xpos_temp, Ypos_temp + iq);
+					BSP_LCD_DrawPixel(Xpos_temp, Ypos_temp + iq, DrawProp.TextColor);
+				}
+					
+					
+/*					
+					LCD_SetAddressPointer( Xpos_temp, Ypos_temp + iq);
+					if ((uint8_t)(((buffer[jq+1+kq] >> iq) & 0x01) << 7) > 0x00 )
+					{	
+						do
+						{
+							Status_LCD = LCD_ReadStatus();	
+						}while ((Status_LCD & 0x03) != 0x03);
+						LCD_WriteData((uint8_t)(((buffer[jq+1+kq] >> iq) & 0x01) << 7));
+//----	
+						PutChar_command_LCD = 0xC4; //запись без Autoincrement
+						do
+						{
+							Status_LCD = LCD_ReadStatus();	
+						}while ((Status_LCD & 0x03) != 0x03);
+						LCD_WriteCommand(PutChar_command_LCD); //RS=1		
+					}	
+*/					
+				}
+			}
+			Xpos_temp = Xpos_temp + 1;
+			Ypos_temp = Ypos;			
+		}
+	} else if(mySize == 8)
+	{ //Розгортка по горизонталі символу
+		//DrawProp_ukr.height кількість пікселів в стовпчику одного символу (27)
+		//i_LCD - кількість байтів, що тримають ширину пікселів символа
+		
+	if (myFont == 0)
+	{
+		size_con = DrawProp_ukr.height;
+	}else if (myFont == 1)
+	{
+		size_con = DrawProp_Big_Digit.height;
+	}
+
+		for(jq = 0; jq < (buffer[0] * size_con); jq = jq + i_LCD) //jq = 0, 3, 6, 9, ...,  27
+		{	
+			//Цикл по групам з buffer[0] байтів поточного символа
+			//jq = 0  від 0-го до buffer[0]
+			//jq = buffer[0]  від buffer[0] до 2*buffer[0]
+//			Xpos_temp = Xpos;
+//k - горизонтальна частина символа
+			for(kq = 0; kq < i_LCD; kq++)
+			{
+				//Цикл всередині групи з i_LCD байтів
+				if (kq > 0)
+				{
+					Xpos_temp = Xpos_temp + 8; //смещение на следующий байт
+				}					
+				tmp_char = (uint8_t) buffer[jq + 1 + kq]; //поточний байт горизонтальної лінії
+				for( iq = 0; iq < 8; iq++ )
+				{
+//Если текущий бит = 1, ставить точку, если 0 - пропускать
+				//TempChar = (uint8_t)(((buffer[jq+1+kq] >> iq) & 0x01) << 7);
+				//----------Значение текущего бита----------------------
+					if ((uint8_t) ((((uint8_t) buffer[jq + 1 + kq] >> iq) & 0x01) << 7) > 0x00 )
+					{
+						//цикл по поточному вертикальному стовпчику
+						//поточний біт ,якщо = 1.ставити Point
+						//LCD_SetPoint(Xpos_temp, Ypos_temp + iq);
+						//LCD_WritePixel(Xpos_temp, Ypos_temp + iq);
+						BSP_LCD_DrawPixel(Xpos_temp + iq, Ypos_temp, DrawProp_ukr.TextColor);
+					}
+				}
+			}
+			Xpos_temp = Xpos;
+			Ypos_temp = Ypos_temp + 1;			
+		}		
+	}
+}
+
+
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

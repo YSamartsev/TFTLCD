@@ -48,6 +48,6 @@ tft_lcd\st7789.o: ..\Middlewares\Third_Party\FatFs\src\drivers\sd_diskio.h
 tft_lcd\st7789.o: ../Inc/fatfs_storage.h
 tft_lcd\st7789.o: ..\Drivers\BSP\Adafruit_Shield\fonts.h
 tft_lcd\st7789.o: ..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_lcd.h
-tft_lcd\st7789.o: ..\Drivers\BSP\Adafruit_Shield\../Components/st7735/st7735.h
-tft_lcd\st7789.o: ..\Drivers\BSP\Adafruit_Shield\../Components/st7735/st7735_cfg.h
+tft_lcd\st7789.o: ..\Drivers\BSP\Adafruit_Shield\../Components/ST7735/ST7735.h
+tft_lcd\st7789.o: ..\Drivers\BSP\Adafruit_Shield\../Components/ST7735/ST7735_cfg.h
 tft_lcd\st7789.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h

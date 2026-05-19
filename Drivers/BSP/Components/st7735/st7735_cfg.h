@@ -1,4 +1,4 @@
-/* st7735_cfg.h
+/* ST7735_cfg.h
  *
  */
 #ifndef ST7735_CFG_H_

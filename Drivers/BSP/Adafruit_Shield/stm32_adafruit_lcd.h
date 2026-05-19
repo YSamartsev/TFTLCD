@@ -43,7 +43,7 @@
 #endif 
 
 /* Includes ------------------------------------------------------------------*/
-#include "../Components/st7735/st7735.h"
+#include "../Components/ST7735/ST7735.h"
 #include "../Components/st7789/st7789.h"
 //#include "../../Utilities/Fonts/fonts.h"
 #include "fonts.h"
@@ -79,8 +79,8 @@ typedef struct
   void     (*DisplayOn)(void);
   void     (*DisplayOff)(void);
   void     (*SetCursor)(uint16_t, uint16_t);
-  void     (*WritePixel)(uint16_t, uint16_t, uint16_t);
-  uint16_t (*ReadPixel)(uint16_t, uint16_t);
+  void     (*DrawPixel)(uint16_t, uint16_t, uint16_t); //(*WritePixel)(uint16_t, uint16_t, uint16_t);
+  uint16_t* (*ReadPixel)(uint16_t, uint16_t);
   void     (*SetDisplayWindow)(uint16_t, uint16_t, uint16_t, uint16_t);
   void     (*DrawHLine)(uint16_t, uint16_t, uint16_t, uint16_t);
   void     (*DrawVLine)(uint16_t, uint16_t, uint16_t, uint16_t);
@@ -94,34 +94,34 @@ typedef struct
 {  
   void     (*Init)(void);
 	uint16_t (*ReadID)(void);
-	void (*SetRotation)(uint8_t m);
-	void (*Fill_Color)(uint16_t color);
-	void (*DrawPixel)(uint16_t x, uint16_t y, uint16_t color);
-	void (*Fill)(uint16_t xSta, uint16_t ySta, uint16_t xEnd, uint16_t yEnd, uint16_t color);
-	void (*DrawPixel_4px)(uint16_t x, uint16_t y, uint16_t color);
+	void (*SetRotation)(uint8_t);
+	void (*Fill_Color)(uint16_t);
+	void (*DrawPixel)(uint16_t, uint16_t, uint16_t);
+	void (*Fill)(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t);
+	void (*DrawPixel_4px)(uint16_t, uint16_t, uint16_t);
 
 /* Graphical functions. */
-	void (*DrawLine)(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
-	void (*DrawRectangle)(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
-	void (*DrawCircle)(uint16_t x0, uint16_t y0, uint8_t r, uint16_t color);
-	void (*DrawImage)(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t *data);
-	void (*InvertColors)(uint8_t invert);
+	void (*DrawLine)(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t);
+	void (*DrawRectangle)(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t);
+	void (*DrawCircle)(uint16_t, uint16_t, uint8_t, uint16_t);
+	void (*DrawImage)(uint16_t, uint16_t, uint16_t, uint16_t, const uint16_t*);
+	void (*InvertColors)(uint8_t);
 	
 /* Text functions. */
-	void (*WriteChar)(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor);
-	void (*WriteString)(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor);
+	void (*WriteChar)(uint16_t, uint16_t, char, FontDef, uint16_t, uint16_t);
+	void (*WriteString)(uint16_t, uint16_t, const char*, FontDef, uint16_t, uint16_t);
 
 /* Extented Graphical functions. */
-	void (*DrawFilledRectangle)(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
-	void (*DrawTriangle)(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color);
-	void (*DrawFilledTriangle)(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color);
-	void (*DrawFilledCircle)(int16_t x0, int16_t y0, int16_t r, uint16_t color);
+	void (*DrawFilledRectangle)(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t);
+	void (*DrawTriangle)(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t);
+	void (*DrawFilledTriangle)(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t);
+	void (*DrawFilledCircle)(int16_t, int16_t, int16_t, uint16_t);
   uint16_t (*GetLcdPixelWidth)(void);
   uint16_t (*GetLcdPixelHeight)(void);
-	void (*DrawHLine)(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
-	void (*DrawVLine)(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
-	void (*DrawBitmap)(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);	
-	void (*SetDisplayWindow)(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
+	void (*DrawHLine)(uint16_t, uint16_t, uint16_t, uint16_t);
+	void (*DrawVLine)(uint16_t, uint16_t, uint16_t, uint16_t);
+	void (*DrawBitmap)(uint16_t, uint16_t, uint8_t*);	
+	void (*SetDisplayWindow)(uint16_t, uint16_t, uint16_t, uint16_t);
 }LCD_7789_DrvTypeDef; 
 
 typedef struct 
@@ -251,6 +251,11 @@ void 		 LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef Font, uint16_t co
 void 		 LCD_sWriteChar(uint16_t x, uint16_t y, char ch, bFontDef bFont, uint16_t color, uint16_t bgcolor);
 
 void 		 LCD_DrawFilledRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
+void 		 LCD_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+
+void 		 GUI_Text_ukr(uint8_t* mycoordinates, char *str, uint8_t mySize, uint8_t myFont);
+void 		 GUI_Text(uint8_t* mycoordinates, char *str, uint8_t mySize);
+void 		 PutChar( uint16_t Xpos, uint16_t Ypos, uint16_t ofset_ASCII, uint8_t mySize, uint8_t myFont);
 
 /**
   * @}
