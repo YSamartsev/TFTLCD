@@ -50,6 +50,7 @@ extern bFontDef Font8;
 
 extern LCD_DrawPropTypeDef DrawProp;
 extern LCD_DrawPropTypeDef DrawProp_ukr;
+extern LCD_DrawPropTypeDef DrawProp_Big_Digit;
 
 Line_ModeTypdef Mode;
 
@@ -284,9 +285,10 @@ int __backspace(FILE *f)
 	uint8_t		Weekday_LCD_Coordinates[4] = {2, 40, 156, 60}; //координати виводу часу
 	uint8_t		TIME_LCD_Coordinates[4] = {2, 100, 76, 156}; //координати виводу часу
 #elif defined TFT_LCD_1_44
-	uint8_t		Weekday_LCD_Coordinates[4] = {2, 20, 126, 60}; //координати виводу часу	
-	uint8_t		TIME_LCD_Coordinates[4] = {0, 60, 127, 100}; //координати виводу часу
-#endif
+	uint8_t		Weekday_LCD_Coordinates[4] = {2, 20, 126, 38}; //координати виводу часу	
+	uint8_t		HOUR_LCD_Coordinates[4] = {2, 60, 52, 100}; //координати виводу годин
+	uint8_t		MIN_LCD_Coordinates[4] = {63, 60, 116, 100}; //координати виводу хвилин
+	#endif
 
 	//char *Text = "12:22";
 	uint16_t sUNICODE;
@@ -1283,7 +1285,7 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	//ST7789_Fill(TIME_LCD_Coordinates[0], TIME_LCD_Coordinates[1], TIME_LCD_Coordinates[0] + 237,  TIME_LCD_Coordinates[1] + 56, LCD_BLACK);
 				
 
-	
+//Години	
 	if (Hours_temp != stimestructureget.Hours)
 	{
 		Hours_temp = stimestructureget.Hours;
@@ -1292,18 +1294,21 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 #ifdef TFT_LCD_1_3	
 		ST7789_Fill(TIME_LCD_Coordinates[0], TIME_LCD_Coordinates[1], TIME_LCD_Coordinates[0] + 74,  TIME_LCD_Coordinates[1] + 56, LCD_BLACK);		
 		GUI_Text(TIME_LCD_Coordinates, (char *) realhours, 7);	//Годин, для огромных цифр, 
-#elif defined TFT_LCD_1_44	
-	  ST7789_Fill(TIME_LCD_Coordinates[0], TIME_LCD_Coordinates[1], TIME_LCD_Coordinates[0] + 74,  TIME_LCD_Coordinates[1] + 56, LCD_BLACK);
-		//GUI_Text(TIME_LCD_Coordinates, (char *) realhours, 5);	//Годин, для огромных цифр, 
-    GUI_Text_ukr(TIME_LCD_Coordinates, realhours, 8, 1); //Друкую великі цифри
-		
-#endif		
 		xy_temp[0] = *TIME_LCD_Coordinates +  (2*DrawProp.width);
 		xy_temp[1] = *(TIME_LCD_Coordinates + 1);
 		//показ ":"
 		LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp.height/3, ":", Font_Size, LCD_WHITE, LCD_BLACK);	// ":"
+#elif defined TFT_LCD_1_44	
+ 	  ST7789_Fill(HOUR_LCD_Coordinates[0], HOUR_LCD_Coordinates[1],  HOUR_LCD_Coordinates[2], HOUR_LCD_Coordinates[3], LCD_BLACK); 
+		//GUI_Text(TIME_LCD_Coordinates, (char *) realhours, 5);	//Годин, для огромных цифр, 
+    GUI_Text_ukr(HOUR_LCD_Coordinates, realhours, 8, 1); //Друкую великі цифри
+		xy_temp[0] = HOUR_LCD_Coordinates[2] + 2;		
+		xy_temp[1] = HOUR_LCD_Coordinates[1];
+		//показ ":"
+		LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp_Big_Digit.height/3, ":", Font_Size, LCD_WHITE, LCD_BLACK);	// ":"
+#endif		
 	}
-	
+//Хвилини	
 	if (Minutes_temp != stimestructureget.Minutes)
 	{	
 		Minutes_temp = stimestructureget.Minutes;
@@ -1313,29 +1318,30 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 		//Очистити хвилини
 		ST7789_Fill(xy_temp[0], xy_temp[1], xy_temp[0] + 74,  xy_temp[1] + 56, LCD_BLACK);
 		GUI_Text(TIME_LCD_Coordinates, (char *) realminutes, 7);	//Хвилин, для огромных цифр, 
-#elif defined TFT_LCD_1_44	
-		xy_temp[0] = TIME_LCD_Coordinates[0] + 2*DrawProp.width - 2 + 8;
-		xy_temp[1] = TIME_LCD_Coordinates[1];		
-		//Очистити хвилини
-		ST7789_Fill(xy_temp[0], xy_temp[1], xy_temp[0] + 2*DrawProp.width - 2,  xy_temp[1] + 40, LCD_BLACK);
-		GUI_Text(xy_temp, (char *) realminutes, 5);	//Хвилин, для огромных цифр, 
-#endif
 		xy_temp[0] = xy_temp[0] +  (2*DrawProp.width);
 	  LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp.height/3, ":",Font_Size, LCD_WHITE, LCD_BLACK);	
-	}
+#elif defined TFT_LCD_1_44	
+		//Очистити хвилини
+	  ST7789_Fill(MIN_LCD_Coordinates[0], MIN_LCD_Coordinates[1],  MIN_LCD_Coordinates[2], MIN_LCD_Coordinates[3], LCD_BLACK); 
+		//GUI_Text(TIME_LCD_Coordinates, (char *) realhours, 5);	//Годин, для огромных цифр, 
+    GUI_Text_ukr(MIN_LCD_Coordinates, realminutes, 8, 1); //Друкую великі цифри
+#endif
+}
 
+//Секуди
 #ifdef TFT_LCD_1_3	
 	xy_temp[0] = TIME_LCD_Coordinates[0] + 52 + 8 + 52 + 8;
 	xy_temp[1] = TIME_LCD_Coordinates[1];	
 #elif defined TFT_LCD_1_44
-	Font_Size = Font_7x10;
-	xy_temp[0] = xy_temp[0] + 8;
+	//Font_Size = Font_11x18;
+		//xy_temp[0] = *TIME_LCD_Coordinates +  (2*DrawProp_Big_Digit.width) + Font_Size.width;		
+	 xy_temp[0] = LCD_WIDTH - 1 - 2*Font_Size.width;		
+	 xy_temp[1] = *(MIN_LCD_Coordinates + 1) - 1 - Font_Size.height;
 	//xy_temp[1] = TIME_LCD_Coordinates[1];
 #endif	
 	//GUI_Text(xy_temp, (char *) realseconds, 5);	//Хвилин, для огромных цифр,
 	LCD_WriteString(xy_temp[0], xy_temp[1], realseconds, Font_Size, LCD_WHITE, LCD_BLACK); //Секунди показую в кожному циклі маленьким шрифтом (16ч26)
-	
-	
+
 	//LCD_WriteString(x, y, temp1,Font_Size, LCD_GREEN, LCD_BLACK);	 //& "." & realmonth
 	//BSP_LCD_Clear(LCD_WHITE);
   

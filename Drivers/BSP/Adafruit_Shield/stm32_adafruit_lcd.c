@@ -881,7 +881,7 @@ void GUI_Text_ukr(uint8_t* mycoordinates, char *str, uint8_t mySize, uint8_t myF
 			str = str + cbyte;
 			if( Xpos + DrawProp_ukr.width < MAX_X)
        {
- 					  Xpos += DrawProp_ukr.width;
+ 					  Xpos += DrawProp_ukr.width; 
 	
        }else if (Ypos + DrawProp_ukr.height < MAX_Y)
        {
@@ -912,7 +912,7 @@ void GUI_Text_ukr(uint8_t* mycoordinates, char *str, uint8_t mySize, uint8_t myF
 		    str = str + cbyte;
 				if( Xpos + DrawProp_Big_Digit.width < MAX_X)
         {
- 					  Xpos += DrawProp_Big_Digit.width;
+ 					  Xpos += DrawProp_Big_Digit.width + 4;
 	
         }else if (Ypos + DrawProp_Big_Digit.height < MAX_Y)
         {
