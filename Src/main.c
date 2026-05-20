@@ -286,8 +286,8 @@ int __backspace(FILE *f)
 	uint8_t		TIME_LCD_Coordinates[4] = {2, 100, 76, 156}; //координати виводу часу
 #elif defined TFT_LCD_1_44
 	uint8_t		Weekday_LCD_Coordinates[4] = {2, 20, 126, 38}; //координати виводу часу	
-	uint8_t		HOUR_LCD_Coordinates[4] = {2, 60, 52, 100}; //координати виводу годин
-	uint8_t		MIN_LCD_Coordinates[4] = {63, 60, 116, 100}; //координати виводу хвилин
+	uint8_t		HOUR_LCD_Coordinates[4] = {2, 60, 55, 100}; //координати виводу годин
+	uint8_t		MIN_LCD_Coordinates[4] = {64, 60, 127, 100}; //координати виводу хвилин
 	#endif
 
 	//char *Text = "12:22";
