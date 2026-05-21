@@ -1,10 +1,9 @@
 tft_lcd\stm32_adafruit_lcd.o: ..\Drivers\BSP\Adafruit_Shield\stm32_adafruit_lcd.c
 tft_lcd\stm32_adafruit_lcd.o: ../Inc/../Drivers/BSP/Adafruit_Shield/stm32_adafruit_lcd.h
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../Drivers/BSP/Adafruit_Shield/../Components/st7735/st7735.h
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../Drivers/BSP/Adafruit_Shield/../Components/st7735/../Common/lcd.h
-tft_lcd\stm32_adafruit_lcd.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+tft_lcd\stm32_adafruit_lcd.o: ../Inc/../Drivers/BSP/Adafruit_Shield/../Components/ST7735/ST7735.h
 tft_lcd\stm32_adafruit_lcd.o: ..\Drivers\BSP\Adafruit_Shield\fonts.h
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../Drivers/BSP/Adafruit_Shield/../Components/st7735/st7735_cfg.h
+tft_lcd\stm32_adafruit_lcd.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+tft_lcd\stm32_adafruit_lcd.o: ../Inc/../Drivers/BSP/Adafruit_Shield/../Components/ST7735/ST7735_cfg.h
 tft_lcd\stm32_adafruit_lcd.o: ../Inc/main.h
 tft_lcd\stm32_adafruit_lcd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 tft_lcd\stm32_adafruit_lcd.o: ../Inc/stm32f1xx_hal_conf.h
@@ -30,6 +29,7 @@ tft_lcd\stm32_adafruit_lcd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_
 tft_lcd\stm32_adafruit_lcd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h
 tft_lcd\stm32_adafruit_lcd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h
 tft_lcd\stm32_adafruit_lcd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
+tft_lcd\stm32_adafruit_lcd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h
 tft_lcd\stm32_adafruit_lcd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 tft_lcd\stm32_adafruit_lcd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h
 tft_lcd\stm32_adafruit_lcd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h
@@ -51,9 +51,3 @@ tft_lcd\stm32_adafruit_lcd.o: ..\Middlewares\Third_Party\FatFs\src\drivers\sd_di
 tft_lcd\stm32_adafruit_lcd.o: ../Inc/fatfs_storage.h
 tft_lcd\stm32_adafruit_lcd.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 tft_lcd\stm32_adafruit_lcd.o: ../Inc/../Drivers/BSP/Adafruit_Shield/../Components/st7789/st7789.h
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/fonts.h
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font24.c
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font20.c
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font16.c
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font12.c
-tft_lcd\stm32_adafruit_lcd.o: ../Inc/../../Utilities/Fonts/font8.c

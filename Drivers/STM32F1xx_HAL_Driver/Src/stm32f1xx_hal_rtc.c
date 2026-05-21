@@ -228,8 +228,6 @@ static uint32_t           RTC_ReadAlarmCounter(RTC_HandleTypeDef *hrtc);
 static HAL_StatusTypeDef  RTC_WriteAlarmCounter(RTC_HandleTypeDef *hrtc, uint32_t AlarmCounter);
 static HAL_StatusTypeDef  RTC_EnterInitMode(RTC_HandleTypeDef *hrtc);
 static HAL_StatusTypeDef  RTC_ExitInitMode(RTC_HandleTypeDef *hrtc);
-static uint8_t            RTC_ByteToBcd2(uint8_t Value);
-static uint8_t            RTC_Bcd2ToByte(uint8_t Value);
 static uint8_t            RTC_IsLeapYear(uint16_t nYear);
 static void               RTC_DateUpdate(RTC_HandleTypeDef *hrtc, uint32_t DayElapsed);
 static uint8_t            RTC_WeekDayNum(uint32_t nYear, uint8_t nMonth, uint8_t nDay);
@@ -341,7 +339,7 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc)
   }
   else
   {
-    /* Clear Flags Bits */
+    /* Clear Flags Bits Скидання всіх прапорців переривання RTC*/
     CLEAR_BIT(hrtc->Instance->CRL, (RTC_FLAG_OW | RTC_FLAG_ALRAF | RTC_FLAG_SEC));
 
     if (hrtc->Init.OutPut != RTC_OUTPUTSOURCE_NONE)
@@ -737,7 +735,7 @@ HAL_StatusTypeDef HAL_RTC_SetTime(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTim
 
     counter_time = (((uint32_t)(RTC_Bcd2ToByte(sTime->Hours)) * 3600U) + \
                     ((uint32_t)(RTC_Bcd2ToByte(sTime->Minutes)) * 60U) + \
-                    ((uint32_t)(RTC_Bcd2ToByte(sTime->Seconds))));
+		((uint32_t)(RTC_Bcd2ToByte(sTime->Seconds)))); //підраховую кількість секунд в часі, що встановлюється
   }
 
   /* Write time counter in RTC registers */
@@ -947,7 +945,7 @@ HAL_StatusTypeDef HAL_RTC_SetDate(RTC_HandleTypeDef *hrtc, RTC_DateTypeDef *sDat
     assert_param(IS_RTC_DATE(RTC_Bcd2ToByte(sDate->Date)));
 
     /* Change the current date */
-    hrtc->DateToUpdate.Year  = RTC_Bcd2ToByte(sDate->Year);
+    hrtc->DateToUpdate.Year  = RTC_Bcd2ToByte(sDate->Year); //Перевожу BCD в двійковий формат
     hrtc->DateToUpdate.Month = RTC_Bcd2ToByte(sDate->Month);
     hrtc->DateToUpdate.Date  = RTC_Bcd2ToByte(sDate->Date);
   }
@@ -958,16 +956,16 @@ HAL_StatusTypeDef HAL_RTC_SetDate(RTC_HandleTypeDef *hrtc, RTC_DateTypeDef *sDat
 
   /* Reset time to be aligned on the same day */
   /* Read the time counter*/
-  counter_time = RTC_ReadTimeCounter(hrtc);
+  counter_time = RTC_ReadTimeCounter(hrtc); //Зчитую поточні секунди з момента вмикання живлення, щоб додати до годин
 
   /* Fill the structure fields with the read parameters */
-  hours = counter_time / 3600U;
-  if (hours > 24U)
+  hours = counter_time / 3600U; //Підраховую кількість годин
+  if (hours > 24U) //якщо секунд більше ніж в добі , то визначаю поточну кількість секунд в цілих значеннях поточних діб
   {
     /* Set updated time in decreasing counter by number of days elapsed */
-    counter_time -= ((hours / 24U) * 24U * 3600U);
+    counter_time -= ((hours / 24U) * 24U * 3600U); //віднімаю від поточної кількості секунд цілу кількість секунд діб, що минули
     /* Write time counter in RTC registers */
-    if (RTC_WriteTimeCounter(hrtc, counter_time) != HAL_OK)
+    if (RTC_WriteTimeCounter(hrtc, counter_time) != HAL_OK) //Тепер в CNTH_CNTL кількість секунд без врахування діб, що минули
     {
       /* Set RTC state */
       hrtc->State = HAL_RTC_STATE_ERROR;
@@ -1003,7 +1001,7 @@ HAL_StatusTypeDef HAL_RTC_SetDate(RTC_HandleTypeDef *hrtc, RTC_DateTypeDef *sDat
       }
     }
 
-
+		//Якщо hours < 24 то в CNTH_CNTL залишається кількість секунд від моменту вмикання живлення
   }
 
   hrtc->State = HAL_RTC_STATE_READY ;
@@ -1750,7 +1748,7 @@ static HAL_StatusTypeDef RTC_ExitInitMode(RTC_HandleTypeDef *hrtc)
   * @param  Value: Byte to be converted
   * @retval Converted byte
   */
-static uint8_t RTC_ByteToBcd2(uint8_t Value)
+uint8_t RTC_ByteToBcd2(uint8_t Value)
 {
   uint32_t bcdhigh = 0U;
 
@@ -1768,7 +1766,7 @@ static uint8_t RTC_ByteToBcd2(uint8_t Value)
   * @param  Value: BCD value to be converted
   * @retval Converted word
   */
-static uint8_t RTC_Bcd2ToByte(uint8_t Value)
+uint8_t RTC_Bcd2ToByte(uint8_t Value)
 {
   uint32_t tmp = 0U;
   tmp = ((uint8_t)(Value & (uint8_t)0xF0) >> (uint8_t)0x4) * 10U;
@@ -1918,7 +1916,7 @@ static uint8_t RTC_WeekDayNum(uint32_t nYear, uint8_t nMonth, uint8_t nDay)
 {
   uint32_t year = 0U, weekday = 0U;
 
-  year = 2000U + nYear;
+  year = 2000U + nYear; //До 20000 додається 25, щоб потім підрахувати день тижня, враховуючи місяц і день місяця
 
   if (nMonth < 3U)
   {
@@ -1933,6 +1931,7 @@ static uint8_t RTC_WeekDayNum(uint32_t nYear, uint8_t nMonth, uint8_t nDay)
 
   return (uint8_t)weekday;
 }
+
 
 /**
   * @}

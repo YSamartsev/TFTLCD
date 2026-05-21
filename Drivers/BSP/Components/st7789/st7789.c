@@ -1,15 +1,116 @@
 #include "st7789.h"
 #include "fonts.h"
+#include "stm32f1xx_nucleo.h"
+#include "main.h"
+#include "stm32_adafruit_lcd.h"
+
+
+/*
+Використовується 16-бітний RGB формат
+|xxxxxxxx xxxxxxxx xxxxxxxx
+*/
 
 extern SPI_HandleTypeDef SpiHandle;
 
-
+//small fonts
 extern FontDef Font_7x10;
 extern FontDef Font_11x18;
 extern FontDef Font_16x26;
-extern const uint16_t saber;
+
+extern const uint16_t saber; //picture
+
+//big fonts
+extern sFontDef Font24;
+extern sFontDef Font20;
+extern sFontDef Font16;
+extern sFontDef Font12;
+extern sFontDef Font8;
+
+extern uint8_t* DigitalsBigBig[];
+extern uint8_t* DigitalsBig[];
+extern uint8_t* myFont_ukr[];
+extern LCD_DrawPropTypeDef DrawProp_ukr;
+extern LCD_DrawPropTypeDef DrawProp;
 
 extern uint32_t bi;
+
+/*uint8_t data_LCD;
+uint16_t i_LCD;
+uint16_t j_LCD;
+uint16_t i, j, k;
+uint16_t iq, jq, kq;
+uint8_t tmp_char;
+uint16_t char_16; */
+
+//Для разворачивания кода шрифта по горизонтали ASCII_8X8_System
+//int myfont = 0;
+//int myVert = 8; 
+//int myGoriz= 1;
+//-----------------------------
+
+//Для разворачивания кода шрифта по горизонтали ASCII_8X14_System
+//uint8_t myfont = 0;
+//uint8_t myVert = 14; 
+//uint8_t myGoriz = 1;
+//-----------------------------
+
+//Для разворачивания кода шрифта по горизонтали ASCII_8X16_System
+//int myfont = 0;
+//int myVert = 16; 
+//int myGoriz= 1;
+//-----------------------------
+
+//Для разворачивания кода шрифта по горизонтали ASCII_10X16_System
+//int myfont = 0;
+//int myVert = 16; 
+//int myGoriz= 2;
+//-----------------------------
+
+//Для разворачивания кода шрифта по вертикали ASCII_10X20_Terminal
+//int myfont = 1;
+//int myVert = 20; //кол-во вертикальных точек в знаке
+//int myGoriz= 10; //кол-во горизонтальных точек в знаке
+
+//uint8_t buffer[]; //Буфер для хранения байтов символа
+
+
+
+
+
+//Заповнюю структуру драйвера
+LCD_7789_DrvTypeDef   ST7789_drv = 
+{
+  ST7789_Init,
+  0,
+	ST7789_SetRotation,
+	ST7789_Fill_Color,
+	ST7789_DrawPixel,
+	ST7789_Fill,
+	ST7789_DrawPixel_4px,
+/* Graphical functions. */
+	ST7789_DrawLine,
+	ST7789_DrawRectangle,
+	ST7789_DrawCircle,
+	ST7789_DrawImage,
+	ST7789_InvertColors,
+/* Text functions. */
+	ST7789_WriteChar,
+	ST7789_WriteString,
+/* Extented Graphical functions. */
+	ST7789_DrawFilledRectangle,
+	ST7789_DrawTriangle,
+	ST7789_DrawFilledTriangle,
+	ST7789_DrawFilledCircle,
+  ST7789_GetLcdPixelWidth,
+  ST7789_GetLcdPixelHeight,
+	ST7789_DrawHLine,
+  ST7789_DrawVLine,
+	ST7789_DrawBitmap,
+	ST7789_SetDisplayWindow,
+
+};
+
+static uint16_t ArrayRGB[480] = {0};
 
 #ifdef USE_DMA
 #include <string.h>
@@ -170,37 +271,37 @@ void ST7789_Init(void)
 
 //while(1)
 //{	
-		LCD_SendCommand(ST7789_COLMOD);		//	Set color mode
+		LCD_SendCommand(ST7789_COLMOD);		//	Встановлення RGB режиму
 //}
 	
     //LCD_SendSmallData(ST7789_COLOR_MODE_16bit);
 	{
-		uint8_t data[] = {ST7789_COLOR_MODE_16bit};
+		uint8_t data[] = {ST7789_COLOR_MODE_16bit}; //0x55  16bit/pixel 65K RGB
 		LCD_SendData(data, sizeof(data));
 	}
-  	LCD_SendCommand(0xB2);				//	Porch control
+  	LCD_SendCommand(ST7789_PORCTRL);				//	0xB2 Porch control Керування інтервал гасіння
 	{
 		uint8_t data[] = {0x0C, 0x0C, 0x00, 0x33, 0x33};
 		LCD_SendData(data, sizeof(data));
 	}
-	ST7789_SetRotation(ST7789_ROTATION);	//	MADCTL (Display Rotation)
+	ST7789_SetRotation(ST7789_ROTATION);	//	MADCTL (Memory Data Access Control) (Display Rotation) 
 	
 	/* Internal LCD Voltage generator settings */
-    LCD_SendCommand(0XB7);				//	Gate Control
+	LCD_SendCommand(ST7789_GCTRL);				//	Gate Control
     //LCD_SendSmallData(0x35);			//	Default value
   {
 		uint8_t data[] = {0x35};
 		LCD_SendData(data, sizeof(data));
 	}		
 	
-		LCD_SendCommand(0xBB);				//	VCOM setting
+	LCD_SendCommand(ST7789_VCOMS);				//	VCOM setting керування напругою
     //LCD_SendSmallData(0x19);			//	0.725v (default 0.75v for 0x20)
 		{		
 			uint8_t data[] = {0x19};
 			LCD_SendData(data, sizeof(data)); 
 		}			
 	
-		LCD_SendCommand(0xC0);				//	LCMCTRL	
+		LCD_SendCommand(ST7789_LCMCTRL);				//	LCMCTRL	
     //LCD_SendSmallData (0x2C);			//	Default value
 		{		
 			uint8_t data[] = {0x2C};
@@ -250,7 +351,7 @@ void ST7789_Init(void)
 		LCD_SendData(data, sizeof(data));
 	}
 
-    LCD_SendCommand(0xE1);
+  LCD_SendCommand(0xE1);
 	{
 		uint8_t data[] = {0xD0, 0x04, 0x0C, 0x11, 0x13, 0x2C, 0x3F, 0x44, 0x51, 0x2F, 0x1F, 0x1F, 0x20, 0x23};
 		LCD_SendData(data, sizeof(data));
@@ -304,7 +405,11 @@ void ST7789_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
 {
 	if ((x >= ST7789_WIDTH) || (y >= ST7789_HEIGHT))	return;
 	
-	ST7789_SetAddressWindow(x, y, x, y);
+	ST7789_SetAddressWindow(x, y, x, y); //Встановлюю адреси рядка і колонки для точки
+	//В Ініціалізації вказав COLMOD (3Ah) = 55h
+	//Стор.  71 of 317 перший байт R4_R3_R2_R1_R0_G5_G4_G3 другий байт G2_G1_G0_B4_B3_B2_B1_B0
+	//G5_G4_G3_G2_G1_G0 Глибина зеленого, R4_R3_R2_R1_R0 Глибина червоного, B4_B3_B2_B1_B0 Глибина синього 
+	//Наприклад для LCD_GREEN першим байтом треба передати 0000`0111 другим 1110'0000
 	uint8_t data[] = {color >> 8, color & 0xFF};
 	LCD_Select();
 	LCD_SendData(data, sizeof(data));
@@ -345,6 +450,71 @@ void ST7789_DrawPixel_4px(uint16_t x, uint16_t y, uint16_t color)
 	LCD_Select();
 	ST7789_Fill(x - 1, y - 1, x + 1, y + 1, color);
 	LCD_UnSelect();
+}
+
+/**
+  * @brief  Draws horizontal line.
+  * @param  RGBCode: Specifies the RGB color   
+  * @param  Xpos: specifies the X position.
+  * @param  Ypos: specifies the Y position.
+  * @param  Length: specifies the line length.  
+  * @retval None
+  */
+void ST7789_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length)
+{
+  uint8_t counter = 0;
+  
+  if(Xpos + Length > ST7789_LCD_PIXEL_WIDTH) return;
+  
+  /* Set Cursor */
+  ST7789_SetCursor(Xpos, Ypos);
+  
+  for(counter = 0; counter < Length; counter++)
+  {
+    ArrayRGB[counter] = RGBCode;
+  }
+  LCD_SendMultipleData((uint8_t*)&ArrayRGB[0], Length * 2);
+}
+
+/**
+  * @brief  Draws vertical line.
+  * @param  RGBCode: Specifies the RGB color   
+  * @param  Xpos: specifies the X position.
+  * @param  Ypos: specifies the Y position.
+  * @param  Length: specifies the line length.  
+  * @retval None
+  */
+void ST7789_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length)
+{
+  uint8_t counter = 0;
+  
+  if(Ypos + Length > ST7789_LCD_PIXEL_HEIGHT) return;
+  for(counter = 0; counter < Length; counter++)
+  {
+    ST7789_WritePixel(Xpos, Ypos + counter, RGBCode);
+  }   
+}
+
+/**
+  * @brief  Sets Cursor position.
+  * @param  Xpos: specifies the X position.
+  * @param  Ypos: specifies the Y position.
+  * @retval None
+  */
+void ST7789_SetCursor(uint16_t Xpos, uint16_t Ypos)
+{
+  uint8_t data = 0;
+  LCD_SendCommand(ST7789_CASET);
+  data = (Xpos) >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = (Xpos) & 0xFF;
+  LCD_SendMultipleData(&data, 1);
+  LCD_SendCommand(ST7789_RASET); 
+  data = (Ypos) >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = (Ypos) & 0xFF;
+  LCD_SendMultipleData(&data, 1);
+  LCD_SendCommand(ST7789_RAMWR);
 }
 
 /**
@@ -512,17 +682,17 @@ void ST7789_InvertColors(uint8_t invert)
  * @param bgcolor -> background color of the char
  * @return  none
  */
-void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t color, uint16_t bgcolor)
+void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef Font, uint16_t color, uint16_t bgcolor)
 {
 	uint32_t i, j;
 	LCD_Select();
-	ST7789_SetAddressWindow(x, y, x + sfont.width - 1, y + sfont.height - 1);
+	ST7789_SetAddressWindow(x, y, x + Font.width - 1, y + Font.height - 1);
 	
-	for (i = 0; i < sfont.height; i++) {
+	for (i = 0; i < Font.height; i++) {
 		//b = font.data[(ch - 32) * font.height + i];
-		bi = sfont.data[(ch - 32) * sfont.height + i];
+		bi = Font.data[(ch - 32) * Font.height + i];
 		
-		for (j = 0; j < sfont.width; j++) {
+		for (j = 0; j < Font.width; j++) {
 			if ((bi << j) & 0x8000) {
 				uint8_t data[] = {color >> 8, color & 0xFF};
 				LCD_SendData(data, sizeof(data));
@@ -731,6 +901,95 @@ void ST7789_DrawFilledCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
 
 
 /**
+  * @brief  Gets the LCD pixel Width.
+  * @param  None
+  * @retval The Lcd Pixel Width
+  */
+uint16_t ST7789_GetLcdPixelWidth(void)
+{
+  return ST7789_WIDTH;
+}
+
+/**
+  * @brief  Gets the LCD pixel Height.
+  * @param  None
+  * @retval The Lcd Pixel Height
+  */
+uint16_t ST7789_GetLcdPixelHeight(void)
+{                          
+  return  ST7789_HEIGHT;
+}
+
+/**
+  * @brief  Displays a bitmap picture loaded in the internal Flash.
+  * @param  BmpAddress: Bmp picture address in the internal Flash.
+  * @retval None
+  */
+void ST7789_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp)
+{
+  uint32_t index = 0, size = 0;
+  
+  /* Read bitmap size */
+  size = *(volatile uint16_t *) (pbmp + 2);
+  size |= (*(volatile uint16_t *) (pbmp + 4)) << 16;
+  /* Get bitmap data address offset */
+  index = *(volatile uint16_t *) (pbmp + 10);
+  index |= (*(volatile uint16_t *) (pbmp + 12)) << 16;
+  size = (size - index)/2;
+  pbmp += index;
+  
+  /* Set GRAM write direction and BGR = 0 */
+  /* Memory access control: MY = 0, MX = 1, MV = 0, ML = 0 */
+  ST7789_WriteReg(ST7789_MADCTL, 0x40);
+
+  /* Set Cursor */
+  ST7789_SetCursor(Xpos, Ypos);  
+ 
+  LCD_SendMultipleData((uint8_t*)pbmp, size*2);
+ 
+  /* Set GRAM write direction and BGR = 0 */
+  /* Memory access control: MY = 1, MX = 1, MV = 0, ML = 0 */
+  ST7789_WriteReg(ST7789_MADCTL, 0xC0);
+}
+
+
+/**
+  * @brief  Writes pixel.   
+  * @param  Xpos: specifies the X position.
+  * @param  Ypos: specifies the Y position.
+  * @param  RGBCode: the RGB pixel color
+  * @retval None
+  */
+void ST7789_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
+{
+  uint8_t data = 0;
+  if((Xpos >= ST7789_LCD_PIXEL_WIDTH) || (Ypos >= ST7789_LCD_PIXEL_HEIGHT)) 
+  {
+    return;
+  }
+  
+  /* Set Cursor */
+  ST7789_SetCursor(Xpos, Ypos);
+  
+  data = RGBCode >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = RGBCode;
+  LCD_SendMultipleData(&data, 1);
+} 
+
+/**
+  * @brief  Writes to the selected LCD register.
+  * @param  LCDReg: Address of the selected register.
+  * @param  LCDRegValue: value to write to the selected register.
+  * @retval None
+  */
+void ST7789_WriteReg(uint8_t LCDReg, uint8_t LCDRegValue)
+{
+  LCD_SendCommand(LCDReg);
+  LCD_SendMultipleData(&LCDRegValue, 1);
+}
+
+/**
  * @brief Open/Close tearing effect line
  * @param tear -> Whether to tear
  * @return none
@@ -741,6 +1000,41 @@ void ST7789_TearEffect(uint8_t tear)
 	LCD_SendCommand(tear ? 0x35 /* TEON */ : 0x34 /* TEOFF */);
 	LCD_UnSelect();
 }
+
+/**
+  * @brief  Sets a display window
+  * @param  Xpos:   specifies the X bottom left position.
+  * @param  Ypos:   specifies the Y bottom left position.
+  * @param  Height: display window height.
+  * @param  Width:  display window width.
+  * @retval None
+  */
+void ST7789_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
+{
+  uint8_t data = 0;
+  /* Column addr set, 4 args, no delay: XSTART = Xpos, XEND = (Xpos + Width - 1) */
+  LCD_SendCommand(ST7789_CASET);
+  data = (Xpos) >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = (Xpos) & 0xFF;
+  LCD_SendMultipleData(&data, 1);
+  data = (Xpos + Width - 1) >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = (Xpos + Width - 1) & 0xFF;
+  LCD_SendMultipleData(&data, 1);
+  /* Row addr set, 4 args, no delay: YSTART = Ypos, YEND = (Ypos + Height - 1) */
+  LCD_SendCommand(ST7789_RASET);
+  data = (Ypos) >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = (Ypos) & 0xFF;
+  LCD_SendMultipleData(&data, 1);
+  data = (Ypos + Height - 1) >> 8;
+  LCD_SendMultipleData(&data, 1);
+  data = (Ypos + Height - 1) & 0xFF;
+  LCD_SendMultipleData(&data, 1);
+}
+
+
 
 
 

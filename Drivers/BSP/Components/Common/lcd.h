@@ -81,7 +81,7 @@ typedef struct
   uint16_t (*GetLcdPixelHeight)(void);
   void     (*DrawBitmap)(uint16_t, uint16_t, uint8_t*);
   void     (*DrawRGBImage)(uint16_t, uint16_t, uint16_t, uint16_t, uint8_t*);
-}LCD_DrvTypeDef;    
+}LCD_7735_DrvTypeDef;    
 /**
   * @}
   */

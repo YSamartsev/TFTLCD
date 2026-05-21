@@ -3259,7 +3259,7 @@ HAL_StatusTypeDef UART_Start_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pDat
   /* Enable the UART Data Register not empty Interrupt Встановлює CR1_RXNEIE*/
   __HAL_UART_ENABLE_IT(huart, UART_IT_RXNE);
 
-  return HAL_OK;
+          return HAL_OK;
 }
 
 /**

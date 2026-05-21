@@ -39,7 +39,7 @@
                                    User NOTES
 1. How To use this driver:
 --------------------------
-   - The LCD st7735 component driver MUST be included with this driver.  
+   - The LCD ST7735 component driver MUST be included with this driver.  
 
 2. Driver description:
 ---------------------
@@ -58,56 +58,46 @@
  
 ------------------------------------------------------------------------------*/
 
-/* Dependencies
-- st7735.c
-- fonts.h
-- font24.c
-- font20.c
-- font16.c
-- font12.c
-- font8.c"
-EndDependencies */
     
 /* Includes ------------------------------------------------------------------*/
 #include "../Drivers/BSP/Adafruit_Shield/stm32_adafruit_lcd.h"
-#include "../../Utilities/Fonts/fonts.h"
-#include "../../Utilities/Fonts/font24.c"
-#include "../../Utilities/Fonts/font20.c"
-#include "../../Utilities/Fonts/font16.c"
-#include "../../Utilities/Fonts/font12.c"
-#include "../../Utilities/Fonts/font8.c"
+
 #include "stm32f1xx_hal_spi.h"
-#include "lcd.h"
+#include "stm32f1xx_nucleo.h"
+#include "fonts.h"
+#include "ST7789.h"
+
+
+uint8_t Xpos, Ypos, myfont, myVert, myGoriz;
+uint16_t TempChar;
+uint8_t data_LCD;
+uint16_t i_LCD;
+uint16_t j_LCD;
+uint16_t i, j, k;
+uint16_t iq, jq, kq;
+uint8_t tmp_char;
+uint16_t char_16;
+uint8_t byte_width;
 
 extern SPI_HandleTypeDef SpiHandle;
-extern LCD_DrvTypeDef   st7735_drv;
+extern LCD_7735_DrvTypeDef   ST7735_drv;
+extern LCD_7789_DrvTypeDef   ST7789_drv;
 
-extern FontDef Font_7x10;
-extern FontDef Font_11x18;
-extern FontDef Font_16x26;
-extern const uint16_t saber;
+//extern FontDef Font_7x10;
+//extern FontDef Font_11x18;
+extern FontDef Font_16x26; //Для маленьких символів
+
+LCD_DrawPropTypeDef DrawProp; //Для великих символів
+LCD_DrawPropTypeDef DrawProp_ukr; //Українські
+LCD_DrawPropTypeDef DrawProp_Big_Digit; //Українські; //Українські
+extern uint8_t* DigitalsBig[];
+extern uint8_t* DigitalsBigBig[];
+extern uint8_t* Arial45x39[];
+
+#define LINE(x) ((x) * (((bFontDef *)BSP_LCD_GetFont())->height))
 
 uint32_t bi;
 
-/** @addtogroup BSP
-  * @{
-  */
-
-/** @addtogroup STM32_ADAFRUIT
-  * @{
-  */
-    
-/** @addtogroup STM32_ADAFRUIT_LCD
-  * @{
-  */ 
-
-/** @defgroup STM32_ADAFRUIT_LCD_Private_TypesDefinitions
-  * @{
-  */ 
-
-/**
-  * @}
-  */ 
 
 /** @defgroup STM32_ADAFRUIT_LCD_Private_Defines
   * @{
@@ -135,36 +125,16 @@ uint32_t bi;
 /** @defgroup STM32_ADAFRUIT_LCD_Private_Variables
   * @{
   */ 
-	LCD_DrawPropTypeDef DrawProp;
-
-	LCD_DrvTypeDef  *lcd_drv; 
-
-//SPI_HandleTypeDef LCD_SPI_PORT;
-
-//SPI_HandleTypeDef hnucleo_Spi;
-
+	
+#ifdef TFT_LCD_7789
+		LCD_7789_DrvTypeDef  *lcd_drv;
+	#elif defined (TFT_LCD_7735)
+		LCD_7735_DrvTypeDef  *lcd_drv;
+#endif
 
 /* Max size of bitmap will based on a font24 (17x24) */
 static uint8_t bitmap[MAX_HEIGHT_FONT*MAX_WIDTH_FONT*2+OFFSET_BITMAP] = {0};
 
-/**
-  * @}
-  */ 
-
-/** @defgroup STM32_ADAFRUIT_LCD_Private_FunctionPrototypes
-  * @{
-  */ 
-static void DrawChar(uint16_t Xpos, uint16_t Ypos, const uint8_t *c);
-static void FillTriangle(uint16_t x1, uint16_t x2, uint16_t x3, uint16_t y1, uint16_t y2, uint16_t y3);
-static void SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
-/**
-  * @}
-  */ 
-
-
-/** @defgroup STM32_ADAFRUIT_LCD_Private_Functions
-  * @{
-  */
   
 /**
   * @brief  Initializes the LCD.
@@ -174,39 +144,36 @@ static void SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint1
 uint8_t BSP_LCD_Init(void)
 { 
   uint8_t ret = LCD_ERROR;
-  
+ 
   /* Default value for draw propriety */
-  DrawProp.BackColor = 0xFFFF;
-  DrawProp.pFont     = &Font24;
-  DrawProp.TextColor = 0x0000;
-
+  DrawProp.BackColor = LCD_BLACK; //Заповнюю структуру DrawProp влістивостями фонту Font24
+  DrawProp.TextColor = LCD_WHITE;
+	//Для української мови
+	DrawProp_ukr.BackColor = LCD_BLACK; //Заповнюю структуру DrawProp влістивостями фонту Font24
+  DrawProp_ukr.TextColor = LCD_WHITE;
+	
 #ifdef TFT_LCD_7735	
 	
-	lcd_drv = &st7735_drv;
+	lcd_drv = &ST7735_drv;
   //lcd_drv = &LCD_drv;
   /* LCD Init */   
   lcd_drv->Init();
 	//ST7735_Init(); //Конфігурація драйвера ST7789 LCD
 	//ST7735_FillScreen(WHITE);
-	LCD_Fill_Color(LCD_WHITE);
+	LCD_Fill_Color(LCD_BLACK);
 
+	//LCD_DrawFilledRectangle(0, 0, 127, 127, LCD_BLACK);//Заповнити квадрат
+	//LCD_DrawRectangle(0, 0, 127, 127, LCD_GREEN); //намалювани лініями квадрат
 #elif defined (TFT_LCD_7789)
-
-	ST7789_Init(); //Конфігурація драйвера ST7789 LCD
-	LCD_Fill_Color(LCD_WHITE);
+	lcd_drv = &ST7789_drv;
+	
+	lcd_drv->Init(); //Послідовність кодів ініціалізації
+	//lcd_drv->ST7789_Init(); //Конфігурація драйвера ST7789 LCD
+	LCD_Fill_Color(LCD_BLACK); //вібувається швидко (240х240 RAM заповнюється двобайтовими кодами кольора)
 #endif
 	HAL_Delay(10);
-	
-	//LCD_Fill_Color(RED);
-  
-  /* Initialize the font */
-  BSP_LCD_SetFont(&LCD_DEFAULT_FONT);
-
-
-  ret = LCD_OK;
-  
+	ret = LCD_OK;
   return ret;
-	
 }
 
 
@@ -275,9 +242,9 @@ void BSP_LCD_SetBackColor(uint16_t Color)
   * @param  fonts: Font to be used
   * @retval None
   */
-void BSP_LCD_SetFont(sFONT *pFonts)
+void BSP_LCD_SetFont(bFontDef *pFonts)
 {
-  DrawProp.pFont = pFonts;
+  //DrawProp.pFont = pFonts;
 }
 
 /**
@@ -285,7 +252,7 @@ void BSP_LCD_SetFont(sFONT *pFonts)
   * @param  None
   * @retval Used font
   */
-sFONT *BSP_LCD_GetFont(void)
+uint8_t *BSP_LCD_GetFont(void)
 {
   return DrawProp.pFont;
 }
@@ -301,150 +268,22 @@ void BSP_LCD_Clear(uint16_t Color)
   uint32_t color_backup = DrawProp.TextColor; 
   DrawProp.TextColor = Color;
   
-  for(counter = 0; counter < 240; counter++) //T7789_WIDTH BSP_LCD_GetYSize(); counter++)
+  for(counter = 0; counter < BSP_LCD_GetYSize(); counter++) //ST7789_WIDTH BSP_LCD_GetYSize(); counter++)
 	{
-    //BSP_LCD_DrawHLine(0, counter, 240); //LCD_HEIGHT BSP_LCD_GetXSize());
-		LCD_DrawLine(0, counter, 239, counter, LCD_WHITE);
+    BSP_LCD_DrawHLine(0, counter, 240); // BSP_LCD_GetXSize()); //LCD_HEIGHT BSP_LCD_GetXSize());
+		//LCD_DrawHLine(0, counter, BSP_LCD_GetXSize());
   }
   DrawProp.TextColor = color_backup; 
   BSP_LCD_SetTextColor(DrawProp.TextColor);
 }
 
 /**
-  * @brief  Clears the selected line.
-  * @param  Line: Line to be cleared
-  *          This parameter can be one of the following values:
-  *            @arg  0..9: if the Current fonts is Font16x24
-  *            @arg  0..19: if the Current fonts is Font12x12 or Font8x12
-  *            @arg  0..29: if the Current fonts is Font8x8
-  * @retval None
-  */
-void BSP_LCD_ClearStringLine(uint16_t Line)
-{ 
-  uint32_t color_backup = DrawProp.TextColor; 
-  DrawProp.TextColor = DrawProp.BackColor;;
-    
-  /* Draw a rectangle with background color */
-  BSP_LCD_FillRect(0, (Line * DrawProp.pFont->Height), BSP_LCD_GetXSize(), DrawProp.pFont->Height);
-  
-  DrawProp.TextColor = color_backup;
-  BSP_LCD_SetTextColor(DrawProp.TextColor);
-}
-
-/**
-  * @brief  Displays one character.
-  * @param  Xpos: Start column address
-  * @param  Ypos: Line where to display the character shape.
-  * @param  Ascii: Character ascii code
-  *           This parameter must be a number between Min_Data = 0x20 and Max_Data = 0x7E 
-  * @retval None
-  */
-void BSP_LCD_DisplayChar(uint16_t Xpos, uint16_t Ypos, uint8_t Ascii)
-{
-  DrawChar(Xpos, Ypos, &DrawProp.pFont->table[(Ascii-' ') *\
-    DrawProp.pFont->Height * ((DrawProp.pFont->Width + 7) / 8)]);
-}
-
-/**
-  * @brief  Displays characters on the LCD.
-  * @param  Xpos: X position (in pixel)
-  * @param  Ypos: Y position (in pixel)   
-  * @param  Text: Pointer to string to display on LCD
-  * @param  Mode: Display mode
-  *          This parameter can be one of the following values:
-  *            @arg  CENTER_MODE
-  *            @arg  RIGHT_MODE
-  *            @arg  LEFT_MODE   
-  * @retval None
-  */
-void BSP_LCD_DisplayStringAt(uint16_t Xpos, uint16_t Ypos, uint8_t *Text, Line_ModeTypdef Mode)
-{
-  uint16_t refcolumn = 1, i = 0;
-  uint32_t size = 0, xsize = 0; 
-  uint8_t  *ptr = Text;
-  
-  /* Get the text size */
-  while (*ptr++) size ++ ;
-  
-  /* Characters number per line */
-  xsize = (BSP_LCD_GetXSize()/DrawProp.pFont->Width);
-  
-  switch (Mode)
-  {
-  case CENTER_MODE:
-    {
-      refcolumn = Xpos + ((xsize - size)* DrawProp.pFont->Width) / 2;
-      break;
-    }
-  case LEFT_MODE:
-    {
-      refcolumn = Xpos;
-      break;
-    }
-  case RIGHT_MODE:
-    {
-      refcolumn =  - Xpos + ((xsize - size)*DrawProp.pFont->Width);
-      break;
-    }    
-  default:
-    {
-      refcolumn = Xpos;
-      break;
-    }
-  }
-  
-  /* Send the string character by character on lCD */
-  while ((*Text != 0) & (((BSP_LCD_GetXSize() - (i*DrawProp.pFont->Width)) & 0xFFFF) >= DrawProp.pFont->Width))
-  {
-    /* Display one character on LCD */
-    BSP_LCD_DisplayChar(refcolumn, Ypos, *Text);
-    /* Decrement the column position by 16 */
-    refcolumn += DrawProp.pFont->Width;
-    /* Point on the next character */
-    Text++;
-    i++;
-  }
-}
-
-/**
-  * @brief  Displays a character on the LCD.
-  * @param  Line: Line where to display the character shape
-  *          This parameter can be one of the following values:
-  *            @arg  0..19: if the Current fonts is Font8
-  *            @arg  0..12: if the Current fonts is Font12
-  *            @arg  0...9: if the Current fonts is Font16
-  *            @arg  0...7: if the Current fonts is Font20
-  *            @arg  0...5: if the Current fonts is Font24
-  * @param  ptr: Pointer to string to display on LCD
-  * @retval None
-  */
-void BSP_LCD_DisplayStringAtLine(uint16_t Line, uint8_t *ptr)
-{
-  BSP_LCD_DisplayStringAt(0, LINE(Line), ptr, LEFT_MODE);
-}
-
-/**
-  * @brief  Draws a pixel on LCD.
-  * @param  Xpos: X position 
-  * @param  Ypos: Y position
-  * @param  RGB_Code: Pixel color in RGB mode (5-6-5)  
-  * @retval None
-  */
-void BSP_LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code)
-{
-  if(lcd_drv->WritePixel != NULL)
-  {
-    lcd_drv->WritePixel(Xpos, Ypos, RGB_Code);
-  }
-}
-  
-/**
   * @brief  Draws an horizontal line.
   * @param  Xpos: X position
   * @param  Ypos: Y position
   * @param  Length: Line length
   * @retval None
-  */
+*/
 void BSP_LCD_DrawHLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length)
 {
   uint32_t index = 0;
@@ -466,628 +305,28 @@ void BSP_LCD_DrawHLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length)
 }
 
 /**
-  * @brief  Draws a vertical line.
-  * @param  Xpos: X position
+  * @brief  Draws a pixel on LCD.
+  * @param  Xpos: X position 
   * @param  Ypos: Y position
-  * @param  Length: Line length
+  * @param  RGB_Code: Pixel color in RGB mode (5-6-5)  
   * @retval None
   */
-void BSP_LCD_DrawVLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length)
+void BSP_LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code)
 {
-  uint32_t index = 0;
-  
-  if(lcd_drv->DrawVLine != NULL)
+  if(lcd_drv->DrawPixel != NULL)
   {
-    lcd_drv->DrawVLine(DrawProp.TextColor, Xpos, Ypos, Length);
-  }
-  else
-  {
-    for(index = 0; index < Length; index++)
-    {
-      BSP_LCD_DrawPixel(Xpos, Ypos + index, DrawProp.TextColor);
-    }
+    lcd_drv->DrawPixel(Xpos, Ypos, RGB_Code);
   }
 }
-
-/**
-  * @brief  Draws an uni-line (between two points).
-  * @param  x1: Point 1 X position
-  * @param  y1: Point 1 Y position
-  * @param  x2: Point 2 X position
-  * @param  y2: Point 2 Y position
-  * @retval None
-  */
-void BSP_LCD_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
-{
-  int16_t deltax = 0, deltay = 0, x = 0, y = 0, xinc1 = 0, xinc2 = 0, 
-  yinc1 = 0, yinc2 = 0, den = 0, num = 0, numadd = 0, numpixels = 0, 
-  curpixel = 0;
-  
-  deltax = ABS(x2 - x1);        /* The difference between the x's */
-  deltay = ABS(y2 - y1);        /* The difference between the y's */
-  x = x1;                       /* Start x off at the first pixel */
-  y = y1;                       /* Start y off at the first pixel */
-  
-  if (x2 >= x1)                 /* The x-values are increasing */
-  {
-    xinc1 = 1;
-    xinc2 = 1;
-  }
-  else                          /* The x-values are decreasing */
-  {
-    xinc1 = -1;
-    xinc2 = -1;
-  }
-  
-  if (y2 >= y1)                 /* The y-values are increasing */
-  {
-    yinc1 = 1;
-    yinc2 = 1;
-  }
-  else                          /* The y-values are decreasing */
-  {
-    yinc1 = -1;
-    yinc2 = -1;
-  }
-  
-  if (deltax >= deltay)         /* There is at least one x-value for every y-value */
-  {
-    xinc1 = 0;                  /* Don't change the x when numerator >= denominator */
-    yinc2 = 0;                  /* Don't change the y for every iteration */
-    den = deltax;
-    num = deltax / 2;
-    numadd = deltay;
-    numpixels = deltax;         /* There are more x-values than y-values */
-  }
-  else                          /* There is at least one y-value for every x-value */
-  {
-    xinc2 = 0;                  /* Don't change the x for every iteration */
-    yinc1 = 0;                  /* Don't change the y when numerator >= denominator */
-    den = deltay;
-    num = deltay / 2;
-    numadd = deltax;
-    numpixels = deltay;         /* There are more y-values than x-values */
-  }
-  
-  for (curpixel = 0; curpixel <= numpixels; curpixel++)
-  {
-    BSP_LCD_DrawPixel(x, y, DrawProp.TextColor);  /* Draw the current pixel */
-    num += numadd;                            /* Increase the numerator by the top of the fraction */
-    if (num >= den)                           /* Check if numerator >= denominator */
-    {
-      num -= den;                             /* Calculate the new numerator value */
-      x += xinc1;                             /* Change the x as appropriate */
-      y += yinc1;                             /* Change the y as appropriate */
-    }
-    x += xinc2;                               /* Change the x as appropriate */
-    y += yinc2;                               /* Change the y as appropriate */
-  }
-}
-
-/**
-  * @brief  Draws a rectangle.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  Width: Rectangle width  
-  * @param  Height: Rectangle height
-  * @retval None
-  */
-void BSP_LCD_DrawRect(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
-{
-  /* Draw horizontal lines */
-  BSP_LCD_DrawHLine(Xpos, Ypos, Width);
-  BSP_LCD_DrawHLine(Xpos, (Ypos+ Height), Width);
-  
-  /* Draw vertical lines */
-  BSP_LCD_DrawVLine(Xpos, Ypos, Height);
-  BSP_LCD_DrawVLine((Xpos + Width), Ypos, Height);
-}
-                            
-/**
-  * @brief  Draws a circle.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  Radius: Circle radius
-  * @retval None
-  */
-void BSP_LCD_DrawCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius)
-{
-  int32_t  D;       /* Decision Variable */ 
-  uint32_t  CurX;   /* Current X Value */
-  uint32_t  CurY;   /* Current Y Value */ 
-  
-  D = 3 - (Radius << 1);
-  CurX = 0;
-  CurY = Radius;
-  
-  while (CurX <= CurY)
-  {
-    BSP_LCD_DrawPixel((Xpos + CurX), (Ypos - CurY), DrawProp.TextColor);
-
-    BSP_LCD_DrawPixel((Xpos - CurX), (Ypos - CurY), DrawProp.TextColor);
-
-    BSP_LCD_DrawPixel((Xpos + CurY), (Ypos - CurX), DrawProp.TextColor);
-
-    BSP_LCD_DrawPixel((Xpos - CurY), (Ypos - CurX), DrawProp.TextColor);
-
-    BSP_LCD_DrawPixel((Xpos + CurX), (Ypos + CurY), DrawProp.TextColor);
-
-    BSP_LCD_DrawPixel((Xpos - CurX), (Ypos + CurY), DrawProp.TextColor);
-
-    BSP_LCD_DrawPixel((Xpos + CurY), (Ypos + CurX), DrawProp.TextColor);
-
-    BSP_LCD_DrawPixel((Xpos - CurY), (Ypos + CurX), DrawProp.TextColor);   
-
-    /* Initialize the font */
-    BSP_LCD_SetFont(&LCD_DEFAULT_FONT);
-
-    if (D < 0)
-    { 
-      D += (CurX << 2) + 6;
-    }
-    else
-    {
-      D += ((CurX - CurY) << 2) + 10;
-      CurY--;
-    }
-    CurX++;
-  } 
-}
-
-/**
-  * @brief  Draws an poly-line (between many points).
-  * @param  Points: Pointer to the points array
-  * @param  PointCount: Number of points
-  * @retval None
-  */
-void BSP_LCD_DrawPolygon(pPoint Points, uint16_t PointCount)
-{
-  int16_t X = 0, Y = 0;
-
-  if(PointCount < 2)
-  {
-    return;
-  }
-
-  BSP_LCD_DrawLine(Points->X, Points->Y, (Points+PointCount-1)->X, (Points+PointCount-1)->Y);
-  
-  while(--PointCount)
-  {
-    X = Points->X;
-    Y = Points->Y;
-    Points++;
-    BSP_LCD_DrawLine(X, Y, Points->X, Points->Y);
-  }
-}
-
-/**
-  * @brief  Draws an ellipse on LCD.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  XRadius: Ellipse X radius
-  * @param  YRadius: Ellipse Y radius
-  * @retval None
-  */
-void BSP_LCD_DrawEllipse(int Xpos, int Ypos, int XRadius, int YRadius)
-{
-  int x = 0, y = -YRadius, err = 2-2*XRadius, e2;
-  float K = 0, rad1 = 0, rad2 = 0;
-  
-  rad1 = XRadius;
-  rad2 = YRadius;
-  
-  K = (float)(rad2/rad1);
-  
-  do {      
-    BSP_LCD_DrawPixel((Xpos-(uint16_t)(x/K)), (Ypos+y), DrawProp.TextColor);
-    BSP_LCD_DrawPixel((Xpos+(uint16_t)(x/K)), (Ypos+y), DrawProp.TextColor);
-    BSP_LCD_DrawPixel((Xpos+(uint16_t)(x/K)), (Ypos-y), DrawProp.TextColor);
-    BSP_LCD_DrawPixel((Xpos-(uint16_t)(x/K)), (Ypos-y), DrawProp.TextColor);      
-    
-    e2 = err;
-    if (e2 <= x) {
-      err += ++x*2+1;
-      if (-y == x && e2 <= y) e2 = 0;
-    }
-    if (e2 > y) err += ++y*2+1;     
-  }
-  while (y <= 0);
-}
-
-/**
-  * @brief  Draws a bitmap picture loaded in the STM32 MCU internal memory.
-  * @param  Xpos: Bmp X position in the LCD
-  * @param  Ypos: Bmp Y position in the LCD
-  * @param  pBmp: Pointer to Bmp picture address
-  * @retval None
-  */
-void BSP_LCD_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pBmp)
-{
-  uint32_t height = 0;
-  uint32_t width  = 0;
-  
-  /* Read bitmap width */
-  width = pBmp[18] + (pBmp[19] << 8) + (pBmp[20] << 16)  + (pBmp[21] << 24);
-
-  /* Read bitmap height */
-  height = pBmp[22] + (pBmp[23] << 8) + (pBmp[24] << 16)  + (pBmp[25] << 24);
-  
-  /* Remap Ypos, st7735 works with inverted X in case of bitmap */
-  /* X = 0, cursor is on Top corner */
-/*  if(lcd_drv == &st7735_drv)
-  {
-    Ypos = BSP_LCD_GetYSize() - Ypos - height;
-  } */
-  
-  SetDisplayWindow(Xpos, Ypos, width, height);
-  
-  if(lcd_drv->DrawBitmap != NULL)
-  {
-    lcd_drv->DrawBitmap(Xpos, Ypos, pBmp);
-  } 
-  SetDisplayWindow(0, 0, BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
-}
-
-/**
-  * @brief  Draws a full rectangle.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  Width: Rectangle width  
-  * @param  Height: Rectangle height
-  * @retval None
-  */
-void BSP_LCD_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
-{
-  BSP_LCD_SetTextColor(DrawProp.TextColor);
-  do
-  {
-    BSP_LCD_DrawHLine(Xpos, Ypos++, Width);    
-  }
-  while(Height--);
-}
-
-/**
-  * @brief  Draws a full circle.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  Radius: Circle radius
-  * @retval None
-  */
-void BSP_LCD_FillCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius)
-{
-  int32_t  D;        /* Decision Variable */ 
-  uint32_t  CurX;    /* Current X Value */
-  uint32_t  CurY;    /* Current Y Value */ 
-  
-  D = 3 - (Radius << 1);
-
-  CurX = 0;
-  CurY = Radius;
-  
-  BSP_LCD_SetTextColor(DrawProp.TextColor);
-
-  while (CurX <= CurY)
-  {
-    if(CurY > 0) 
-    {
-      BSP_LCD_DrawHLine(Xpos - CurY, Ypos + CurX, 2*CurY);
-      BSP_LCD_DrawHLine(Xpos - CurY, Ypos - CurX, 2*CurY);
-    }
-
-    if(CurX > 0) 
-    {
-      BSP_LCD_DrawHLine(Xpos - CurX, Ypos - CurY, 2*CurX);
-      BSP_LCD_DrawHLine(Xpos - CurX, Ypos + CurY, 2*CurX);
-    }
-    if (D < 0)
-    { 
-      D += (CurX << 2) + 6;
-    }
-    else
-    {
-      D += ((CurX - CurY) << 2) + 10;
-      CurY--;
-    }
-    CurX++;
-  }
-
-  BSP_LCD_SetTextColor(DrawProp.TextColor);
-  BSP_LCD_DrawCircle(Xpos, Ypos, Radius);
-}
-
-/**
-  * @brief  Draws a full poly-line (between many points).
-  * @param  Points: Pointer to the points array
-  * @param  PointCount: Number of points
-  * @retval None
-  */
-void BSP_LCD_FillPolygon(pPoint Points, uint16_t PointCount)
-{
-  int16_t X = 0, Y = 0, X2 = 0, Y2 = 0, X_center = 0, Y_center = 0, X_first = 0, Y_first = 0, pixelX = 0, pixelY = 0, counter = 0;
-  uint16_t  IMAGE_LEFT = 0, IMAGE_RIGHT = 0, IMAGE_TOP = 0, IMAGE_BOTTOM = 0;  
-  
-  IMAGE_LEFT = IMAGE_RIGHT = Points->X;
-  IMAGE_TOP= IMAGE_BOTTOM = Points->Y;
-  
-  for(counter = 1; counter < PointCount; counter++)
-  {
-    pixelX = POLY_X(counter);
-    if(pixelX < IMAGE_LEFT)
-    {
-      IMAGE_LEFT = pixelX;
-    }
-    if(pixelX > IMAGE_RIGHT)
-    {
-      IMAGE_RIGHT = pixelX;
-    }
-    
-    pixelY = POLY_Y(counter);
-    if(pixelY < IMAGE_TOP)
-    {
-      IMAGE_TOP = pixelY;
-    }
-    if(pixelY > IMAGE_BOTTOM)
-    {
-      IMAGE_BOTTOM = pixelY;
-    }
-  }  
-  
-  if(PointCount < 2)
-  {
-    return;
-  }
-  
-  X_center = (IMAGE_LEFT + IMAGE_RIGHT)/2;
-  Y_center = (IMAGE_BOTTOM + IMAGE_TOP)/2;
-  
-  X_first = Points->X;
-  Y_first = Points->Y;
-  
-  while(--PointCount)
-  {
-    X = Points->X;
-    Y = Points->Y;
-    Points++;
-    X2 = Points->X;
-    Y2 = Points->Y;    
-    
-    FillTriangle(X, X2, X_center, Y, Y2, Y_center);
-    FillTriangle(X, X_center, X2, Y, Y_center, Y2);
-    FillTriangle(X_center, X2, X, Y_center, Y2, Y);   
-  }
-  
-  FillTriangle(X_first, X2, X_center, Y_first, Y2, Y_center);
-  FillTriangle(X_first, X_center, X2, Y_first, Y_center, Y2);
-  FillTriangle(X_center, X2, X_first, Y_center, Y2, Y_first);   
-}
-
-/**
-  * @brief  Draws a full ellipse.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  XRadius: Ellipse X radius
-  * @param  YRadius: Ellipse Y radius  
-  * @retval None
-  */
-void BSP_LCD_FillEllipse(int Xpos, int Ypos, int XRadius, int YRadius)
-{
-  int x = 0, y = -YRadius, err = 2-2*XRadius, e2;
-  float K = 0, rad1 = 0, rad2 = 0;
-  
-  rad1 = XRadius;
-  rad2 = YRadius;
-  
-  K = (float)(rad2/rad1);    
-  
-  do 
-  { 
-    BSP_LCD_DrawHLine((Xpos-(uint16_t)(x/K)), (Ypos+y), (2*(uint16_t)(x/K) + 1));
-    BSP_LCD_DrawHLine((Xpos-(uint16_t)(x/K)), (Ypos-y), (2*(uint16_t)(x/K) + 1));
-    
-    e2 = err;
-    if (e2 <= x) 
-    {
-      err += ++x*2+1;
-      if (-y == x && e2 <= y) e2 = 0;
-    }
-    if (e2 > y) err += ++y*2+1;
-  }
-  while (y <= 0);
-}
-
-/**
-  * @brief  Enables the display.
-  * @param  None
-  * @retval None
-  */
-void BSP_LCD_DisplayOn(void)
-{
-  lcd_drv->DisplayOn();
-}
-
-/**
-  * @brief  Disables the display.
-  * @param  None
-  * @retval None
-  */
-void BSP_LCD_DisplayOff(void)
-{
-  lcd_drv->DisplayOff();
-}
+                         
 
 /*******************************************************************************
                             Static Functions
 *******************************************************************************/
 
 /**
-  * @brief  Draws a character on LCD.
-  * @param  Xpos: Line where to display the character shape
-  * @param  Ypos: Start column address
-  * @param  pChar: Pointer to the character data
-  * @retval None
-  */
-static void DrawChar(uint16_t Xpos, uint16_t Ypos, const uint8_t *pChar)
-{
-  uint32_t counterh = 0, counterw = 0, index = 0;
-  uint16_t height = 0, width = 0;
-  uint8_t offset = 0;
-  uint8_t *pchar = NULL;
-  uint32_t line = 0;
-  
-  height = DrawProp.pFont->Height;
-  width  = DrawProp.pFont->Width;
-  
-  /* Fill bitmap header*/
-  *(uint16_t *) (bitmap + 2) = (uint16_t)(height*width*2+OFFSET_BITMAP);
-  *(uint16_t *) (bitmap + 4) = (uint16_t)((height*width*2+OFFSET_BITMAP)>>16);
-  *(uint16_t *) (bitmap + 10) = OFFSET_BITMAP;
-  *(uint16_t *) (bitmap + 18) = (uint16_t)(width);
-  *(uint16_t *) (bitmap + 20) = (uint16_t)((width)>>16);
-  *(uint16_t *) (bitmap + 22) = (uint16_t)(height);
-  *(uint16_t *) (bitmap + 24) = (uint16_t)((height)>>16);
-  
-  offset =  8 *((width + 7)/8) - width ;
-  
-  for(counterh = 0; counterh < height; counterh++)
-  {
-    pchar = ((uint8_t *)pChar + (width + 7)/8 * counterh);
-    
-    if(((width + 7)/8) == 3)
-    {
-      line =  (pchar[0]<< 16) | (pchar[1]<< 8) | pchar[2];
-    }
-    
-    if(((width + 7)/8) == 2)
-    {
-      line =  (pchar[0]<< 8) | pchar[1];
-    }
-    
-    if(((width + 7)/8) == 1)
-    {
-      line =  pchar[0];
-    }    
-    
-    for (counterw = 0; counterw < width; counterw++)
-    {
-      /* Image in the bitmap is written from the bottom to the top */
-      /* Need to invert image in the bitmap */
-      index = (((height-counterh-1)*width)+(counterw))*2+OFFSET_BITMAP;
-      if(line & (1 << (width- counterw + offset- 1))) 
-      {
-        bitmap[index] = (uint8_t)DrawProp.TextColor;
-        bitmap[index+1] = (uint8_t)(DrawProp.TextColor >> 8);
-      }
-      else
-      {
-        bitmap[index] = (uint8_t)DrawProp.BackColor;
-        bitmap[index+1] = (uint8_t)(DrawProp.BackColor >> 8);
-      } 
-    }
-  }
-  
-  BSP_LCD_DrawBitmap(Xpos, Ypos, bitmap);
-}
-
-/**
-  * @brief  Fills a triangle (between 3 points).
-  * @param  Points: Pointer to the points array
-  * @param  x1: Point 1 X position
-  * @param  y1: Point 1 Y position
-  * @param  x2: Point 2 X position
-  * @param  y2: Point 2 Y position
-  * @param  x3: Point 3 X position
-  * @param  y3: Point 3 Y position
-  * @retval None
-  */
-static void FillTriangle(uint16_t x1, uint16_t x2, uint16_t x3, uint16_t y1, uint16_t y2, uint16_t y3)
-{ 
-  int16_t deltax = 0, deltay = 0, x = 0, y = 0, xinc1 = 0, xinc2 = 0, 
-  yinc1 = 0, yinc2 = 0, den = 0, num = 0, numadd = 0, numpixels = 0, 
-  curpixel = 0;
-  
-  deltax = ABS(x2 - x1);        /* The difference between the x's */
-  deltay = ABS(y2 - y1);        /* The difference between the y's */
-  x = x1;                       /* Start x off at the first pixel */
-  y = y1;                       /* Start y off at the first pixel */
-  
-  if (x2 >= x1)                 /* The x-values are increasing */
-  {
-    xinc1 = 1;
-    xinc2 = 1;
-  }
-  else                          /* The x-values are decreasing */
-  {
-    xinc1 = -1;
-    xinc2 = -1;
-  }
-  
-  if (y2 >= y1)                 /* The y-values are increasing */
-  {
-    yinc1 = 1;
-    yinc2 = 1;
-  }
-  else                          /* The y-values are decreasing */
-  {
-    yinc1 = -1;
-    yinc2 = -1;
-  }
-  
-  if (deltax >= deltay)         /* There is at least one x-value for every y-value */
-  {
-    xinc1 = 0;                  /* Don't change the x when numerator >= denominator */
-    yinc2 = 0;                  /* Don't change the y for every iteration */
-    den = deltax;
-    num = deltax / 2;
-    numadd = deltay;
-    numpixels = deltax;         /* There are more x-values than y-values */
-  }
-  else                          /* There is at least one y-value for every x-value */
-  {
-    xinc2 = 0;                  /* Don't change the x for every iteration */
-    yinc1 = 0;                  /* Don't change the y when numerator >= denominator */
-    den = deltay;
-    num = deltay / 2;
-    numadd = deltax;
-    numpixels = deltay;         /* There are more y-values than x-values */
-  }
-  
-  for (curpixel = 0; curpixel <= numpixels; curpixel++)
-  {
-    BSP_LCD_DrawLine(x, y, x3, y3);
-    
-    num += numadd;              /* Increase the numerator by the top of the fraction */
-    if (num >= den)             /* Check if numerator >= denominator */
-    {
-      num -= den;               /* Calculate the new numerator value */
-      x += xinc1;               /* Change the x as appropriate */
-      y += yinc1;               /* Change the y as appropriate */
-    }
-    x += xinc2;                 /* Change the x as appropriate */
-    y += yinc2;                 /* Change the y as appropriate */
-  } 
-}
-
-/**
-  * @brief  Sets display window.
-  * @param  LayerIndex: layer index
-  * @param  Xpos: LCD X position
-  * @param  Ypos: LCD Y position
-  * @param  Width: LCD window width
-  * @param  Height: LCD window height  
-  * @retval None
-  */
-static void SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
-{
-  if(lcd_drv->SetDisplayWindow != NULL)
-  {
-    lcd_drv->SetDisplayWindow(Xpos, Ypos, Width, Height);
-  }  
-}
-
-
-/**
- * @brief Fill the DisplayWindow with single color
- * @param color -> color to Fill with
+* @brief Заповнює DisplayWindow одним кольором with single color
+ * @param color -> color to Fill with 0xXX 0x00 (
  * @return none
  */
 void LCD_Fill_Color(uint16_t color)
@@ -1115,7 +354,7 @@ void LCD_Fill_Color(uint16_t color)
 			{
 				for (j = 0; j < LCD_HEIGHT; j++) 
 				{
-					uint8_t data[] = {color >> 8, color & 0xFF};
+					uint8_t data[] = {color >> 8, color & 0xFF}; //Перетворення двобайтового кода в масив байт
 					LCD_SendData(data, sizeof(data));
 					z++;
 				}
@@ -1125,6 +364,7 @@ void LCD_Fill_Color(uint16_t color)
 	LCD_CS_HIGH();
 }
 
+//Встановлення розмірів вікна виводу
 static void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {
 	LCD_CS_LOW();
@@ -1369,48 +609,6 @@ void LCD_DrawCircle(uint16_t x0, uint16_t y0, uint8_t r, uint16_t color)
 	LCD_CS_HIGH();
 }
 
-/**
- * @brief Draw an Image on the screen
- * @param x&y -> start point of the Image
- * @param w&h -> width & height of the Image to Draw
- * @param data -> pointer of the Image array
- * @return none
- */
-void LCD_DrawImage(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t *data)
-{
-#ifdef TFT_LCD_7789
-	uint16_t	LCD_WIDTH = ST7789_WIDTH;
-	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
-#elif defined (TFT_LCD_7735)
-	uint16_t	LCD_WIDTH = ST7735_WIDTH;
-	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
-#endif
-
-	if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT))
-		return;
-	if ((x + w - 1) >= LCD_WIDTH)
-		return;
-	if ((y + h - 1) >= LCD_HEIGHT)
-		return;
-
-	LCD_CS_LOW();
-	LCD_SetAddressWindow(x, y, x + w - 1, y + h - 1);
-	LCD_SendData((uint8_t *)data, sizeof(uint16_t) * w * h);
-	LCD_CS_HIGH();
-}
-
-/**
- * @brief Invert Fullscreen color
- * @param invert -> Whether to invert
- * @return none
- */
-void LCD_InvertColors(uint8_t invert)
-{
-	LCD_CS_LOW();
-	LCD_SendCommand(invert ? 0x21 /* INVON */ : 0x20 /* INVOFF */);
-	LCD_CS_HIGH();
-}
-
 /** 
  * @brief Write a char
  * @param  x&y -> cursor of the start point.
@@ -1420,17 +618,17 @@ void LCD_InvertColors(uint8_t invert)
  * @param bgcolor -> background color of the char
  * @return  none
  */
-void LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t color, uint16_t bgcolor)
+void LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef Font, uint16_t color, uint16_t bgcolor)
 {
 	uint32_t i, b, j;
 	LCD_CS_LOW();
-	LCD_SetAddressWindow(x, y, x + sfont.width - 1, y + sfont.height - 1);
+	LCD_SetAddressWindow(x, y, x + Font.width - 1, y + Font.height - 1);
 	
-	for (i = 0; i < sfont.height; i++) {
+	for (i = 0; i < Font.height; i++) {
 		//b = font.data[(ch - 32) * font.height + i];
-		bi = sfont.data[(ch - 32) * sfont.height + i];
+		bi = Font.data[(ch - 32) * Font.height + i];
 		
-		for (j = 0; j < sfont.width; j++) {
+		for (j = 0; j < Font.width; j++) {
 			if ((bi << j) & 0x8000) {
 				uint8_t data[] = {color >> 8, color & 0xFF};
 				LCD_SendData(data, sizeof(data));
@@ -1444,6 +642,7 @@ void LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t colo
 	LCD_CS_HIGH();
 }
 
+
 /** 
  * @brief Write a string 
  * @param  x&y -> cursor of the start point.
@@ -1453,22 +652,22 @@ void LCD_WriteChar(uint16_t x, uint16_t y, char ch, FontDef sfont, uint16_t colo
  * @param bgcolor -> background color of the string
  * @return  none
  */
-void LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor)
+void LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef Font, uint16_t color, uint16_t bgcolor)
 {
 #ifdef TFT_LCD_7789
-	uint16_t	LCD_WIDTH = ST7789_WIDTH;
+	uint16_t	LCD_WIDTH = ST7789_WIDTH; //240x240
 	uint16_t	LCD_HEIGHT = ST7789_HEIGHT;
 #elif defined (TFT_LCD_7735)
-	uint16_t	LCD_WIDTH = ST7735_WIDTH;
+	uint16_t	LCD_WIDTH = ST7735_WIDTH; //128x128
 	uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
 #endif
 	
 	LCD_CS_LOW();
 	while (*str) {
-		if (x + font.width >= LCD_WIDTH) {
+		if (x + Font.width >= LCD_WIDTH) {
 			x = 0;
-			y += font.height;
-			if (y + font.height >= LCD_HEIGHT) {
+			y += Font.height;
+			if (y + Font.height >= LCD_HEIGHT) {
 				break;
 			}
 
@@ -1478,8 +677,8 @@ void LCD_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint
 				continue;
 			}
 		}
-		LCD_WriteChar(x, y, *str, font, color, bgcolor);
-		x += font.width;
+		LCD_WriteChar(x, y, *str, Font, color, bgcolor);
+		x += Font.width;
 		str++;
 	}
 	LCD_CS_HIGH();
@@ -1528,249 +727,472 @@ void LCD_DrawFilledRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uin
 	LCD_CS_HIGH();
 }
 
-/** 
- * @brief Draw a Triangle with single color
- * @param  xi&yi -> 3 coordinates of 3 top points.
- * @param color ->color of the lines
- * @return  none
- */
-void LCD_DrawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color)
+/******************************************************************************
+* Function Name  : GUI_Text
+* Description    : 
+* Input          : - Xpos: 
+*                  - Ypos: 
+*				           - str:
+*				           - charColor:
+*				           - bkColor:
+* Output         : None
+* Return         : None
+* Attention		 : None
+*  *mycoordinates Координати X, Y початку роміщення рядка символів
+* mySize індекс  таблиці символів
+*******************************************************************************/
+void GUI_Text(uint8_t* mycoordinates, char *str, uint8_t mySize)
 {
-	LCD_CS_LOW();
-	/* Draw lines */
-	LCD_DrawLine(x1, y1, x2, y2, color);
-	LCD_DrawLine(x2, y2, x3, y3, color);
-	LCD_DrawLine(x3, y3, x1, y1, color);
-	LCD_CS_HIGH();
+//	uint8_t TempChar;
+	
+//i = Xpos;
+//j = Ypos;
+	Xpos = *mycoordinates;
+	Ypos = *(mycoordinates + 1);
+if (mySize == 0x00) //8x14
+{
+	myfont = 0;
+	myVert = 14; 
+	myGoriz= 8;
+}	
+else if (mySize == 0x01) //10x20
+{
+	myfont = 1;
+	myVert = 20; //кол-во вертикальных точек в знаке (Три байта) 
+	myGoriz= 10; //кол-во горизонтальных точек в знаке (10 груп по 3 байта)
+}	
+
+else if (mySize == 0x02) // x24
+{
+	myfont = 1;
+	myVert = 24; //кол-во вертикальных точек в знаке
+	myGoriz= 19; //кол-во горизонтальных точек в знаке
+}	
+
+else if (mySize == 0x03) //
+{
+	myfont = 1;
+	myVert = 26; //кол-во вертикальных точек в знаке
+	myGoriz= 18; //кол-во горизонтальных точек в знаке
+}		
+ 
+else if (mySize == 0x05) //
+{
+	myfont = 1;
+	DrawProp.pFont = DigitalsBig[0];
+	DrawProp.height = 40; //кол-во вертикальных точек в знаке 8*5
+	DrawProp.width = 26; //кол-во горизонтальных точек в знаке 130/5
+}		
+
+else if (mySize == 0x07) //
+{
+	myfont = 1;
+	DrawProp.pFont = DigitalsBigBig[0];
+	DrawProp.height = 56; //кол-во вертикальных точек в знаке 8*7
+	DrawProp.width = 37; //кол-во горизонтальных точек в знаке 259/7
+}
+	do
+	{
+				TempChar = *str++;  //ASCI код символа
+ 
+//i = Xpos;
+//j = Ypos;
+		
+		PutChar( Xpos, Ypos, TempChar, mySize, 0); //mySize індекс таблиці символів
+			
+		if (myfont == 1)	
+		{
+			//Развертывание по вертикали
+			if( Xpos + DrawProp.width < MAX_X)
+        {
+            Xpos += DrawProp.width;
+        } 
+        else if (Ypos + DrawProp.height < MAX_Y)
+        {
+            Xpos = 0;
+            Ypos += myVert;
+        }   
+        else
+        {
+						BSP_LCD_Clear(0x00);
+						Xpos = 0;
+            Ypos = 0;
+        } 
+			}
+			else if (myfont == 0)
+			{
+//Развертывание по горизонтали
+				if( Xpos + DrawProp.width < MAX_X / 8)
+        {
+            Xpos += DrawProp.width;
+        } 
+        else if (Ypos + DrawProp.height < MAX_Y)
+        {
+            Xpos = 0;
+            Ypos += DrawProp.height;
+        }   
+        else
+        {
+						BSP_LCD_Clear(0x00);
+						Xpos = 0;
+            Ypos = 0;
+        } 
+			}
+				
+//i = Xpos;
+//j = Ypos;
+	}
+  while ( *str != 0 );
 }
 
-/** 
- * @brief Draw a filled Triangle with single color
- * @param  xi&yi -> 3 coordinates of 3 top points.
- * @param color ->color of the triangle
- * @return  none
- */
-void LCD_DrawFilledTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3, uint16_t color)
+void GUI_Text_ukr(uint8_t* mycoordinates, char *str, uint8_t mySize, uint8_t myFont)
 {
-	LCD_CS_LOW();
-	int16_t deltax = 0, deltay = 0, x = 0, y = 0, xinc1 = 0, xinc2 = 0,
-			yinc1 = 0, yinc2 = 0, den = 0, num = 0, numadd = 0, numpixels = 0,
-			curpixel = 0;
+//	uint8_t TempChar;
+	
+//i = Xpos;
+//j = Ypos;
+	uint16_t TempChar, char_16;
+	uint8_t Xpos, Ypos, cbyte;
+	Xpos = *mycoordinates;
+	Ypos = *(mycoordinates + 1);
+	
+	do
+	{
+		//size_t *cbyte;
+		if (myFont == 0) //Друкую день тижня українською
+		{
+			char_16 = utf8_to_unicode(str, &cbyte); //utf8_to_codepoint(str3, cbyte); 
+			if (cbyte == 1 && char_16 == 0x27)
+			{
+				char_16 = 0x0485;
+			}
 
-	deltax = ABS(x2 - x1);
-	deltay = ABS(y2 - y1);
-	x = x1;
-	y = y1;
+		/*!!!!Не можна використовувати віднімання 16-х кодів, тому що вони не послідовні на відміну від порядкових номерів таблиці кодів
+		Наприклад для кодів кирилиці п->0xD0BF[UTF8] / 0x43F[UNICODE] /1087[Десятковий]
+		                             р->0xD180[UTF8] / 0x440[UNICODE] /1088[Десятковий] !!!!
+		Перед відніманням тре перетворити UTF8 в UNICODE !!!!		
+		*/
+			TempChar = ((char_16 - 0x0406)); //*4 + 8); // порядковий номер символу в масиві myFont_ukr (по 4 байти в позиційному вказівнику на масиві символу)
+			if (cbyte == 1 && char_16 == 0x0485)  
+				 {
+					 Xpos += (DrawProp_ukr.width / 2);
+				 }
+			PutChar( Xpos, Ypos, TempChar, mySize, myFont); //mySize індекс таблиці символів
+			str = str + cbyte;
+			if( Xpos + DrawProp_ukr.width < MAX_X)
+       {
+ 					  Xpos += DrawProp_ukr.width; 
+	
+       }else if (Ypos + DrawProp_ukr.height < MAX_Y)
+       {
+            Xpos = 0;
+            Ypos += myVert;
+        }else
+        {
+						BSP_LCD_Clear(0x00);
+						Xpos = 0;
+            Ypos = 0;
+        } 
+		}else if(myFont == 1) //Друкую час великими цифрами
+		{
+		char_16 = utf8_to_unicode(str, &cbyte); //utf8_to_codepoint(str3, cbyte); 
+		//if (cbyte == 1 && char_16 == 0x27)
+		//{
+		//	char_16 = 0x0485;
+		//}
 
-	if (x2 >= x1) {
-		xinc1 = 1;
-		xinc2 = 1;
-	}
-	else {
-		xinc1 = -1;
-		xinc2 = -1;
-	}
-
-	if (y2 >= y1) {
-		yinc1 = 1;
-		yinc2 = 1;
-	}
-	else {
-		yinc1 = -1;
-		yinc2 = -1;
-	}
-
-	if (deltax >= deltay) {
-		xinc1 = 0;
-		yinc2 = 0;
-		den = deltax;
-		num = deltax / 2;
-		numadd = deltay;
-		numpixels = deltax;
-	}
-	else {
-		xinc2 = 0;
-		yinc1 = 0;
-		den = deltay;
-		num = deltay / 2;
-		numadd = deltax;
-		numpixels = deltay;
-	}
-
-	for (curpixel = 0; curpixel <= numpixels; curpixel++) {
-		LCD_DrawLine(x, y, x3, y3, color);
-
-		num += numadd;
-		if (num >= den) {
-			num -= den;
-			x += xinc1;
-			y += yinc1;
+		/*!!!!Не можна використовувати віднімання 16-х кодів, тому що вони не послідовні на відміну від порядкових номерів таблиці кодів
+		Наприклад для кодів кирилиці п->0xD0BF[UTF8] / 0x43F[UNICODE] /1087[Десятковий]
+		                             р->0xD180[UTF8] / 0x440[UNICODE] /1088[Десятковий] !!!!
+		Перед відніманням тре перетворити UTF8 в UNICODE !!!!		
+		*/
+				TempChar = (char_16 - 48); //порядковий номер символу в масиві myFont_Big_Digit
+				//TempChar = *str - 48; //порядковий номер символу в масиві myFont_Big_Digit
+				PutChar( Xpos, Ypos, TempChar, mySize, 1); //mySize індекс таблиці символів
+		    str = str + cbyte;
+				if( Xpos + DrawProp_Big_Digit.width < MAX_X)
+        {
+ 					  Xpos += DrawProp_Big_Digit.width + 4;
+	
+        }else if (Ypos + DrawProp_Big_Digit.height < MAX_Y)
+        {
+            Xpos = 0;
+            Ypos += myVert;
+        }else
+        {
+						BSP_LCD_Clear(0x00);
+						Xpos = 0;
+            Ypos = 0;
+        } 
 		}
-		x += xinc2;
-		y += yinc2;
-	}
-	LCD_CS_HIGH();
+
+	} while ( *str != 0 );
 }
 
-/** 
- * @brief Draw a Filled circle with single color
- * @param x0&y0 -> coordinate of circle center
- * @param r -> radius of circle
- * @param color -> color of circle
- * @return  none
- */
-void LCD_DrawFilledCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
+/******************************************************************************
+* Function Name  : PutChar
+* Description    : 
+* Input          : - Xpos:
+*                  - Ypos:
+*				           - ASCI:
+*				           - mySize індекс таблиці симолів
+*******************************************************************************/
+void PutChar( uint16_t Xpos, uint16_t Ypos, uint16_t ofset_ASCII, uint8_t mySize, uint8_t myFont)
 {
-	LCD_CS_LOW();
-	int16_t f = 1 - r;
-	int16_t ddF_x = 1;
-	int16_t ddF_y = -2 * r;
-	int16_t x = 0;
-	int16_t y = r;
+//	uint8_t data_LCD;
+//  uint8_t PutChar_command_LCD;
+//	uint8_t Status_LCD;
+//	uint8_t iq, jq, kq;
+	uint8_t Xpos_temp, Ypos_temp;
+	uint8_t buffer[260]; //Буфер для хранения байтов символа
+	uint8_t size_con;
+//	uint8_t i, j, k;
+//i = Xpos;
+//j = Ypos;
 
-	LCD_DrawPixel(x0, y0 + r, color);
-	LCD_DrawPixel(x0, y0 - r, color);
-	LCD_DrawPixel(x0 + r, y0, color);
-	LCD_DrawPixel(x0 - r, y0, color);
-	LCD_DrawLine(x0 - r, y0, x0 + r, y0, color);
+	GetASCIICode(buffer, ofset_ASCII, mySize, myFont); //, myVert); //Заполенние буфера buffer точками изображения символа с кодом ASCI
 
-	while (x < y) {
-		if (f >= 0) {
-			y--;
-			ddF_y += 2;
-			f += ddF_y;
+	Xpos_temp = Xpos;
+	Ypos_temp = Ypos;
+/*
+	if(myfont == 0)
+{
+	if (myGoriz == 1)
+	{	
+		for( iq=0; iq < myVert; iq++ )
+    {
+//      tmp_char = buffer[iq];
+			LCD_SetAddressPointer( Xpos_temp, Ypos_temp +iq);
+			if (buffer[iq] > 0x00 )
+			{	
+					do
+					{
+						Status_LCD = LCD_ReadStatus();	
+					}while ((Status_LCD & 0x03) != 0x03);
+					FMC_BANK1_WriteData(buffer[iq]);
+//----	
+					command_LCD = 0xC4; //запись без Autoincrement
+//					command_LCD = 0xC0; //запись с Autoincrement
+					do
+					{
+						Status_LCD = LCD_ReadStatus();	
+					}while ((Status_LCD & 0x03) != 0x03);
+					FMC_BANK1_WriteCommand(command_LCD); //RS=1		
+			}
 		}
-		x++;
-		ddF_x += 2;
-		f += ddF_x;
-
-		LCD_DrawLine(x0 - x, y0 + y, x0 + x, y0 + y, color);
-		LCD_DrawLine(x0 + x, y0 - y, x0 - x, y0 - y, color);
-
-		LCD_DrawLine(x0 + y, y0 + x, x0 - y, y0 + x, color);
-		LCD_DrawLine(x0 + y, y0 - x, x0 - y, y0 - x, color);
 	}
-	LCD_CS_HIGH();
+	else if (myGoriz == 2)
+	{
+		kq = 0; //каждый симол  - два байта массива, первый -правая половина символа
+		//второй - левая половина символа
+		for( iq=0; iq < myVert; iq++ ) //iq - индекс строки симола
+		{
+			for (jq = 0; jq < myGoriz; jq++) //jq - левая или правая половина символа
+			{			
+				switch (jq)
+				{
+					case 0:
+//позиция левой половины	myGoriz - 1					
+//					  tmp_char = buffer[iq + kq + 1]; //байт правой половины
+						LCD_SetAddressPointer( Xpos + jq, Ypos + iq); //  myGoriz - 2
+						if (buffer[iq + kq + 1] > 0x00 )
+						{	
+							do
+							{
+								Status_LCD = LCD_ReadStatus();	
+							}while ((Status_LCD & 0x03) != 0x03);
+							FMC_BANK1_WriteData(buffer[iq + kq + 1]);
+//----	
+							command_LCD = 0xC4; //запись без Autoincrement
+							do
+							{
+								Status_LCD = LCD_ReadStatus();	
+							}while ((Status_LCD & 0x03) != 0x03);
+							FMC_BANK1_WriteCommand(command_LCD); //RS=1		
+						}
+						break;
+					case 1:
+//позиция правой половины
+//  					tmp_char = buffer[iq + kq]; //байт левой половины
+						LCD_SetAddressPointer( Xpos_temp + jq, Ypos_temp + iq); //  myGoriz - 2
+
+//					LCD_SetAddressPointer( Xpos + jq + kq + myGoriz - 2, Ypos + iq);
+						if (buffer[iq + kq] > 0x00 )
+						{	
+							do
+							{
+								Status_LCD = LCD_ReadStatus();	
+							}while ((Status_LCD & 0x03) != 0x03);
+							FMC_BANK1_WriteData(buffer[iq + kq]);
+//----	
+							command_LCD = 0xC4; //запись без Autoincrement
+							do
+							{
+								Status_LCD = LCD_ReadStatus();	
+							}while ((Status_LCD & 0x03) != 0x03);
+							FMC_BANK1_WriteCommand(command_LCD); //RS=1		
+						}
+						break;
+					case 2:
+//						tmp_char = buffer[iq + jq + kq + myGoriz - 4];
+						LCD_SetAddressPointer( Xpos + jq + kq + myGoriz - 4, Ypos + iq - 2);
+						if (buffer[iq + jq + kq + myGoriz - 4] > 0x00 )
+						{	
+							do
+							{
+								Status_LCD = LCD_ReadStatus();	
+							}while ((Status_LCD & 0x03) != 0x03);
+							FMC_BANK1_WriteData(buffer[iq + jq + kq + myGoriz - 4]);
+//----	
+							command_LCD = 0xC4; //запись без Autoincrement
+							do
+							{
+								Status_LCD = LCD_ReadStatus();	
+							}while ((Status_LCD & 0x03) != 0x03);
+							FMC_BANK1_WriteCommand(command_LCD); //RS=1		
+						}
+						break;
+				}	
+
+			}
+			kq = kq + 1;
+			Ypos_temp = Ypos;
+		}
+	}		
+	
+	}
+	else
+	{
+*/
+//buffer[0] содержит кол-во колонок символа, j - текущая колонка
+//каждая колонка описывается тремя или 4 байтами хххххххх хххххххх хх
+		if (mySize == 0 || mySize == 1 || mySize == 2)
+		{
+			i_LCD = 3;
+		}
+		else if (mySize == 4)
+		{
+		//		i_LCD = 4; //для DigitalsBig[10][81]
+//			i_LCD = 7; //для DigitalsBig[10][260]
+//			i_LCD = 5; //для DigitalsMidle[10][171]
+			i_LCD = 4; //для DigitalsMidle[10][73]
+		}	
+		else if (mySize == 5)
+		{
+			i_LCD = 5; //Кількість байтів на один стовпчик для DigitalsBig[10][131]
+		}
+		else if (mySize == 7)
+		{
+			i_LCD = 7; //кількість байтів на один стовпчик для DigitalsBigBig[10][260]
+		}
+		else if (mySize == 8)
+		{
+			i_LCD = byte_width; //для myFont_ukr 3
+		}		
+if (mySize < 8)
+	{ //Розгортка по вертикалі символа	
+		//i_LCD - кількість байт в ширині одного символу
+		for(jq = 0; jq < (buffer[0] * i_LCD); jq = jq + i_LCD)
+		{	
+			//Цикл по групам з buffer[0] байтів поточного символа
+			//jq = 0  від 0-го до buffer[0]-1 включно
+			//jq = buffer[0]  від buffer[0] до 2*buffer[0]-1
+//k - горизонтальна частина колонки битов
+			for(kq = 0; kq < i_LCD; kq++)
+			{
+				//Цикл всередині групи з i_LCD байтів
+				if (kq > 0)
+				{
+					Ypos_temp = Ypos_temp + 8; //зміщення на наступний байт
+				}					
+				tmp_char = (uint8_t) buffer[jq + 1 + kq]; //поточний байт горизонтальної лінії
+				for( iq = 0; iq < 8; iq++ )
+				{
+					//Якщо поточний біт = 1, замальовувати піксель, якщо 0 - пропустити або замальовувати фоном
+				//TempChar = (uint8_t)(((buffer[jq+1+kq] >> iq) & 0x01) << 7);
+				//----------Значення поточного біту----------------------
+				if ((uint8_t) ((((uint8_t) buffer[jq + 1 + kq] >> iq) & 0x01) << 7) > 0x00 )
+				{
+					//цикл по поточній вертикалі символа
+					//поточний біт ,якщо = 1.ставити Point
+					//LCD_SetPoint(Xpos_temp, Ypos_temp + iq);
+					//LCD_WritePixel(Xpos_temp, Ypos_temp + iq);
+					BSP_LCD_DrawPixel(Xpos_temp, Ypos_temp + iq, DrawProp.TextColor);
+				}
+					
+					
+/*					
+					LCD_SetAddressPointer( Xpos_temp, Ypos_temp + iq);
+					if ((uint8_t)(((buffer[jq+1+kq] >> iq) & 0x01) << 7) > 0x00 )
+					{	
+						do
+						{
+							Status_LCD = LCD_ReadStatus();	
+						}while ((Status_LCD & 0x03) != 0x03);
+						LCD_WriteData((uint8_t)(((buffer[jq+1+kq] >> iq) & 0x01) << 7));
+//----	
+						PutChar_command_LCD = 0xC4; //запись без Autoincrement
+						do
+						{
+							Status_LCD = LCD_ReadStatus();	
+						}while ((Status_LCD & 0x03) != 0x03);
+						LCD_WriteCommand(PutChar_command_LCD); //RS=1		
+					}	
+*/					
+				}
+			}
+			Xpos_temp = Xpos_temp + 1;
+			Ypos_temp = Ypos;			
+		}
+	} else if(mySize == 8)
+	{ //Розгортка по горизонталі символу
+		//DrawProp_ukr.height кількість пікселів в стовпчику одного символу (27)
+		//i_LCD - кількість байтів, що тримають ширину пікселів символа
+		
+	if (myFont == 0)
+	{
+		size_con = DrawProp_ukr.height;
+	}else if (myFont == 1)
+	{
+		size_con = DrawProp_Big_Digit.height;
+	}
+
+		for(jq = 0; jq < (buffer[0] * size_con); jq = jq + i_LCD) //jq = 0, 3, 6, 9, ...,  27
+		{	
+			//Цикл по групам з buffer[0] байтів поточного символа
+			//jq = 0  від 0-го до buffer[0]
+			//jq = buffer[0]  від buffer[0] до 2*buffer[0]
+//			Xpos_temp = Xpos;
+//k - горизонтальна частина символа
+			for(kq = 0; kq < i_LCD; kq++)
+			{
+				//Цикл всередині групи з i_LCD байтів
+				if (kq > 0)
+				{
+					Xpos_temp = Xpos_temp + 8; //смещение на следующий байт
+				}					
+				tmp_char = (uint8_t) buffer[jq + 1 + kq]; //поточний байт горизонтальної лінії
+				for( iq = 0; iq < 8; iq++ )
+				{
+//Если текущий бит = 1, ставить точку, если 0 - пропускать
+				//TempChar = (uint8_t)(((buffer[jq+1+kq] >> iq) & 0x01) << 7);
+				//----------Значение текущего бита----------------------
+					if ((uint8_t) ((((uint8_t) buffer[jq + 1 + kq] >> iq) & 0x01) << 7) > 0x00 )
+					{
+						//цикл по поточному вертикальному стовпчику
+						//поточний біт ,якщо = 1.ставити Point
+						//LCD_SetPoint(Xpos_temp, Ypos_temp + iq);
+						//LCD_WritePixel(Xpos_temp, Ypos_temp + iq);
+						BSP_LCD_DrawPixel(Xpos_temp + iq, Ypos_temp, DrawProp_ukr.TextColor);
+					}
+				}
+			}
+			Xpos_temp = Xpos;
+			Ypos_temp = Ypos_temp + 1;			
+		}		
+	}
 }
 
 
-/**
- * @brief Open/Close tearing effect line
- * @param tear -> Whether to tear
- * @return none
- */
-void LCD_TearEffect(uint8_t tear)
-{
-	LCD_CS_LOW();
-	LCD_SendCommand(tear ? 0x35 /* TEON */ : 0x34 /* TEOFF */);
-	LCD_CS_HIGH();
-}
 
-void LCD_Test(void)
-{
-	LCD_Fill_Color(LCD_WHITE);
-	HAL_Delay(100);
-	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_16x26, LCD_RED, LCD_WHITE);
-	HAL_Delay(100);
-	LCD_Fill_Color(LCD_WHITE);
-	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_11x18, LCD_RED, LCD_WHITE);
-	HAL_Delay(100);
-	LCD_Fill_Color(LCD_WHITE);
-	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_7x10, LCD_RED, LCD_WHITE);
-	HAL_Delay(100);
-	LCD_Fill_Color(LCD_WHITE);
-	LCD_WriteString(10, 10, "11:28 20.02.2025", Font_16x26, LCD_RED, LCD_WHITE);
-	HAL_Delay(100);
-	LCD_Fill_Color(LCD_WHITE);
-	HAL_Delay(100);
-	
-	LCD_Fill_Color(LCD_CYAN);
-		HAL_Delay(100);
-	LCD_Fill_Color(LCD_RED);
-    HAL_Delay(100);
-	LCD_Fill_Color(LCD_BLUE);
-    HAL_Delay(100);
-	LCD_Fill_Color(LCD_GREEN);
-    HAL_Delay(100);
-	LCD_Fill_Color(LCD_YELLOW);
-    HAL_Delay(100);
-	LCD_Fill_Color(LCD_BROWN);
-    HAL_Delay(100);
-	LCD_Fill_Color(LCD_DARKBLUE);
-    HAL_Delay(100);
-	LCD_Fill_Color(LCD_MAGENTA);
-    HAL_Delay(100);
-	LCD_Fill_Color(LCD_LIGHTGREEN);
-    HAL_Delay(100);
-	LCD_Fill_Color(LCD_LGRAY);
-    HAL_Delay(100);
-	LCD_Fill_Color(LCD_LBBLUE);
-    HAL_Delay(100);
-	LCD_Fill_Color(LCD_WHITE);
-		HAL_Delay(100);
-
-	LCD_Fill_Color(LCD_RED);
-	LCD_WriteString(10, 10, "Rect./Line.", Font_11x18, LCD_YELLOW, LCD_RED);
-
-	LCD_DrawRectangle(30, 30, 100, 100, LCD_WHITE);
-		HAL_Delay(100);
-	LCD_Fill_Color(LCD_RED);
-	
-	LCD_DrawFilledRectangle(30, 30, 50, 50, LCD_WHITE);
-		HAL_Delay(100);
-	LCD_Fill_Color(LCD_RED);
-	
-	LCD_DrawCircle(60, 60, 25, LCD_WHITE);
-		HAL_Delay(100);
-
-	LCD_Fill_Color(LCD_RED);
-	LCD_WriteString(10, 10, "Filled Cir.", Font_11x18, LCD_YELLOW, LCD_RED);
-		HAL_Delay(100);
-	LCD_Fill_Color(LCD_RED);
-	
-	LCD_DrawFilledCircle(60, 60, 25, LCD_WHITE);
-		HAL_Delay(100);
-	LCD_Fill_Color(LCD_RED);
-	
-	//LCD_WriteString(10, 10, "Triangle", Font_11x18, YELLOW, BLACK);
-	LCD_DrawTriangle(30, 30, 30, 70, 60, 40, LCD_WHITE);
-		HAL_Delay(100);
-	LCD_Fill_Color(LCD_RED);
-	
-	//LCD_WriteString(10, 10, "Filled Tri", Font_11x18, YELLOW, BLACK);
-	LCD_DrawFilledTriangle(30, 30, 30, 70, 60, 40, LCD_WHITE);
-		HAL_Delay(100);
-	LCD_Fill_Color(LCD_RED);
-
-	LCD_WriteString(10, 10, "Hello Steve", Font_16x26, LCD_GBLUE, LCD_WHITE);
-		HAL_Delay(100);
-	LCD_Fill_Color(LCD_RED);
-	LCD_WriteString(10, 50, "Hello Steve!", Font_7x10, LCD_RED, LCD_WHITE);
-		HAL_Delay(100);
-	LCD_Fill_Color(LCD_RED);
-	LCD_WriteString(10, 75, "Hello Steve!", Font_11x18, LCD_YELLOW, LCD_WHITE);
-		HAL_Delay(1000);
-
-	//	If FLASH cannot storage anymore datas, please delete codes below.
-	LCD_Fill_Color(LCD_WHITE);
-	LCD_DrawImage(0, 0, 128, 128, &saber);
-	HAL_Delay(1000);
-}
-
-
-/**
-  * @}
-  */  
-  
-/**
-  * @}
-  */ 
-  
-/**
-  * @}
-  */     
-
-/**
-  * @}
-  */  
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    st7735.h
+  * @file    ST7735.h
   * @author  MCD Application Team
   * @version V1.1.1
   * @date    24-November-2014
-  * @brief   This file contains all the functions prototypes for the st7735.c
+  * @brief   This file contains all the functions prototypes for the ST7735.c
   *          driver.
   ******************************************************************************
   * @attention
@@ -45,7 +45,6 @@
 #endif 
 
 /* Includes ------------------------------------------------------------------*/
-#include "../Common/lcd.h"
 #include "fonts.h"
 
 /** @addtogroup BSP
@@ -78,7 +77,10 @@
 #define  ST7735_LCD_PIXEL_WIDTH    ((uint16_t)128)
 #define  ST7735_LCD_PIXEL_HEIGHT   ((uint16_t)128)
 
+/*
+ 
 
+*/
 /** 
   * @brief  ST7735 Registers  
   */ 
@@ -166,27 +168,28 @@
   * @{
   */ 
 
-uint16_t st7735_ReadID(void);
-void 		 st7735_Init(void);
-void     st7735_DisplayOn(void);
-void     st7735_DisplayOff(void);
-void     st7735_SetCursor(uint16_t Xpos, uint16_t Ypos);
-void     st7735_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode);
-void     st7735_WriteReg(uint8_t LCDReg, uint8_t LCDRegValue);
-uint8_t  st7735_ReadReg(uint8_t LCDReg);
+uint16_t ST7735_ReadID(void);
+void 		 ST7735_Init(void);
+void     ST7735_DisplayOn(void);
+void     ST7735_DisplayOff(void);
+void     ST7735_SetCursor(uint16_t Xpos, uint16_t Ypos);
+void 		 ST7735_DrawPixel(uint16_t x, uint16_t y, uint16_t color);
+uint16_t* ST7735_ReadPixel(uint16_t x, uint16_t y);
+void     ST7735_WriteReg(uint8_t LCDReg, uint8_t LCDRegValue);
+uint8_t  ST7735_ReadReg(uint8_t LCDReg);
 
-void     st7735_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
-void     st7735_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
-void     st7735_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
+void     ST7735_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
+void     ST7735_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
+void     ST7735_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length);
 
-void ST7735_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor);
+void 		 ST7735_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor);
 
-uint16_t st7735_GetLcdPixelWidth(void);
-uint16_t st7735_GetLcdPixelHeight(void);
-void     st7735_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);
+uint16_t ST7735_GetLcdPixelWidth(void);
+uint16_t ST7735_GetLcdPixelHeight(void);
+void     ST7735_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp);
 
 /* LCD driver structure */
-//extern LCD_DrvTypeDef   st7735_drv;
+//extern LCD_DrvTypeDef   ST7735_drv;
 
 /* LCD IO functions */
 void     LCD_IO_Init(void);
@@ -205,7 +208,7 @@ void     LCD_Delay(uint32_t delay);
 
 //=======================================================================
 #include "fonts.h"
-#include "st7735_cfg.h"
+#include "ST7735_cfg.h"
 #include <stdbool.h>
 
 
@@ -327,6 +330,7 @@ void ST7735_SetRotation(uint8_t m);
 uint8_t ST7735_GetRotation(void);
 int16_t ST7735_GetHeight(void);
 int16_t ST7735_GetWidth(void);
+
 #endif /* ST7735_H_ */
 
 

@@ -41,8 +41,12 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_nucleo.h"
+#include "../Drivers/BSP/Adafruit_Shield/stm32_adafruit_lcd.h"
+#include "fonts.h"
 
 extern SPI_HandleTypeDef SpiHandle;
+extern 	LCD_DrawPropTypeDef DrawProp;
+
 
 /** @addtogroup BSP
   * @{
@@ -100,7 +104,7 @@ const uint8_t  BUTTON_IRQn[BUTTONn] = {USER_BUTTON_EXTI_IRQn };
  */
 
 #ifdef HAL_SPI_MODULE_ENABLED
-uint32_t SpixTimeout = NUCLEO_SPIx_TIMEOUT_MAX;        /*<! Value of Timeout when SPI communication fails */
+uint32_t SpixTimeout = SPIx_TIMEOUT_MAX;        /*<! Value of Timeout when SPI communication fails */
 
 #endif /* HAL_SPI_MODULE_ENABLED */
 
@@ -354,6 +358,13 @@ uint32_t BSP_PB_GetState(Button_TypeDef Button)
   {
   return HAL_GPIO_ReadPin(BUTTON_PORT[Button], BUTTON_PIN[Button]);
   }
+
+#ifdef DCF77	
+uint32_t BSP_DCF77_GetState()
+  {
+  return HAL_GPIO_ReadPin(IN_DCF77_GPIO_PORT, IN_DCF77_PIN);
+  }	
+	#endif
 /**
   * @}
   */ 
@@ -378,21 +389,21 @@ void SPIx_MspInit(void)
   
   /*** Configure the GPIOs ***/  
   /* Enable GPIO clock */
-  NUCLEO_SPIx_SCK_GPIO_CLK_ENABLE();
+  SPIx_SCK_GPIO_CLK_ENABLE();
   
   /* Configure SPI SCK */
-  gpioinitstruct.Pin        = NUCLEO_SPIx_SCK_PIN;
+  gpioinitstruct.Pin        = SPIx_SCK_PIN;
   gpioinitstruct.Mode       = GPIO_MODE_AF_PP;
   gpioinitstruct.Speed      = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(NUCLEO_SPIx_SCK_GPIO_PORT, &gpioinitstruct);
+  HAL_GPIO_Init(SPIx_SCK_GPIO_PORT, &gpioinitstruct);
 
   /* Configure SPI MOSI */ 
-  gpioinitstruct.Pin        = NUCLEO_SPIx_MOSI_PIN;
-  HAL_GPIO_Init(NUCLEO_SPIx_MOSI_GPIO_PORT, &gpioinitstruct);
+  gpioinitstruct.Pin        = SPIx_MOSI_PIN;
+  HAL_GPIO_Init(SPIx_MOSI_GPIO_PORT, &gpioinitstruct);
   
    /*** Configure the SPI peripheral ***/ 
   /* Enable SPI clock */
-  NUCLEO_SPIx_CLK_ENABLE();
+  SPIx_CLK_ENABLE();
 }
 
 /**
@@ -403,7 +414,7 @@ void SPIx_Init(void)
   if(HAL_SPI_GetState(&SpiHandle) == HAL_SPI_STATE_RESET)
   {
 		
-    SpiHandle.Instance = NUCLEO_SPIx;
+    SpiHandle.Instance = SPIx;
       /* SPI baudrate is set to 8 MHz maximum (PCLK2/SPI_BaudRatePrescaler = 64/8 = 8 MHz) 
        to verify these constraints:
           - ST7735 LCD SPI interface max baudrate is 15MHz for write and 6.66MHz for read
@@ -509,107 +520,13 @@ void SPIx_Error (void)
   * @brief  Initialize the SD Card and put it into StandBy State (Ready for 
   *         data transfer).
   */
-void SD_IO_Init(void)
-{
-  GPIO_InitTypeDef  gpioinitstruct = {0};
-  uint8_t counter = 0;
 
-  /* SD_CS_GPIO Periph clock enable */
-  SD_CS_GPIO_CLK_ENABLE();
-
-  /* Configure SD_CS_PIN pin: SD Card CS pin */
-  gpioinitstruct.Pin    = SD_CS_PIN;
-  gpioinitstruct.Mode   = GPIO_MODE_OUTPUT_PP;
-  gpioinitstruct.Pull   = GPIO_PULLUP;
-  gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(SD_CS_GPIO_PORT, &gpioinitstruct);
-
-  /* Configure LCD_CS_PIN pin: LCD Card CS pin */
-  gpioinitstruct.Pin   = LCD_CS_PIN;
-  gpioinitstruct.Mode  = GPIO_MODE_OUTPUT_PP;
-  gpioinitstruct.Pull  = GPIO_NOPULL;
-  gpioinitstruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(SD_CS_GPIO_PORT, &gpioinitstruct);
-  LCD_CS_HIGH();
-  /*------------Put SD in SPI mode--------------*/
-  /* SD SPI Config */
-  SPIx_Init();
-
-  /* SD chip select high */
-  SD_CS_HIGH();
-  
-  /* Send dummy byte 0xFF, 10 times with CS high */
-  /* Rise CS and MOSI for 80 clocks cycles */
-  for (counter = 0; counter <= 9; counter++)
-  {
-    /* Send dummy byte 0xFF */
-    SD_IO_WriteByte(SD_DUMMY_BYTE);
-  }
-}
 
 /**
   * @brief  Set the SD_CS pin.
   * @param  pin value.
   */
-void SD_IO_CSState(uint8_t val)
-{
-  if(val == 1) 
-  {
-    SD_CS_HIGH();
-}
-  else
-  {
-    SD_CS_LOW();
-  }
-}
- 
-/**
-  * @brief  Write byte(s) on the SD
-  * @param  DataIn: Pointer to data buffer to write
-  * @param  DataOut: Pointer to data buffer for read data
-  * @param  DataLength: number of bytes to write
-  */
-void SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength)
-  {
-  /* Send the byte */
-  SPIx_WriteReadData(DataIn, DataOut, DataLength);
-}
 
-/**
-  * @brief  Write a byte on the SD.
-  * @param  Data: byte to send.
-  * @retval Data written
-  */
-uint8_t SD_IO_WriteByte(uint8_t Data)
-{
-  uint8_t tmp;
-
-  /* Send the byte */
-  SPIx_WriteReadData(&Data,&tmp,1);
-  return tmp;
-}
-
-/**
-  * @brief  Write an amount of data on the SD.
-  * @param  Data: byte to send.
-  * @param  DataLength: number of bytes to write
-  */
-void SD_IO_ReadData(uint8_t *DataOut, uint16_t DataLength)
-{
-  /* Send the byte */
-  SD_IO_WriteReadData(DataOut, DataOut, DataLength);
-  }   
- 
-/**
-  * @brief  Write an amount of data on the SD.
-  * @param  Data: byte to send.
-  * @param  DataLength: number of bytes to write
-  */
-void SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength)
-{
-  /* Send the byte */
-  SPIx_WriteData((uint8_t *)Data, DataLength);
-}
 
 /********************************* LINK LCD ***********************************/
 /**
@@ -623,6 +540,10 @@ void LCD_IO_Init(void)
   LCD_CS_GPIO_CLK_ENABLE(); //Не використовую
   LCD_DC_GPIO_CLK_ENABLE(); //PB1 CLK
   LCD_RST_GPIO_CLK_ENABLE(); //PA7 CLK
+
+#ifdef DCF77	
+	DCF77_GPIO_CLK_ENABLE();
+#endif
 	
   /* Configure типу роботи піна PB12: LCD_CS_PIN pin : LCD Card CS pin */
   gpioinitstruct.Pin    = LCD_CS_PIN; //PB12 Не використовую
@@ -638,6 +559,13 @@ void LCD_IO_Init(void)
   gpioinitstruct.Pin    = LCD_RST_PIN; //PA7 Скидання дисплея
 	gpioinitstruct.Mode   = GPIO_MODE_OUTPUT_PP;
   HAL_GPIO_Init(LCD_RST_GPIO_PORT, &gpioinitstruct); 
+
+#ifdef DCF77
+	gpioinitstruct.Pin    = DCF77_PIN; //PA1 
+  gpioinitstruct.Mode   = GPIO_MODE_INPUT;
+  HAL_GPIO_Init(DCF77_GPIO_PORT, &gpioinitstruct); 
+#endif	
+	
 
 	/* LCD chip select high */
   LCD_CS_HIGH(); //Використовую PB12. В платі не використовується
@@ -887,6 +815,8 @@ JOYState_TypeDef BSP_JOY_GetState(void)
   /* Return the code of the Joystick key pressed*/
   return state;
 }
+
+
 
 
 /**

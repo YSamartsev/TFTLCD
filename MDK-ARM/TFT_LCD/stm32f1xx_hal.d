@@ -24,6 +24,7 @@ tft_lcd\stm32f1xx_hal.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h
 tft_lcd\stm32f1xx_hal.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h
 tft_lcd\stm32f1xx_hal.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h
 tft_lcd\stm32f1xx_hal.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
+tft_lcd\stm32f1xx_hal.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h
 tft_lcd\stm32f1xx_hal.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 tft_lcd\stm32f1xx_hal.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h
 tft_lcd\stm32f1xx_hal.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h
