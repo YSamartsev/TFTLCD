@@ -1317,7 +1317,7 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 		xy_temp[1] = TIME_LCD_Coordinates[1];		
 		//Очистити хвилини
 		ST7789_Fill(xy_temp[0], xy_temp[1], xy_temp[0] + 74,  xy_temp[1] + 56, LCD_BLACK);
-		GUI_Text(TIME_LCD_Coordinates, (char *) realminutes, 7);	//Хвилин, для огромных цифр, 
+		GUI_Text(xy_temp, (char *) realminutes, 7);	//Хвилин, для огромных цифр, 
 		xy_temp[0] = xy_temp[0] +  (2*DrawProp.width);
 	  LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp.height/3, ":",Font_Size, LCD_WHITE, LCD_BLACK);	
 #elif defined TFT_LCD_1_44	
@@ -1330,7 +1330,7 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 
 //Секуди
 #ifdef TFT_LCD_1_3	
-	xy_temp[0] = TIME_LCD_Coordinates[0] + 52 + 8 + 52 + 8;
+	xy_temp[0] = TIME_LCD_Coordinates[0] + 74 + 16 + 74 + 16;
 	xy_temp[1] = TIME_LCD_Coordinates[1];	
 #elif defined TFT_LCD_1_44
 	//Font_Size = Font_11x18;
