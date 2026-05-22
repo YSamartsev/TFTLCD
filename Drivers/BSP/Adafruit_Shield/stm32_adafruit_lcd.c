@@ -158,12 +158,23 @@ uint8_t BSP_LCD_Init(void)
   //lcd_drv = &LCD_drv;
   /* LCD Init */   
   lcd_drv->Init();
+	
+	
 	//ST7735_Init(); //Конфігурація драйвера ST7789 LCD
-	//ST7735_FillScreen(WHITE);
-	LCD_Fill_Color(LCD_BLACK);
-
-	//LCD_DrawFilledRectangle(0, 0, 127, 127, LCD_BLACK);//Заповнити квадрат
+	//ST7735_FillScreen(LCD_WHITE);
+	//Якщо зображення зміщено відносно розмірів екрану, 
+	//в функції LCD_SetAddressWindow для ST7735 додаю/віднімаю зміщення
+	/*
+	#elif defined TFT_LCD_7735
+	uint16_t x_start = x0 + ST7735_XSTART, x_end = x1 + ST7735_XSTART;
+	uint16_t y_start = y0 + ST7735_YSTART, y_end = y1 + ST7735_YSTART;
+	ST7735_XSTART = 2 ST7735_YSTART =3
+	*/
+	LCD_Fill_Color(LCD_BLACK); 
 	//LCD_DrawRectangle(0, 0, 127, 127, LCD_GREEN); //намалювани лініями квадрат
+	
+	//LCD_DrawFilledRectangle(0, 0, 127, 127, LCD_RED);//Заповнити квадрат
+
 #elif defined (TFT_LCD_7789)
 	lcd_drv = &ST7789_drv;
 	
@@ -365,13 +376,13 @@ void LCD_Fill_Color(uint16_t color)
 }
 
 //Встановлення розмірів вікна виводу
-static void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
+void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {
 	LCD_CS_LOW();
-	uint16_t x_start = x0 + X_SHIFT, x_end = x1 + X_SHIFT;
-	uint16_t y_start = y0 + Y_SHIFT, y_end = y1 + Y_SHIFT;
 
 #ifdef TFT_LCD_7789	
+	uint16_t x_start = x0 + X_SHIFT, x_end = x1 + X_SHIFT;
+	uint16_t y_start = y0 + Y_SHIFT, y_end = y1 + Y_SHIFT;
 	/* Column Address set */
 	LCD_SendCommand(ST7789_CASET); 
 	{
@@ -388,6 +399,8 @@ static void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t
 	/* Write to RAM */
 	LCD_SendCommand(ST7789_RAMWR);
 #elif defined TFT_LCD_7735
+	uint16_t x_start = x0 + ST7735_XSTART, x_end = x1 + ST7735_XSTART;
+	uint16_t y_start = y0 + ST7735_YSTART, y_end = y1 + ST7735_YSTART;
 		/* Column Address set */
 	LCD_SendCommand(ST7735_CASET); 
 	{
