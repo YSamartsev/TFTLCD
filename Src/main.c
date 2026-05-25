@@ -1067,7 +1067,7 @@ static void RTC_SECConfig(void)
   sdatestructure.Month = 0x01; //RTC_MONTH_JANUARY; //01 = 0x10+01
   sdatestructure.Date = 0x07; //0x10+7
   sdatestructure.WeekDay = 0x02; //RTC_WEEKDAY_TUESDAY; 02 = 0x10+02 */
-  
+  //sdatestructure -> RtcHandle
   if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
   {
     // Initialization Error //
@@ -1181,7 +1181,7 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 #endif
 
  //RTC_DateTypeDef sdatestructureget;
-  
+ //RtcHandle ->  sdatestructureget
   HAL_RTC_GetDate(&RtcHandle, &sdatestructureget, RTC_FORMAT_BIN);
   
   //printf("%02d.%02d.20%02d %02d:%02d:%02d\n\r",sdatestructureget.Date, sdatestructureget.Month, sdatestructureget.Year, stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
