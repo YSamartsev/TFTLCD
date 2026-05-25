@@ -322,7 +322,8 @@ int main(void)
 	BSP_LED_Init(LED_GREEN);	//Ініціалізація світлодіода Користувача		
 	
 	MX_UART2_Init();		
-
+	//Конфігурування BlueTooth модуля командвми AT
+	//myHC-06 98:DA:60:04:Ae:07 1234
 	myCommandAT.ATstring = "AT"; //3222323
 	myCommandAT.ATversion = "AT+VERSION";																																																																																																							
 	myCommandAT.ATname = "AT+NAMEmyHC-06";	
@@ -658,9 +659,9 @@ RTC_SECConfig(); //Встановлюю дату з sdatestructure і stimestruc
 	{
 		//printf("Hours = %d Minutes = %d Seconds = %d\n\r", stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);	
 //Для відлагодження======================
-										//RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
+			//RTC_SECConfig(); //Конфігурую для переривання кожну секуду по RTC_IRQHandler
 
-										//RTC_SECUpdate(); //Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
+			//RTC_SECUpdate(); //Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
 			//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100, "Real Date:",Font_Size, LCD_GREEN, LCD_BLACK);
 			RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 5) / 100); //показати дату фонтом 16х26
 			//RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100); //показати дату фонтом 16х26
