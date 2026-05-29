@@ -186,6 +186,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 
+
+extern char aRxBuffer[14];
+extern RTC_DateTypeDef  sdatestructure;
+extern RTC_TimeTypeDef  stimestructure;
+extern FlagStatus DCF77_Status;
 /** @addtogroup STM32F1xx_HAL_Driver
   * @{
   */
@@ -307,7 +312,11 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc)
     }
   }
 #else
-  if (hrtc->State == HAL_RTC_STATE_RESET)
+HAL_PWR_EnableBkUpAccess(); //Відкриваю доступ до регістрів RTC і Backup
+uint16_t myTemp = HAL_RTCEx_BKUPRead(hrtc, RTC_BKP_DR1);
+//if (myTemp != 0x1234)
+//{
+	if (hrtc->State == HAL_RTC_STATE_RESET)
   {
     /* Allocate lock resource and initialize it */
     hrtc->Lock = HAL_UNLOCKED;
@@ -387,7 +396,7 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc)
 
       return HAL_ERROR;
     }
-
+    // Первое включение, настраиваем время и дату
     /* Initialize date to 1st of January 2000 */
     hrtc->DateToUpdate.Year = 0x00U;
     hrtc->DateToUpdate.Month = RTC_MONTH_JANUARY;
@@ -395,9 +404,10 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc)
 
     /* Set RTC state */
     hrtc->State = HAL_RTC_STATE_READY;
-
+	}
+	HAL_RTCEx_BKUPWrite(hrtc, RTC_BKP_DR1, 0x1234); //Записую маркер ініціалізації
+//}	
     return HAL_OK;
-  }
 }
 
 /**
@@ -788,7 +798,7 @@ HAL_StatusTypeDef HAL_RTC_SetTime(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTim
 }
 
 /**
-  * @brief  Gets RTC current time.
+  * @brief  Читає поточний час з CNTH_CNTL
   * @param  hrtc   pointer to a RTC_HandleTypeDef structure that contains
   *                the configuration information for RTC.
   * @param  sTime: Pointer to Time structure
