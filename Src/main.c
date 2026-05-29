@@ -299,6 +299,8 @@ int __backspace(FILE *f)
 	
 	time_t daytime;
 	time_t curtime;
+	struct tm tstart; //задаю дату початку відліку через структуру
+	struct tm tstop; //задаю дату початку відліку через структуру
 	char * pTemp;
 	
 int main(void)
@@ -639,6 +641,7 @@ if (Bluetooth_present == SHIELD_DETECTED)
 
 //мобільний формує коригуючу послідовність байтів: 0x32 0x38 0x30 0x33 0x32 0x35 0x31 0x33	px35 0x38 0x30 0x35 == 28,03.2025 13:58:01
 // кожен байт - це 4-х розрядний код символа цифри	2    8    0    3     2    5    1    3    5     8    0    5		
+/*
 	aRxBuffer[0] = (sdatestructure.Date >> 4) | 0x30;
   aRxBuffer[1] = (sdatestructure.Date & 0x0F) | 0x30;
 
@@ -656,11 +659,11 @@ if (Bluetooth_present == SHIELD_DETECTED)
 
 	aRxBuffer[10] = (stimestructure.Seconds >> 4) | 0x30;
   aRxBuffer[11] = (stimestructure.Seconds & 0x0F) | 0x30; 
-	DCF77_Status = SET;
+	DCF77_Status = SET; */
 #endif
 
 //Для відлагодження===========================
-RTC_SECConfig(); //Встановлюю дату з sdatestructure і stimestructure дату і секунди
+//RTC_SECConfig(); //Встановлюю дату з sdatestructure і stimestructure дату і секунди
 //============================================	
 
 	while (1)
@@ -699,7 +702,7 @@ https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 __HAL_LOCK(&RtcHandle); */
 
 //HAL_NVIC_DisableIRQ(RTC_IRQn);
-HAL_RTCEx_DeactivateSecond(&RtcHandle);
+			HAL_RTCEx_DeactivateSecond(&RtcHandle);
 	
 			switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) 
 			{  //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
@@ -743,16 +746,14 @@ printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);  */
 						{
 							//Контрольні суми співпадають
 							//Вирахоиую час в форматі time_t
-							struct tm tstart; //задаю дату початку відліку через структуру
 							tstart.tm_sec    = (aRxBuffer[10] & 0x0F)*10 + (aRxBuffer[11] & 0x0F);
-							
 							tstart.tm_min    = (aRxBuffer[8] & 0x0F)*10 + (aRxBuffer[9] & 0x0F);
 							tstart.tm_hour   = (aRxBuffer[6] & 0x0F)*10 + (aRxBuffer[7] & 0x0F);
 							tstart.tm_mday   = (aRxBuffer[0] & 0x0F)*10 + (aRxBuffer[1] & 0x0F);
 							tstart.tm_mon    = (aRxBuffer[2] & 0x0F)*10 + (aRxBuffer[3] & 0x0F) - 1;//місяць 0...11
 							tstart.tm_year   = (aRxBuffer[4] & 0x0F)*10 + (aRxBuffer[5] & 0x0F) + 2000 - 1900; //Число років, починаючи з 1900 
 							//tstart.tm_wday   = RTC_WeekDayNum(tstart.tm_year, tstart.tm_mon, tstart.tm_mday); //День тижня
-							daytime = mktime(&tstart); //Претворюю структуру в формат time_t
+							daytime = mktime(&tstart); //Перетворюю структуру в формат time_t
 							pTemp = asctime(&tstart); //претворюю структуру в рядок ascii
 							printf("Date of start %s\n", pTemp);	//друкую рядок дати
 
@@ -1215,19 +1216,34 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
   //printf("%02d.%02d.20%02d %02d:%02d:%02d\n\r",sdatestructureget.Date, sdatestructureget.Month, sdatestructureget.Year, stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
 	
 	//snprintf(realdate, sizeof realdate, "%s", &sdatestructureget.Date);
-	
-	sprintf(realweekday, "%02d", sdatestructureget.WeekDay);
+
+/*	sprintf(realweekday, "%02d", sdatestructureget.WeekDay);
 	sprintf(realdate, "%02d", sdatestructureget.Date);
 	sprintf(realmonth, "%02d", sdatestructureget.Month);
-	sprintf(realyear, "%02d", sdatestructureget.Year);
-			
-	char temp1[11];
+	sprintf(realyear, "%02d", sdatestructureget.Year); */
 
-	if (Date_temp != (float)(sdatestructureget.Year * sdatestructureget.Month * sdatestructureget.Date))
+	struct tm *varL = localtime(&daytime); 
+	
+	sprintf(realweekday, "%02d",  varL->tm_wday);
+	sprintf(realdate, "%02d", varL->tm_mday);
+	sprintf(realmonth, "%02d", varL->tm_mon + 1);
+	sprintf(realyear, "%02d", varL->tm_year +1900 - 2000);
+
+
+	char temp1[11];
+		//Отримати time_t, збережаний після останнього BlueTooth-сеанса
+//		time_t sdaytime = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR3) << 16; 
+//		sdaytime += HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR2);
+		
+	if (Date_temp != varL->tm_wday)
 	{
-		Date_temp = (float)(sdatestructureget.Year * sdatestructureget.Month * sdatestructureget.Date);
+		//Date_temp = (float)(sdatestructureget.Year * sdatestructureget.Month * sdatestructureget.Date);
+		Date_temp = varL->tm_wday;
+		
 		//printf("date = %s\n\r", temp1);
 		concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
+		//concat_date(temp1, varL->tm_mday, realmonth, realyear); //соединить строки -> *temp2
+		
 		temp1[10] = 0x00;	//останній код для string повинен бути 0x00
 		//Очистити прямокутник дати
 		LCD_DrawFilledRectangle(x, y, 10*Font_Size.width, Font_Size.height, LCD_BLACK);
@@ -1235,7 +1251,7 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 		LCD_WriteString(x, y, temp1, Font_Size, LCD_WHITE, LCD_BLACK);	 //& "." & realmonth
 	
 		//Отримати день тижня
-		strweekday = get_WeekDay(sdatestructureget.WeekDay);
+		strweekday = get_WeekDay(varL->tm_wday);
 		//Очистити прямокутник дня тижня
 		LCD_DrawFilledRectangle(Weekday_LCD_Coordinates[0], Weekday_LCD_Coordinates[1], Weekday_LCD_Coordinates[2], Weekday_LCD_Coordinates[3], LCD_BLACK); 
 		//Вивести день тижня
@@ -1360,6 +1376,7 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 #ifdef TFT_LCD_1_3	
 	xy_temp[0] = TIME_LCD_Coordinates[0] + 74 + 16 + 74 + 16;
 	xy_temp[1] = TIME_LCD_Coordinates[1];	
+	daytime += 1;
 #elif defined TFT_LCD_1_44
 	//Font_Size = Font_11x18;
 		//xy_temp[0] = *TIME_LCD_Coordinates +  (2*DrawProp_Big_Digit.width) + Font_Size.width;		
