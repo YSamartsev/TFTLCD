@@ -23,11 +23,13 @@
 #include <main.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "stm32_adafruit_lcd.h"
 #include <math.h>
 #include <stdlib.h>
 #include "fonts.h"
 #include "stm32_adafruit_lcd.h"
+#include "stm32f1xx_hal_rtc.h"
 
 //small fonts
 extern FontDef Font_7x10;
@@ -295,6 +297,10 @@ int __backspace(FILE *f)
 	//char *str1 = "П'ятниця";
 	uint8_t cbyte;
 	
+	time_t daytime;
+	time_t curtime;
+	char * pTemp;
+	
 int main(void)
 	//Початкова дата встановлюеться в  RTC_AlarmConfig
                                                                                                                                                                                                                                                                                           {  
@@ -453,9 +459,11 @@ BSP_LCD_Init(); //Ініціалізативна послідовність + с
 //DrawProp_ukr.width = 3; //20; //кількість байтів ширини символа 3*8 = 24
 //; //"ІЇАБВГДПятниця"; //ЇїАБААВГДЕФ"; //ІЇАБВГА"; //іАБВГіІЇї"; //҅ятниця"; //"҅"; 
 */
-   char *str1 = "П'ятниця";
- 	 GUI_Text_ukr(Weekday_LCD_Coordinates, str1, 8, 0);
-	 //Для TFT_LCD_1_44 Використовую шрифт  Arial36x33[]	 
+
+//   char *str1 = "П'ятниця";
+// 	 GUI_Text_ukr(Weekday_LCD_Coordinates, str1, 8, 0);
+
+		//Для TFT_LCD_1_44 Використовую шрифт  Arial36x33[]	 
 	 //Для TFT_LCD_1_3 Використовую шрифт  Arial45x39[]	
 		
 //=================================
@@ -734,6 +742,25 @@ printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);  */
 						if(Buffercmp((uint8_t *) &aRxBuffer[12], (uint8_t*) &myTempD, 2) == 0) 
 						{
 							//Контрольні суми співпадають
+							//Вирахоиую час в форматі time_t
+							struct tm tstart; //задаю дату початку відліку через структуру
+							tstart.tm_sec    = (aRxBuffer[10] & 0x0F)*10 + (aRxBuffer[11] & 0x0F);
+							
+							tstart.tm_min    = (aRxBuffer[8] & 0x0F)*10 + (aRxBuffer[9] & 0x0F);
+							tstart.tm_hour   = (aRxBuffer[6] & 0x0F)*10 + (aRxBuffer[7] & 0x0F);
+							tstart.tm_mday   = (aRxBuffer[0] & 0x0F)*10 + (aRxBuffer[1] & 0x0F);
+							tstart.tm_mon    = (aRxBuffer[2] & 0x0F)*10 + (aRxBuffer[3] & 0x0F) - 1;//місяць 0...11
+							tstart.tm_year   = (aRxBuffer[4] & 0x0F)*10 + (aRxBuffer[5] & 0x0F) + 2000 - 1900; //Число років, починаючи з 1900 
+							//tstart.tm_wday   = RTC_WeekDayNum(tstart.tm_year, tstart.tm_mon, tstart.tm_mday); //День тижня
+							daytime = mktime(&tstart); //Претворюю структуру в формат time_t
+							pTemp = asctime(&tstart); //претворюю структуру в рядок ascii
+							printf("Date of start %s\n", pTemp);	//друкую рядок дати
+
+							uint16_t daytimeL = daytime & 0x0000FFFF;
+							uint16_t daytimeH = (daytime >> 16) & 0x0000FFFF;
+							HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR2, daytimeL); //Записую time_t у Backup	
+							HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR3, daytimeH); //Записую time_t у Backup	
+							
 							RTC_SECUpdate(); ////Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
 							//RTC_DateShow(10, 50); //, aShowDate);
 							//RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);

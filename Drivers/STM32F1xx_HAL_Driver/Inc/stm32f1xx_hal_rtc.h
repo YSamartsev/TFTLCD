@@ -565,6 +565,8 @@ HAL_StatusTypeDef HAL_RTC_PollForAlarmAEvent(RTC_HandleTypeDef *hrtc, uint32_t T
 void              HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc);
 uint8_t           RTC_ByteToBcd2(uint8_t Value);
 uint8_t           RTC_Bcd2ToByte(uint8_t Value);
+uint8_t 					RTC_WeekDayNum(uint32_t nYear, uint8_t nMonth, uint8_t nDay);
+
 /**
   * @}
   */

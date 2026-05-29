@@ -1912,7 +1912,7 @@ static uint8_t RTC_IsLeapYear(uint16_t nYear)
   *         @arg RTC_WEEKDAY_SATURDAY
   *         @arg RTC_WEEKDAY_SUNDAY
   */
-static uint8_t RTC_WeekDayNum(uint32_t nYear, uint8_t nMonth, uint8_t nDay)
+uint8_t RTC_WeekDayNum(uint32_t nYear, uint8_t nMonth, uint8_t nDay)
 {
   uint32_t year = 0U, weekday = 0U;
 
