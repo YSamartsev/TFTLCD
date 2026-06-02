@@ -530,6 +530,7 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc);
 HAL_StatusTypeDef HAL_RTC_DeInit(RTC_HandleTypeDef *hrtc);
 void              HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc);
 void              HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc);
+uint32_t 					RTC_ReadTimeCounter(RTC_HandleTypeDef *hrtc);
 
 /* Callbacks Register/UnRegister functions  ***********************************/
 #if (USE_HAL_RTC_REGISTER_CALLBACKS == 1)
@@ -566,6 +567,7 @@ void              HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc);
 uint8_t           RTC_ByteToBcd2(uint8_t Value);
 uint8_t           RTC_Bcd2ToByte(uint8_t Value);
 uint8_t 					RTC_WeekDayNum(uint32_t nYear, uint8_t nMonth, uint8_t nDay);
+
 
 /**
   * @}

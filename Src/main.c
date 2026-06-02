@@ -387,14 +387,22 @@ int main(void)
       - Asynch Prediv  = Automatic calculation of prediv for 1 sec timebase
   */
 
+	RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
+	
+	__HAL_RCC_BKP_CLK_ENABLE();
+	__HAL_RCC_PWR_CLK_ENABLE();
+  HAL_PWR_EnableBkUpAccess();
 
-RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
+	if (1)  //(HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR3) != 0x1234) 
+{
+		if (HAL_RTC_Init(&RtcHandle) != HAL_OK) //RtcHandle сконфігуровано на 01.01.2000
+		{
+			char *myError = "HAL_RTC_Init";
+			Error_Handler(myError);
+		} 
+		HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR3, 0x1234);
 
-if (HAL_RTC_Init(&RtcHandle) != HAL_OK) //RtcHandle сконфігуровано на 01.01.2000
-  {
-    char *myError = "HAL_RTC_Init";
-		Error_Handler(myError);
-  } 
+}
 
 
 
@@ -666,6 +674,10 @@ if (Bluetooth_present == SHIELD_DETECTED)
 //RTC_SECConfig(); //Встановлюю дату з sdatestructure і stimestructure дату і секунди
 //============================================	
 
+//При вимиканні Vdd при наявності VBAT зберігаються тільки RTC_Count і BKP_DR
+//Всі змінні time_t  обнуляються, треба виправляти !!!!!!!!!!!
+
+
 	while (1)
 	{
 		//printf("Hours = %d Minutes = %d Seconds = %d\n\r", stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);	
@@ -702,7 +714,7 @@ https://controllerstech.com/stm32-uart-5-receive-data-using-idle-line/
 __HAL_LOCK(&RtcHandle); */
 
 //HAL_NVIC_DisableIRQ(RTC_IRQn);
-			HAL_RTCEx_DeactivateSecond(&RtcHandle);
+			//HAL_RTCEx_DeactivateSecond(&RtcHandle);
 	
 			switch (HAL_UART_Receive_IT(&UartHandle, (uint8_t *)aRxBuffer, sizeof(aRxBuffer))) 
 			{  //Приймаю 12 символів: число.місяць.рік.годин.хвилин.секунд 070125122800
@@ -757,12 +769,25 @@ printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);  */
 							pTemp = asctime(&tstart); //претворюю структуру в рядок ascii
 							printf("Date of start %s\n", pTemp);	//друкую рядок дати
 
+		/* Write time counter in RTC registers */
+  if (MSP_WriteTimeCounter(&RtcHandle, daytime) != HAL_OK)
+  {
+    /* Set RTC state */
+    RtcHandle.State = HAL_RTC_STATE_ERROR;
+
+    /* Process Unlocked */
+    __HAL_UNLOCK(&RtcHandle);
+
+    return HAL_ERROR;
+  }
+						
+							
 							uint16_t daytimeL = daytime & 0x0000FFFF;
 							uint16_t daytimeH = (daytime >> 16) & 0x0000FFFF;
 							HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR2, daytimeL); //Записую time_t у Backup	
 							HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR3, daytimeH); //Записую time_t у Backup	
 							
-							RTC_SECUpdate(); ////Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
+							//RTC_SECUpdate(); ////Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
 							//RTC_DateShow(10, 50); //, aShowDate);
 							//RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
 	
@@ -798,8 +823,8 @@ printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);  */
 /*RtcHandle.State = HAL_RTC_STATE_BUSY;
 __HAL_LOCK(&RtcHandle);		*/
 			//HAL_NVIC_EnableIRQ(RTC_IRQn);
-			HAL_RTCEx_SetSecond_IT(&RtcHandle);
-			HAL_Delay(100);	
+//			HAL_RTCEx_SetSecond_IT(&RtcHandle);
+//			HAL_Delay(100);	
 			//Для відлагодження=====================	
 	}
 }
@@ -1111,7 +1136,7 @@ static void RTC_SECConfig(void)
   stimestructure.Minutes = 0x59;
   stimestructure.Seconds = 0x55; */
   
-  if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
+  if(HAL_RTC_SetTime(&RtcHandle,&stimestructure, RTC_FORMAT_BCD) != HAL_OK)
   {
     // Initialization Error 
     char *myError = "HAL_RTC_SetTime";
@@ -1178,7 +1203,7 @@ static void RTC_SECUpdate(void)
   stimestructureget.Minutes = RTC_Data_Update(8);
   stimestructureget.Seconds = RTC_Data_Update(10);
   
-  if(HAL_RTC_SetTime(&RtcHandle, &stimestructureget,RTC_FORMAT_BCD) != HAL_OK) //Запис Часу в лічильник часу RTC
+  if(HAL_RTC_SetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BCD) != HAL_OK) //Запис Часу в лічильник часу RTC
   {
     // Initialization Error 
     char *myError = "HAL_RTC_SetTime";
@@ -1211,7 +1236,7 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 
  //RTC_DateTypeDef sdatestructureget;
  //RtcHandle ->  sdatestructureget
-  HAL_RTC_GetDate(&RtcHandle, &sdatestructureget, RTC_FORMAT_BIN);
+  //HAL_RTC_GetDate(&RtcHandle, &sdatestructureget, RTC_FORMAT_BIN);
   
   //printf("%02d.%02d.20%02d %02d:%02d:%02d\n\r",sdatestructureget.Date, sdatestructureget.Month, sdatestructureget.Year, stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
 	
@@ -1222,12 +1247,17 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	sprintf(realmonth, "%02d", sdatestructureget.Month);
 	sprintf(realyear, "%02d", sdatestructureget.Year); */
 
+	  /* Read the time counter*/
+  daytime = MSP_ReadTimeCounter(&RtcHandle);
+
+  //daytime = 0x6A1D51FB;
 	struct tm *varL = localtime(&daytime); 
+	mktime(varL);
 	
-	sprintf(realweekday, "%02d",  varL->tm_wday);
-	sprintf(realdate, "%02d", varL->tm_mday);
-	sprintf(realmonth, "%02d", varL->tm_mon + 1);
-	sprintf(realyear, "%02d", varL->tm_year +1900 - 2000);
+	sprintf(realweekday, "%02d",  varL->tm_wday); //день тижня 0...6 (0->Неділя)
+	sprintf(realdate, "%02d", varL->tm_mday); //день місяця 1...12
+	sprintf(realmonth, "%02d", varL->tm_mon + 1); // місяць 0...11
+	sprintf(realyear, "%02d", varL->tm_year +1900 - 2000); //Кількість років з 1900 року: 2026->126
 
 
 	char temp1[11];
@@ -1308,17 +1338,19 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 	
 	//Hours_temp = stimestructureget.Hours;
 	//Minutes_temp = stimestructureget.Minutes;
-	Seconds_temp = stimestructureget.Seconds;
+	//Seconds_temp = stimestructureget.Seconds;
  
- 	HAL_RTC_GetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BIN); //З лічильника CNTH_CNTL RTC формується структура stimestructureget
+ 	//HAL_RTC_GetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BIN); //З лічильника CNTH_CNTL RTC формується структура stimestructureget
  
   //printf("%02d.%02d.20%02d %02d:%02d:%02d\n\r",sdatestructureget.Date, sdatestructureget.Month, sdatestructureget.Year, stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
 	
 	//snprintf(realdate, sizeof realdate, "%s", &sdatestructureget.Date);
 	
-	sprintf(realhours, "%02d", stimestructureget.Hours);
-	sprintf(realminutes, "%02d", stimestructureget.Minutes);
-	sprintf(realseconds, "%02d", stimestructureget.Seconds);
+	struct tm *varL = localtime(&daytime); 
+	
+	sprintf(realhours, "%02d", varL->tm_hour);
+	sprintf(realminutes, "%02d", varL->tm_min);
+	sprintf(realseconds, "%02d", varL->tm_sec);
 	
 	char temp1[9];
 	concat_time(temp1, realhours, realminutes, realseconds); //соединить строки -> *temp2
@@ -1330,9 +1362,9 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 				
 
 //Години	
-	if (Hours_temp != stimestructureget.Hours)
+	if (Hours_temp != varL->tm_hour)
 	{
-		Hours_temp = stimestructureget.Hours;
+		Hours_temp = varL->tm_hour;
 		//Очистити прямокутник з годиною
 
 #ifdef TFT_LCD_1_3	
@@ -1353,9 +1385,9 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 #endif		
 	}
 //Хвилини	
-	if (Minutes_temp != stimestructureget.Minutes)
+	if (Minutes_temp != varL->tm_min)
 	{	
-		Minutes_temp = stimestructureget.Minutes;
+		Minutes_temp = varL->tm_min;
 #ifdef TFT_LCD_1_3	
 		xy_temp[0] = TIME_LCD_Coordinates[0] + 74 + 16;
 		xy_temp[1] = TIME_LCD_Coordinates[1];		
@@ -1376,7 +1408,6 @@ static void RTC_TimeShow(uint16_t x, uint16_t y) //х, у -координати 
 #ifdef TFT_LCD_1_3	
 	xy_temp[0] = TIME_LCD_Coordinates[0] + 74 + 16 + 74 + 16;
 	xy_temp[1] = TIME_LCD_Coordinates[1];	
-	daytime += 1;
 #elif defined TFT_LCD_1_44
 	//Font_Size = Font_11x18;
 		//xy_temp[0] = *TIME_LCD_Coordinates +  (2*DrawProp_Big_Digit.width) + Font_Size.width;		
@@ -1605,6 +1636,8 @@ char * get_WeekDay(uint8_t nday)
 {
 	switch (nday)
 	{
+		case 00:
+			return "Неділя";  //"Sunday";	
 		case 01:
 			return "Понеділок"; //"Monday";
 		case 02:
@@ -1617,10 +1650,98 @@ char * get_WeekDay(uint8_t nday)
 			return "П'ятниця";  //"Friday";
 		case 6:
 			return "Субота";  //"Saturday";
-		case 07:
-			return "Неділя";  //"Sunday";	
-		
 	}
+}
+
+uint32_t MSP_ReadTimeCounter(RTC_HandleTypeDef *hrtc)
+{
+  uint16_t high1 = 0U, high2 = 0U, low = 0U;
+  uint32_t timecounter = 0U;
+
+  high1 = READ_REG(hrtc->Instance->CNTH & RTC_CNTH_RTC_CNT);
+  low   = READ_REG(hrtc->Instance->CNTL & RTC_CNTL_RTC_CNT);
+  high2 = READ_REG(hrtc->Instance->CNTH & RTC_CNTH_RTC_CNT);
+
+  if (high1 != high2)
+  {
+    /* In this case the counter roll over during reading of CNTL and CNTH registers,
+       read again CNTL register then return the counter value */
+    timecounter = (((uint32_t) high2 << 16U) | READ_REG(hrtc->Instance->CNTL & RTC_CNTL_RTC_CNT));
+  }
+  else
+  {
+    /* No counter roll over during reading of CNTL and CNTH registers, counter
+       value is equal to first value of CNTL and CNTH */
+    timecounter = (((uint32_t) high1 << 16U) | low);
+  }
+
+  return timecounter;
+}
+
+HAL_StatusTypeDef MSP_WriteTimeCounter(RTC_HandleTypeDef *hrtc, uint32_t TimeCounter)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+
+  /* Set Initialization mode */
+  if (MSP_EnterInitMode(hrtc) != HAL_OK)
+  {
+    status = HAL_ERROR;
+  }
+  else
+  {
+    /* Set RTC COUNTER MSB word */
+    WRITE_REG(hrtc->Instance->CNTH, (TimeCounter >> 16U));
+    /* Set RTC COUNTER LSB word */
+    WRITE_REG(hrtc->Instance->CNTL, (TimeCounter & RTC_CNTL_RTC_CNT));
+
+    /* Wait for synchro */
+    if (MSP_ExitInitMode(hrtc) != HAL_OK)
+    {
+      status = HAL_ERROR;
+    }
+  }
+
+  return status;
+}
+
+HAL_StatusTypeDef MSP_EnterInitMode(RTC_HandleTypeDef *hrtc)
+{
+  uint32_t tickstart = 0U;
+
+  tickstart = HAL_GetTick();
+  /* Wait till RTC is in INIT state and if Time out is reached exit */
+  while ((hrtc->Instance->CRL & RTC_CRL_RTOFF) == (uint32_t)RESET)
+  {
+    if ((HAL_GetTick() - tickstart) >  RTC_TIMEOUT_VALUE)
+    {
+      return HAL_TIMEOUT;
+    }
+  }
+
+  /* Disable the write protection for RTC registers */
+  __HAL_RTC_WRITEPROTECTION_DISABLE(hrtc);
+
+  return HAL_OK;
+}
+
+HAL_StatusTypeDef MSP_ExitInitMode(RTC_HandleTypeDef *hrtc)
+{
+  uint32_t tickstart = 0U;
+
+  /* Disable the write protection for RTC registers */
+  __HAL_RTC_WRITEPROTECTION_ENABLE(hrtc);
+
+  tickstart = HAL_GetTick();
+  /* Wait till RTC is in INIT state and if Time out is reached exit */
+  while ((hrtc->Instance->CRL & RTC_CRL_RTOFF) == (uint32_t)RESET)
+  {
+    if ((HAL_GetTick() - tickstart) >  RTC_TIMEOUT_VALUE)
+    {
+      return HAL_TIMEOUT;
+    }
+  }
+
+  return HAL_OK;
 }
 
 

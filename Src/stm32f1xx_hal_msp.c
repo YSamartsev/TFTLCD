@@ -169,12 +169,12 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc)
      - Reset the Back up Domain using __HAL_RCC_BACKUPRESET_FORCE() and 
        __HAL_RCC_BACKUPRESET_RELEASE().
      - Configure the needed RTC clock source */
-  __HAL_RCC_BKP_CLK_ENABLE();
-	__HAL_RCC_PWR_CLK_ENABLE();
-  HAL_PWR_EnableBkUpAccess();
+//  __HAL_RCC_BKP_CLK_ENABLE();
+//	__HAL_RCC_PWR_CLK_ENABLE();
+//  HAL_PWR_EnableBkUpAccess();
 
-if (HAL_RTCEx_BKUPRead(hrtc, RTC_BKP_DR1) != 0x1234) 
-{
+//if (HAL_RTCEx_BKUPRead(hrtc, RTC_BKP_DR3) != 0x1234) 
+//{
 	
   /*##-2- Configue LSE/LSI as RTC clock soucre ###############################*/
 #ifdef RTC_CLOCK_SOURCE_LSE  
@@ -214,8 +214,7 @@ if (HAL_RTCEx_BKUPRead(hrtc, RTC_BKP_DR1) != 0x1234)
 #else
 #	error Please select the RTC Clock source inside the main.h file
 #endif /*RTC_CLOCK_SOURCE_LSE*/
-	HAL_RTCEx_BKUPWrite(hrtc, RTC_BKP_DR1, 0x1234);  
-}
+
   /*##-2- Enable RTC peripheral Clocks #######################################*/ 
   /* Enable RTC Clock */ 
   __HAL_RCC_RTC_ENABLE(); 
@@ -229,6 +228,8 @@ RTC_IRQHandler замість RTC_Alarm_IRQHandler
     HAL_NVIC_SetPriority(RTC_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(RTC_IRQn); 
 
+//		HAL_RTCEx_BKUPWrite(hrtc, RTC_BKP_DR3, 0x1234);  
+//}
 
 }
 

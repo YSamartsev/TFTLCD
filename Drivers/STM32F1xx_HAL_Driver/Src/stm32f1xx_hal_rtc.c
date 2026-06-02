@@ -392,6 +392,19 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc)
     hrtc->DateToUpdate.Year = 0x00U;
     hrtc->DateToUpdate.Month = RTC_MONTH_JANUARY;
     hrtc->DateToUpdate.Date = 0x01U;
+		uint32_t time_start = 0x6A1D51FB; //01.06.2026
+
+		/* Write time counter in RTC registers */
+  if (RTC_WriteTimeCounter(hrtc, time_start) != HAL_OK)
+  {
+    /* Set RTC state */
+    hrtc->State = HAL_RTC_STATE_ERROR;
+
+    /* Process Unlocked */
+    __HAL_UNLOCK(hrtc);
+
+    return HAL_ERROR;
+  }
 
     /* Set RTC state */
     hrtc->State = HAL_RTC_STATE_READY;
@@ -1583,7 +1596,7 @@ HAL_StatusTypeDef HAL_RTC_WaitForSynchro(RTC_HandleTypeDef *hrtc)
   *                the configuration information for RTC.
   * @retval Time counter
   */
-static uint32_t RTC_ReadTimeCounter(RTC_HandleTypeDef *hrtc)
+ uint32_t RTC_ReadTimeCounter(RTC_HandleTypeDef *hrtc)
 {
   uint16_t high1 = 0U, high2 = 0U, low = 0U;
   uint32_t timecounter = 0U;
