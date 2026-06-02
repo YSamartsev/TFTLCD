@@ -168,12 +168,15 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc)
        configure the RTC clock source (to be done once after reset).
      - Reset the Back up Domain using __HAL_RCC_BACKUPRESET_FORCE() and 
        __HAL_RCC_BACKUPRESET_RELEASE().
-     - Configure the needed RTC clock source */
-  __HAL_RCC_PWR_CLK_ENABLE();
-	__HAL_RCC_BKP_CLK_ENABLE();
+	*/
+	
+//  __HAL_RCC_BKP_CLK_ENABLE();
+//	__HAL_RCC_PWR_CLK_ENABLE();
+//  HAL_PWR_EnableBkUpAccess();
 
-	 // Часы не настроены 
-		hrtc->Init.AsynchPrediv = RTC_AUTO_1_SECOND;
+//if (HAL_RTCEx_BKUPRead(hrtc, RTC_BKP_DR3) != 0x1234) 
+//{
+
   /*##-2- Configue LSE/LSI as RTC clock soucre ###############################*/
 #ifdef RTC_CLOCK_SOURCE_LSE  
 		RCC_OscInitStruct.OscillatorType =  RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_LSE;
@@ -211,13 +214,14 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc)
 			Error_Handler();
 		}
 #else
-#error Please select the RTC Clock source inside the main.h file
+#	error Please select the RTC Clock source inside the main.h file
 #endif /*RTC_CLOCK_SOURCE_LSE*/
-  
+
   /*##-2- Enable RTC peripheral Clocks #######################################*/ 
   /* Enable RTC Clock */ 
-		__HAL_RCC_RTC_ENABLE(); 
- 
+
+  __HAL_RCC_RTC_ENABLE(); 
+
   /*##-4- Configure the NVIC for RTC Alarm ###################################*/
 //  HAL_NVIC_SetPriority(RTC_Alarm_IRQn, 0x0F, 0);
 //  HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
@@ -227,6 +231,8 @@ RTC_IRQHandler замість RTC_Alarm_IRQHandler
     HAL_NVIC_SetPriority(RTC_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(RTC_IRQn); 
 
+//		HAL_RTCEx_BKUPWrite(hrtc, RTC_BKP_DR3, 0x1234);  
+//}
 
 }
 
