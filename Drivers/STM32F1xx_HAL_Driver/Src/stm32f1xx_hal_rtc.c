@@ -312,10 +312,7 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc)
     }
   }
 #else
-HAL_PWR_EnableBkUpAccess(); //Відкриваю доступ до регістрів RTC і Backup
-uint16_t myTemp = HAL_RTCEx_BKUPRead(hrtc, RTC_BKP_DR1);
-//if (myTemp != 0x1234)
-//{
+	HAL_PWR_EnableBkUpAccess(); //Відкриваю доступ до регістрів RTC і Backup
 	if (hrtc->State == HAL_RTC_STATE_RESET)
   {
     /* Allocate lock resource and initialize it */
@@ -401,7 +398,7 @@ uint16_t myTemp = HAL_RTCEx_BKUPRead(hrtc, RTC_BKP_DR1);
     hrtc->DateToUpdate.Year = 0x00U;
     hrtc->DateToUpdate.Month = RTC_MONTH_JANUARY;
     hrtc->DateToUpdate.Date = 0x01U;
-		uint32_t time_start = 0x6A1D51FB; //01.06.2026
+		uint32_t time_start = 0x6A1D51FB; //01.06.2026 09:33:00
 
 		/* Write time counter in RTC registers */
   if (RTC_WriteTimeCounter(hrtc, time_start) != HAL_OK)
@@ -419,7 +416,7 @@ uint16_t myTemp = HAL_RTCEx_BKUPRead(hrtc, RTC_BKP_DR1);
     hrtc->State = HAL_RTC_STATE_READY;
 	}
 	HAL_RTCEx_BKUPWrite(hrtc, RTC_BKP_DR1, 0x1234); //Записую маркер ініціалізації
-//}	
+
     return HAL_OK;
 }
 

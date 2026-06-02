@@ -170,13 +170,6 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc)
        __HAL_RCC_BACKUPRESET_RELEASE().
 	*/
 	
-//  __HAL_RCC_BKP_CLK_ENABLE();
-//	__HAL_RCC_PWR_CLK_ENABLE();
-//  HAL_PWR_EnableBkUpAccess();
-
-//if (HAL_RTCEx_BKUPRead(hrtc, RTC_BKP_DR3) != 0x1234) 
-//{
-
   /*##-2- Configue LSE/LSI as RTC clock soucre ###############################*/
 #ifdef RTC_CLOCK_SOURCE_LSE  
 		RCC_OscInitStruct.OscillatorType =  RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_LSE;
@@ -230,10 +223,6 @@ RTC_IRQHandler замість RTC_Alarm_IRQHandler
 то треба 	*/
     HAL_NVIC_SetPriority(RTC_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(RTC_IRQn); 
-
-//		HAL_RTCEx_BKUPWrite(hrtc, RTC_BKP_DR3, 0x1234);  
-//}
-
 }
 
 /**
