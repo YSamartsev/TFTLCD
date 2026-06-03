@@ -888,7 +888,7 @@ HAL_StatusTypeDef HAL_RTC_GetTime(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTim
     }
 
     /* Update date */
-    RTC_DateUpdate(hrtc, days_elapsed);
+    RTC_DateUpdate(hrtc, days_elapsed); //змінює дату з врахуванням 30/31  28/29 і високосного року
   }
   else
   {

@@ -373,18 +373,38 @@ int main(void)
 	
   /*##-1- Configure the RTC peripheral #######################################*/
 	RtcHandle.Instance = RTC;
-  
-	  /* Configure RTC prescaler and RTC data registers */
-  /* RTC configured as follows:
-      - Asynch Prediv  = Automatic calculation of prediv for 1 sec timebase
-  */
+	
+	sUNICODE = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR1);  
+if (1) //(sUNICODE != 0x1234)
+{
+//мобільний формує коригуючу послідовність байтів: 0x32 0x38 0x30 0x33 0x32 0x35 0x31 0x33	px35 0x38 0x30 0x35 == 28,03.2025 13:58:01
+// кожен байт - це 4-х розрядний код символа цифри	2    8    0    3     2    5    1    3    5     8    0    5		
+	aRxBuffer[0] = (sdatestructure.Date >> 4) | 0x30;
+  aRxBuffer[1] = (sdatestructure.Date & 0x0F) | 0x30;
+
+	aRxBuffer[2] = (sdatestructure.Month >> 4) | 0x30;
+  aRxBuffer[3] = (sdatestructure.Month & 0x0F) | 0x30;
+
+	aRxBuffer[4] = (sdatestructure.Year >> 4) | 0x30;
+  aRxBuffer[5] = (sdatestructure.Year & 0x0F) | 0x30;
+
+	aRxBuffer[6] = (stimestructure.Hours >> 4) | 0x30;
+  aRxBuffer[7] = (stimestructure.Hours & 0x0F) | 0x30;
+
+	aRxBuffer[8] = (stimestructure.Minutes >> 4) | 0x30;
+  aRxBuffer[9] = (stimestructure.Minutes & 0x0F) | 0x30;
+
+	aRxBuffer[10] = (stimestructure.Seconds >> 4) | 0x30;
+  aRxBuffer[11] = (stimestructure.Seconds & 0x0F) | 0x30; 
+	DCF77_Status = SET; //Імітую прийом від BlueTooth 
+	RTC_SECUpdate(); ////Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
 	
 	if (HAL_RTC_Init(&RtcHandle) != HAL_OK) //RtcHandle сконфігуровано на 01.01.2000
   {
     char *myError = "HAL_RTC_Init";
 		Error_Handler(myError);
   } 
-
+}
 
 
 /* -------------RTC End--------------*/
@@ -617,44 +637,21 @@ if (Bluetooth_present == SHIELD_DETECTED)
 				}
 #else
 
-	//Для відлагодження в форматі BCD
+//Для відлагодження в форматі BCD (двійково-десятковий формат): 0x26 означає 2*10 + 6
 
-stimestructure.Hours   = 0x15; // 18 годин
-	stimestructure.Minutes   = 0x03;  //34 хвилини
-	stimestructure.Seconds   = 0x55;  //5 хвилин
+	stimestructure.Hours   = 0x09; // 9 годин
+	stimestructure.Minutes   = 0x33;  //33 хвилини
+	stimestructure.Seconds   = 0x57;  //57  секунд
  	
-  sdatestructure.Date = 0x05; //6 число
-	sdatestructure.WeekDay = 0x04; //Четвертий день тижня
+  sdatestructure.Date = 0x01; //1 число
+	//sdatestructure.WeekDay = 0x04; //Четвертий день тижня
   sdatestructure.Month = 0x06;	//Шостий місяць
-	sdatestructure.Year = 0x25;  //25 рік
+	sdatestructure.Year = 0x26;  //26 рік
 #endif
 
 sUNICODE = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR1);
 
-/*if (sUNICODE != 0x1234)
-{
-//мобільний формує коригуючу послідовність байтів: 0x32 0x38 0x30 0x33 0x32 0x35 0x31 0x33	px35 0x38 0x30 0x35 == 28,03.2025 13:58:01
-// кожен байт - це 4-х розрядний код символа цифри	2    8    0    3     2    5    1    3    5     8    0    5		
-	aRxBuffer[0] = (sdatestructure.Date >> 4) | 0x30;
-  aRxBuffer[1] = (sdatestructure.Date & 0x0F) | 0x30;
-
-	aRxBuffer[2] = (sdatestructure.Month >> 4) | 0x30;
-  aRxBuffer[3] = (sdatestructure.Month & 0x0F) | 0x30;
-
-	aRxBuffer[4] = (sdatestructure.Year >> 4) | 0x30;
-  aRxBuffer[5] = (sdatestructure.Year & 0x0F) | 0x30;
-
-	aRxBuffer[6] = (stimestructure.Hours >> 4) | 0x30;
-  aRxBuffer[7] = (stimestructure.Hours & 0x0F) | 0x30;
-
-	aRxBuffer[8] = (stimestructure.Minutes >> 4) | 0x30;
-  aRxBuffer[9] = (stimestructure.Minutes & 0x0F) | 0x30;
-
-	aRxBuffer[10] = (stimestructure.Seconds >> 4) | 0x30;
-  aRxBuffer[11] = (stimestructure.Seconds & 0x0F) | 0x30; 
-	DCF77_Status = SET; //Імітую прийом від BlueTooth 
-}
-*/																																																																																																																																													
+																																																																																																																													
 
 
 //Для відлагодження===========================
@@ -1134,10 +1131,11 @@ static void RTC_SECUpdate(void)
  
  //##-1- Configure the Date #################################################
   // Set Date: 25.
-  
-	sdatestructureget.Date = RTC_Data_Update(0); //0x10+7
-	sdatestructureget.Month = RTC_Data_Update(2); //RTC_MONTH_JANUARY; //01 = 0x10+01
-	sdatestructureget.Year = RTC_Data_Update(4); //0x25; //0x14;
+  //aRxBuffer[12] = 32 35 30 31 32 36 31 32 32 38 30 31 приклад
+	
+	sdatestructureget.Date = RTC_Data_Update(0); //День місяця = 0x10 + 7 = 25
+	sdatestructureget.Month = RTC_Data_Update(2); //RTC_MONTH_JANUARY; //01 = 0x00+01
+	sdatestructureget.Year = RTC_Data_Update(4); //0x26; //0x14;
   //sdatestructure.WeekDay = RTC_Data_Update(6); //RTC_WEEKDAY_TUESDAY; 02 = 0x10+02
   
   if(HAL_RTC_SetDate(&RtcHandle, &sdatestructureget, RTC_FORMAT_BCD) != HAL_OK) //Запис Дати з sdatestructureget в  CNTH_CNTL
@@ -1193,10 +1191,10 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	
 	//snprintf(realdate, sizeof realdate, "%s", &sdatestructureget.Date);
 	
-	sprintf(realweekday, "%02d", sdatestructureget.WeekDay); // Дата, вирахована з CNTH_CNTL
-	sprintf(realdate, "%02d", sdatestructureget.Date);
-	sprintf(realmonth, "%02d", sdatestructureget.Month);
-	sprintf(realyear, "%02d", sdatestructureget.Year);
+	sprintf(realweekday, "%02d", sdatestructureget.WeekDay); // Дата, вирахована з CNTH_CNTL 0...6
+	sprintf(realdate, "%02d", sdatestructureget.Date); // 0...31
+	sprintf(realmonth, "%02d", sdatestructureget.Month); //0...11
+	sprintf(realyear, "%02d", sdatestructureget.Year); //число років від 1900р, 26 = 2026 - 1900 -100
 			
 	char temp1[11];
 
@@ -1565,6 +1563,8 @@ char * get_WeekDay(uint8_t nday)
 {
 	switch (nday)
 	{
+		case 00:
+			return "Неділя";  //"Sunday";	
 		case 01:
 			return "Понеділок"; //"Monday";
 		case 02:
@@ -1577,9 +1577,7 @@ char * get_WeekDay(uint8_t nday)
 			return "П'ятниця";  //"Friday";
 		case 6:
 			return "Субота";  //"Saturday";
-		case 07:
-			return "Неділя";  //"Sunday";	
-		
+	
 	}
 }
 
