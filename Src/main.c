@@ -393,14 +393,14 @@ int main(void)
 	__HAL_RCC_PWR_CLK_ENABLE();
   HAL_PWR_EnableBkUpAccess();
 
-	if (1)  //(HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR3) != 0x1234) 
+	if (HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR1) != 0x1234) 
 {
 		if (HAL_RTC_Init(&RtcHandle) != HAL_OK) //RtcHandle сконфігуровано на 01.01.2000
 		{
 			char *myError = "HAL_RTC_Init";
 			Error_Handler(myError);
 		} 
-		HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR3, 0x1234);
+		HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR1, 0x1234);
 
 }
 
