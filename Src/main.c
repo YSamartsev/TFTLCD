@@ -23,11 +23,13 @@
 #include <main.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "stm32_adafruit_lcd.h"
 #include <math.h>
 #include <stdlib.h>
 #include "fonts.h"
 #include "stm32_adafruit_lcd.h"
+#include "stm32f1xx_hal_rtc.h"
 
 //small fonts
 extern FontDef Font_7x10;
@@ -292,8 +294,18 @@ int __backspace(FILE *f)
 
 	//char *Text = "12:22";
 	uint16_t sUNICODE;
-	//char *str1 = "П'ятниця";
+	
+	time_t daytime;
+	time_t curent_daytime;
 	uint8_t cbyte;
+	struct tm tstart; //задаю дату початку відліку через структуру
+	struct tm tstop; //задаю дату початку відліку через структуру
+	char * pTemp;
+	
+	char realhours[2];
+	char realminutes[2];
+	char realseconds[2];
+	char realweekday[2];
 	
 int main(void)
 	//Початкова дата встановлюеться в  RTC_AlarmConfig
@@ -380,14 +392,54 @@ int main(void)
   */
 
 
-RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
+	RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
 
-if (HAL_RTC_Init(&RtcHandle) != HAL_OK) //RtcHandle сконфігуровано на 01.01.2000
-  {
-    char *myError = "HAL_RTC_Init";
-		Error_Handler(myError);
-  } 
+	__HAL_RCC_BKP_CLK_ENABLE();
+	__HAL_RCC_PWR_CLK_ENABLE();
+	HAL_PWR_EnableBkUpAccess(); //Відкриваю доступ до регістрів RTC і Backup
 
+	if (HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR1) != 0x1234) 
+	{
+		if (HAL_RTC_Init(&RtcHandle) != HAL_OK) //RtcHandle сконфігуровано на 01.01.2000
+		{
+			char *myError = "HAL_RTC_Init";
+			Error_Handler(myError);
+		} 
+		HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR1, 0x1234);
+
+	}else
+	{
+		if (HAL_RTC_WaitForSynchro(&RtcHandle) != HAL_OK)
+		{
+			/* Set RTC state */
+			RtcHandle.State = HAL_RTC_STATE_ERROR;
+			return HAL_ERROR;
+		}
+		//Визначаю покази таймера в момент запису дати_часу в BKP_DR2_DR3
+						uint32_t daytimeL = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR2); //Читаю time_t з Backup	
+						uint32_t daytimeH = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR3); //Читаю time_t з Backup	
+						daytime = (daytimeH << 16) + daytimeL;
+						struct tm *varL = localtime(&daytime); 
+		 //кількість секунд в TimeCounter, на момент запису в BKP_DR2_DR3				
+						tempTime = (varL->tm_hour * 3600) + (varL->tm_min * 60) + varL->tm_sec; 
+		//Читаю кількіст секунд в TimeCounter в поточний момент	
+						uint32_t curentTime = RTC_ReadTimeCounter(&RtcHandle);
+		//Значення поточного часу в секунда в форматі timer.h
+						time_t curent_daytime = 	daytime + (curentTime - tempTime);
+		//Заповнюю змінні hjre
+						struct tm *varM = localtime(&curent_daytime);
+						RtcHandle.DateToUpdate.Year  = varM->tm_year - 100; //RTC_Bcd2ToByte(sDate->Year); //Перевожу BCD в двійковий формат
+						RtcHandle.DateToUpdate.Month = varM->tm_mon + 1; // (sDate->Month);
+						RtcHandle.DateToUpdate.Date  = varM->tm_mday; //(sDate->Date);
+						RtcHandle.DateToUpdate.WeekDay = varM->tm_wday;
+		
+		
+		
+						/*sdatestructureget.WeekDay = varM->tm_wday;
+						sdatestructureget.Date = varM->tm_mday;
+						sdatestructureget.Month = varM->tm_mon;
+						sdatestructureget.Year = varM->tm_year; */
+	}
 
 
 /* -------------RTC End--------------*/
@@ -453,8 +505,8 @@ BSP_LCD_Init(); //Ініціалізативна послідовність + с
 //DrawProp_ukr.width = 3; //20; //кількість байтів ширини символа 3*8 = 24
 //; //"ІЇАБВГДПятниця"; //ЇїАБААВГДЕФ"; //ІЇАБВГА"; //іАБВГіІЇї"; //҅ятниця"; //"҅"; 
 */
-   char *str1 = "П'ятниця";
- 	 GUI_Text_ukr(Weekday_LCD_Coordinates, str1, 8, 0);
+   //char *str1 = "П'ятниця";
+ 	 //GUI_Text_ukr(Weekday_LCD_Coordinates, str1, 8, 0);
 	 //Для TFT_LCD_1_44 Використовую шрифт  Arial36x33[]	 
 	 //Для TFT_LCD_1_3 Використовую шрифт  Arial45x39[]	
 		
@@ -616,44 +668,7 @@ if (Bluetooth_present == SHIELD_DETECTED)
 							HAL_Delay(5);
 						}while (DCF77_Fine == 0x00); 
 				}
-#else
-
-	//Для відлагодження в форматі BCD
-
-	stimestructure.Hours   = 0x15; // 18 годин
-	stimestructure.Minutes   = 0x03;  //34 хвилини
-	stimestructure.Seconds   = 0x55;  //5 хвилин
- 	
-  sdatestructure.Date = 0x05; //6 число
-	sdatestructure.WeekDay = 0x04; //Четвертий день тижня
-  sdatestructure.Month = 0x06;	//Шостий місяць
-	sdatestructure.Year = 0x25;  //25 рік
-
-//мобільний формує коригуючу послідовність байтів: 0x32 0x38 0x30 0x33 0x32 0x35 0x31 0x33	px35 0x38 0x30 0x35 == 28,03.2025 13:58:01
-// кожен байт - це 4-х розрядний код символа цифри	2    8    0    3     2    5    1    3    5     8    0    5		
-	aRxBuffer[0] = (sdatestructure.Date >> 4) | 0x30;
-  aRxBuffer[1] = (sdatestructure.Date & 0x0F) | 0x30;
-
-	aRxBuffer[2] = (sdatestructure.Month >> 4) | 0x30;
-  aRxBuffer[3] = (sdatestructure.Month & 0x0F) | 0x30;
-
-	aRxBuffer[4] = (sdatestructure.Year >> 4) | 0x30;
-  aRxBuffer[5] = (sdatestructure.Year & 0x0F) | 0x30;
-
-	aRxBuffer[6] = (stimestructure.Hours >> 4) | 0x30;
-  aRxBuffer[7] = (stimestructure.Hours & 0x0F) | 0x30;
-
-	aRxBuffer[8] = (stimestructure.Minutes >> 4) | 0x30;
-  aRxBuffer[9] = (stimestructure.Minutes & 0x0F) | 0x30;
-
-	aRxBuffer[10] = (stimestructure.Seconds >> 4) | 0x30;
-  aRxBuffer[11] = (stimestructure.Seconds & 0x0F) | 0x30; 
-	DCF77_Status = SET;
 #endif
-
-//Для відлагодження===========================
-RTC_SECConfig(); //Встановлюю дату з sdatestructure і stimestructure дату і секунди
-//============================================	
 
 	while (1)
 	{
@@ -720,25 +735,45 @@ HAL_RTCEx_DeactivateSecond(&RtcHandle);
 						sprintf(&myTempD[0], "%x", dTemp);	
 						dTemp = (mycrc & 0x0f);
 						sprintf(&myTempD[1], "%x",  dTemp);
-/*printf("mycr1 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);
-						printf("aRxBufer:");
-						for(uint8_t ix = 0; ix < 14; ix++)
-						{	
-							printf("0x%x ", aRxBuffer[ix]);
-					
-						}	
-printf("mycr2 = 0x%x , 0x%x\n\r", myTempD[0], myTempD[1]);  */
-						//Ця функція заповнює регістри UART і переводить його в режим переривання. Без очікування Timeout
-						//ST7789_WriteString(10, 180, aRxBuffer, Font_16x26, RED, WHITE);
-						//printf("Code = %s", aRxBuffer[0]);
+
 						if(Buffercmp((uint8_t *) &aRxBuffer[12], (uint8_t*) &myTempD, 2) == 0) 
 						{
 							//Контрольні суми співпадають
-							RTC_SECUpdate(); ////Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
-							//RTC_DateShow(10, 50); //, aShowDate);
-							//RTC_DateShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 20) / 100);
-	
-							//RTC_TimeShow((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 55) / 100);	
+						RTC_SECUpdate(); ////Оновлення RtcHandle новими даними Дати Часу з aRxBuffer[12]
+						
+						//Вираховую час в форматі time_t і записую його в BKP_DR2_DR3
+						tstart.tm_sec    = (aRxBuffer[10] & 0x0F)*10 + (aRxBuffer[11] & 0x0F);
+						tstart.tm_min    = (aRxBuffer[8] & 0x0F)*10 + (aRxBuffer[9] & 0x0F);
+						tstart.tm_hour   = (aRxBuffer[6] & 0x0F)*10 + (aRxBuffer[7] & 0x0F);
+						tstart.tm_mday   = (aRxBuffer[0] & 0x0F)*10 + (aRxBuffer[1] & 0x0F);
+						tstart.tm_mon    = (aRxBuffer[2] & 0x0F)*10 + (aRxBuffer[3] & 0x0F) - 1;//місяць 0...11
+						tstart.tm_year   = (aRxBuffer[4] & 0x0F)*10 + (aRxBuffer[5] & 0x0F) + 2000 - 1900; //Число років, починаючи з 1900 
+						//tstart.tm_wday   = RTC_WeekDayNum(tstart.tm_year, tstart.tm_mon, tstart.tm_mday); //День тижня
+						daytime = mktime(&tstart); //Перетворюю структуру в формат time_t
+						pTemp = asctime(&tstart); //претворюю структуру в рядок ascii
+						printf("Date of start %s\n", pTemp);	//друкую рядок дати
+						
+						//Записую дату і час в форматі time.h в BKP_DR2_DR3	
+						uint16_t daytimeL = daytime & 0x0000FFFF;
+						uint16_t daytimeH = (daytime >> 16) & 0x0000FFFF;
+						HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR2, daytimeL); //Записую time_t у Backup	
+						HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR3, daytimeH); //Записую time_t у Backup	
+//перевіряю
+struct tm *varL = localtime(&daytime); 							
+sprintf(realhours, "%02d", varL->tm_hour);
+sprintf(realminutes, "%02d", varL->tm_min);
+sprintf(realseconds, "%02d", varL->tm_sec);
+							
+		/* Write time counter in RTC registers */
+/*  if (MSP_WriteTimeCounter(&RtcHandle, daytime) != HAL_OK)
+  {
+    RtcHandle.State = HAL_RTC_STATE_ERROR;
+    Process Unlocked 
+    __HAL_UNLOCK(&RtcHandle);
+    return HAL_ERROR;
+  }	*/						
+
+							
 						}else	{
 						 // Disable RXNE, PE and ERR (Frame error, noise error, overrun error) interrupts 
   
@@ -1056,7 +1091,7 @@ static void RTC_AlarmConfig(void)
   }
 }
 
-static void RTC_SECConfig(void)
+void RTC_SECConfig(void)
 {
   //RTC_DateTypeDef  sdatestructure;
   //RTC_TimeTypeDef  stimestructure;
@@ -1068,8 +1103,8 @@ static void RTC_SECConfig(void)
   sdatestructure.Month = 0x01; //RTC_MONTH_JANUARY; //01 = 0x10+01
   sdatestructure.Date = 0x07; //0x10+7
   sdatestructure.WeekDay = 0x02; //RTC_WEEKDAY_TUESDAY; 02 = 0x10+02 */
-  
-  if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
+  //З sdatestructure -> &RtcHandle->DateToUpdate
+  if(HAL_RTC_SetDate(&RtcHandle, &sdatestructure, RTC_FORMAT_BCD) != HAL_OK)
   {
     // Initialization Error //
     char *myError = "HAL_RTC_SetDate";
@@ -1082,8 +1117,8 @@ static void RTC_SECConfig(void)
 /*  stimestructure.Hours = 0x23;
   stimestructure.Minutes = 0x59;
   stimestructure.Seconds = 0x55; */
-  
-  if(HAL_RTC_SetTime(&RtcHandle,&stimestructure,RTC_FORMAT_BCD) != HAL_OK)
+  //З &stimestructure -> RTC_Counter
+  if(HAL_RTC_SetTime(&RtcHandle, &stimestructure, RTC_FORMAT_BCD) != HAL_OK)
   {
     // Initialization Error 
     char *myError = "HAL_RTC_SetTime";
@@ -1561,6 +1596,8 @@ char * get_WeekDay(uint8_t nday)
 {
 	switch (nday)
 	{
+	case 00:
+			return "Неділя";  //"Sunday";	
 		case 01:
 			return "Понеділок"; //"Monday";
 		case 02:
@@ -1572,12 +1609,77 @@ char * get_WeekDay(uint8_t nday)
 		case 05:
 			return "П'ятниця";  //"Friday";
 		case 6:
-			return "Субота";  //"Saturday";
-		case 07:
-			return "Неділя";  //"Sunday";	
+			return "Субота";  //"Saturday";	
 		
 	}
 }
+
+/*HAL_StatusTypeDef MSP_WriteTimeCounter(RTC_HandleTypeDef *hrtc, uint32_t TimeCounter)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+
+  // Set Initialization mode 
+  if (MSP_EnterInitMode(hrtc) != HAL_OK)
+  {
+    status = HAL_ERROR;
+  }
+  else
+  {
+    // Set RTC COUNTER MSB word 
+    WRITE_REG(hrtc->Instance->CNTH, (TimeCounter >> 16U));
+    // Set RTC COUNTER LSB word 
+    WRITE_REG(hrtc->Instance->CNTL, (TimeCounter & RTC_CNTL_RTC_CNT));
+
+    // Wait for synchro 
+    if (MSP_ExitInitMode(hrtc) != HAL_OK)
+    {
+      status = HAL_ERROR;
+    }
+  }
+
+  return status;
+} */
+
+/*HAL_StatusTypeDef MSP_EnterInitMode(RTC_HandleTypeDef *hrtc)
+{
+  uint32_t tickstart = 0U;
+
+  tickstart = HAL_GetTick();
+  // Wait till RTC is in INIT state and if Time out is reached exit 
+  while ((hrtc->Instance->CRL & RTC_CRL_RTOFF) == (uint32_t)RESET)
+  {
+    if ((HAL_GetTick() - tickstart) >  RTC_TIMEOUT_VALUE)
+    {
+      return HAL_TIMEOUT;
+    }
+  }
+
+  // Disable the write protection for RTC registers 
+  __HAL_RTC_WRITEPROTECTION_DISABLE(hrtc);
+
+  return HAL_OK;
+} */
+
+/*HAL_StatusTypeDef MSP_ExitInitMode(RTC_HandleTypeDef *hrtc)
+{
+  uint32_t tickstart = 0U;
+
+  
+  __HAL_RTC_WRITEPROTECTION_ENABLE(hrtc);
+
+  tickstart = HAL_GetTick();
+  
+  while ((hrtc->Instance->CRL & RTC_CRL_RTOFF) == (uint32_t)RESET)
+  {
+    if ((HAL_GetTick() - tickstart) >  RTC_TIMEOUT_VALUE)
+    {
+      return HAL_TIMEOUT;
+    }
+  }
+
+  return HAL_OK;
+} */
+
 
 
 //==============================================================================

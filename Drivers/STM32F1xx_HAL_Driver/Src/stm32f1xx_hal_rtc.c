@@ -185,6 +185,24 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
+#include "main.h"
+#include "time.h"
+
+extern char aRxBuffer[14];
+extern RTC_DateTypeDef  sdatestructure;
+extern RTC_TimeTypeDef  stimestructure;
+extern FlagStatus DCF77_Status;
+extern time_t daytime;
+
+extern	uint8_t cbyte;
+extern	struct tm tstart; //задаю дату початку відліку через структуру
+extern	struct tm tstop; //задаю дату початку відліку через структуру
+extern	char * pTemp;
+	
+extern	char realhours[2];
+extern	char realminutes[2];
+extern	char realseconds[2];
+extern	char realweekday[2];
 
 /** @addtogroup STM32F1xx_HAL_Driver
   * @{
@@ -222,12 +240,12 @@
 /** @defgroup RTC_Private_Functions RTC Private Functions
   * @{
   */
-static uint32_t           RTC_ReadTimeCounter(RTC_HandleTypeDef *hrtc);
+//static uint32_t           RTC_ReadTimeCounter(RTC_HandleTypeDef *hrtc);
 static HAL_StatusTypeDef  RTC_WriteTimeCounter(RTC_HandleTypeDef *hrtc, uint32_t TimeCounter);
 static uint32_t           RTC_ReadAlarmCounter(RTC_HandleTypeDef *hrtc);
 static HAL_StatusTypeDef  RTC_WriteAlarmCounter(RTC_HandleTypeDef *hrtc, uint32_t AlarmCounter);
-static HAL_StatusTypeDef  RTC_EnterInitMode(RTC_HandleTypeDef *hrtc);
-static HAL_StatusTypeDef  RTC_ExitInitMode(RTC_HandleTypeDef *hrtc);
+//static HAL_StatusTypeDef  RTC_EnterInitMode(RTC_HandleTypeDef *hrtc);
+//static HAL_StatusTypeDef  RTC_ExitInitMode(RTC_HandleTypeDef *hrtc);
 static uint8_t            RTC_IsLeapYear(uint16_t nYear);
 static void               RTC_DateUpdate(RTC_HandleTypeDef *hrtc, uint32_t DayElapsed);
 static uint8_t            RTC_WeekDayNum(uint32_t nYear, uint8_t nMonth, uint8_t nDay);
@@ -393,6 +411,83 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc)
     hrtc->DateToUpdate.Month = RTC_MONTH_JANUARY;
     hrtc->DateToUpdate.Date = 0x01U;
 
+		// в форматі BCD (Двійково-десятковий), наприклад десяткове 26 -> 0x26 (2*10+6)
+
+	stimestructure.Hours   = 0x09; // 9 годин
+	stimestructure.Minutes   = 0x33;  //33 хвилини
+	stimestructure.Seconds   = 0x57;  //57 ctreyl
+ 	
+  sdatestructure.Date = 0x01; //1 Перше число місяця
+	//sdatestructure.WeekDay = 0x04; //Четвертий день тижня НЕ ВИКОРИСТОВУЄТЬСЯ
+		sdatestructure.Month = 0x06;	//Шостий місяць року
+	sdatestructure.Year = 0x26;  //26 рік
+
+//мобільний формує коригуючу послідовність байтів: 0x32 0x38 0x30 0x33 0x32 0x35 0x31 0x33	px35 0x38 0x30 0x35 == 28,03.2025 13:58:01
+// кожен байт - це 4-х розрядний код символа цифри	2    8    0    3     2    5    1    3    5     8    0    5		
+	aRxBuffer[0] = (sdatestructure.Date >> 4) | 0x30;
+  aRxBuffer[1] = (sdatestructure.Date & 0x0F) | 0x30;
+
+	aRxBuffer[2] = (sdatestructure.Month >> 4) | 0x30;
+  aRxBuffer[3] = (sdatestructure.Month & 0x0F) | 0x30;
+
+	aRxBuffer[4] = (sdatestructure.Year >> 4) | 0x30;
+  aRxBuffer[5] = (sdatestructure.Year & 0x0F) | 0x30;
+
+	aRxBuffer[6] = (stimestructure.Hours >> 4) | 0x30;
+  aRxBuffer[7] = (stimestructure.Hours & 0x0F) | 0x30;
+
+	aRxBuffer[8] = (stimestructure.Minutes >> 4) | 0x30;
+  aRxBuffer[9] = (stimestructure.Minutes & 0x0F) | 0x30;
+
+	aRxBuffer[10] = (stimestructure.Seconds >> 4) | 0x30;
+  aRxBuffer[11] = (stimestructure.Seconds & 0x0F) | 0x30; 
+	DCF77_Status = SET; //Імітую прийом часу з UART
+
+//===Перше значення часу========================
+ RTC_SECConfig(); //Встановлюю дату з sdatestructure і stimestructure дату і секунди
+//============================================	
+
+						//Вирахоиую час в форматі time_t і записую його в BKP_DR2_DR3
+						tstart.tm_sec    = (aRxBuffer[10] & 0x0F)*10 + (aRxBuffer[11] & 0x0F);
+						tstart.tm_min    = (aRxBuffer[8] & 0x0F)*10 + (aRxBuffer[9] & 0x0F);
+						tstart.tm_hour   = (aRxBuffer[6] & 0x0F)*10 + (aRxBuffer[7] & 0x0F);
+						tstart.tm_mday   = (aRxBuffer[0] & 0x0F)*10 + (aRxBuffer[1] & 0x0F);
+						tstart.tm_mon    = (aRxBuffer[2] & 0x0F)*10 + (aRxBuffer[3] & 0x0F) - 1;//місяць 0...11
+						tstart.tm_year   = (aRxBuffer[4] & 0x0F)*10 + (aRxBuffer[5] & 0x0F) + 2000 - 1900; //Число років, починаючи з 1900 
+						//tstart.tm_wday   = RTC_WeekDayNum(tstart.tm_year, tstart.tm_mon, tstart.tm_mday); //День тижня
+						daytime = mktime(&tstart); //Перетворюю структуру в формат time_t
+						pTemp = asctime(&tstart); //претворюю структуру в рядок ascii
+						printf("Date of start %s\n", pTemp);	//друкую рядок дати
+						
+						//Записую дату і час в форматі time.h в BKP_DR2_DR3	
+						uint16_t daytimeL = daytime & 0x0000FFFF;
+						uint16_t daytimeH = (daytime >> 16) & 0x0000FFFF;
+						HAL_RTCEx_BKUPWrite(hrtc, RTC_BKP_DR2, daytimeL); //Записую time_t у Backup	
+						HAL_RTCEx_BKUPWrite(hrtc, RTC_BKP_DR3, daytimeH); //Записую time_t у Backup	
+//перевіряю
+struct tm *varL = localtime(&daytime); 							
+sprintf(realhours, "%02d", varL->tm_hour);
+sprintf(realminutes, "%02d", varL->tm_min);
+sprintf(realseconds, "%02d", varL->tm_sec);
+
+
+
+
+			/* Write time counter in RTC registers */
+  if (RTC_WriteTimeCounter(hrtc, daytime) != HAL_OK)
+  {
+    /* Set RTC state */
+    hrtc->State = HAL_RTC_STATE_ERROR;
+
+    /* Process Unlocked */
+    __HAL_UNLOCK(hrtc);
+
+    return HAL_ERROR;
+  }	
+		
+		
+		
+		
     /* Set RTC state */
     hrtc->State = HAL_RTC_STATE_READY;
 
@@ -1583,7 +1678,7 @@ HAL_StatusTypeDef HAL_RTC_WaitForSynchro(RTC_HandleTypeDef *hrtc)
   *                the configuration information for RTC.
   * @retval Time counter
   */
-static uint32_t RTC_ReadTimeCounter(RTC_HandleTypeDef *hrtc)
+uint32_t RTC_ReadTimeCounter(RTC_HandleTypeDef *hrtc)
 {
   uint16_t high1 = 0U, high2 = 0U, low = 0U;
   uint32_t timecounter = 0U;
@@ -1696,7 +1791,7 @@ static HAL_StatusTypeDef RTC_WriteAlarmCounter(RTC_HandleTypeDef *hrtc, uint32_t
   *                the configuration information for RTC.
   * @retval HAL status
   */
-static HAL_StatusTypeDef RTC_EnterInitMode(RTC_HandleTypeDef *hrtc)
+HAL_StatusTypeDef RTC_EnterInitMode(RTC_HandleTypeDef *hrtc)
 {
   uint32_t tickstart = 0U;
 
@@ -1723,7 +1818,7 @@ static HAL_StatusTypeDef RTC_EnterInitMode(RTC_HandleTypeDef *hrtc)
   *                the configuration information for RTC.
   * @retval HAL status
   */
-static HAL_StatusTypeDef RTC_ExitInitMode(RTC_HandleTypeDef *hrtc)
+HAL_StatusTypeDef RTC_ExitInitMode(RTC_HandleTypeDef *hrtc)
 {
   uint32_t tickstart = 0U;
 

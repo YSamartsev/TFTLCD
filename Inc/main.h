@@ -216,13 +216,18 @@ char calcModulo256(char *aRxBuffer, uint16_t BufferLength);
 void SystemClock_Config(void);
 static void MX_UART2_Init(void);
 static void RTC_AlarmConfig(void);
-static void RTC_SECConfig(void);
+void RTC_SECConfig(void);
 static void RTC_DateShow(uint16_t x, uint16_t y); //, uint8_t* showdate);
 static void RTC_TimeShow(uint16_t x, uint16_t y); //, uint8_t* showtime);
 //HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77, uint8_t lineLength);
 HAL_StatusTypeDef checkDCF77(uint8_t *lineDCF77);
 char* get_WeekDay(uint8_t nday);
 uint32_t utf8_to_unicode(const char *str_utf8,  uint8_t *length);
+
+
+//HAL_StatusTypeDef MSP_WriteTimeCounter(RTC_HandleTypeDef *hrtc, uint32_t TimeCounter);
+//HAL_StatusTypeDef MSP_EnterInitMode(RTC_HandleTypeDef *hrtc);
+//HAL_StatusTypeDef MSP_ExitInitMode(RTC_HandleTypeDef *hrtc);
 
 #endif /* __MAIN_H */
 
