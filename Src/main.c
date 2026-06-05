@@ -561,12 +561,12 @@ if (Bluetooth_present == SHIELD_DETECTED)
 		
 		myAnswerAT.BLUETOOTH_shield = "BL present";
 		//LCD_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_GREEN, LCD_BLACK);
-		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield,Font_Size, LCD_GREEN, LCD_BLACK);
+		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield, Font_Size, LCD_GREEN, LCD_BLACK);
 	}else
 	{
 		myAnswerAT.BLUETOOTH_shield = "BL not present";
 		//LCD_WriteString(10, 206, myAnswerAT.BLUETOOTH_shield, Font_16x26, LCD_GREEN, LCD_BLACK);
-		LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield,Font_Size, LCD_GREEN, LCD_BLACK);
+		//LCD_WriteString((LCD_WIDTH * 4) / 100,(LCD_HEIGHT * 85) / 100, myAnswerAT.BLUETOOTH_shield, Font_Size, LCD_GREEN, LCD_BLACK);
 	}
  
 	*aRxBuffer = 0x00;
