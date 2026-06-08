@@ -425,7 +425,7 @@ printf("==================Start RTC Watch===================\n\r");
 */
 
 /* Initialize the LCD */
-BSP_LCD_Init(); //Ініціалізативна послідовність + структура фонту Font24
+	BSP_LCD_Init(); //Ініціалізативна послідовність + структура фонту Font24
 
 	//ВАЖЛИВО!!!! ST7789_SetRotation(ST7789_ROTATION) впливаэ на очищення через зміну координат x=0, 	y=0	екрану !!!!!!
 	//Для 1.44 128x128  x=0, 	y=0 знаходиться навпроти роз'єму в кінці зліва. Це відповідає для st7789: #define ST7789_ROTATION 2	
@@ -459,7 +459,7 @@ BSP_LCD_Init(); //Ініціалізативна послідовність + с
 						char realyear[2];
 						char realweekday[2];
 						char *strweekday;
-						char temp1[9];
+						char temp1[11];
 					
 						uint32_t daytimeL = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR2); //Читаю time_t з Backup	
 						uint32_t daytimeH = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR3); //Читаю time_t з Backup	
@@ -483,8 +483,8 @@ BSP_LCD_Init(); //Ініціалізативна послідовність + с
 //Вони будуть змінені зразу	в	RTC_DateShow і RTC_TimeShow 
 						sdatestructureget.WeekDay = varM->tm_wday;
 						sdatestructureget.Date = varM->tm_mday;
-						sdatestructureget.Month = varM->tm_mon;
-						sdatestructureget.Year = varM->tm_year;
+						sdatestructureget.Month = varM->tm_mon + 1;
+						sdatestructureget.Year = varM->tm_year - 100;
 						
 						sprintf(realweekday, "%02d", sdatestructureget.WeekDay);
 						sprintf(realdate, "%02d", sdatestructureget.Date);
@@ -498,9 +498,6 @@ BSP_LCD_Init(); //Ініціалізативна послідовність + с
 						sprintf(realhours, "%02d", stimestructureget.Hours);
 						sprintf(realminutes, "%02d", stimestructureget.Minutes);
 						sprintf(realseconds, "%02d", stimestructureget.Seconds);
-						//char temp1[9];
-						//concat_time(temp1, realhours, realminutes, realseconds); //соединить строки -> *temp2
-						//temp1[8] = 0x00;
 
 						uint8_t xy_temp[2];
 		#ifdef TFT_LCD_1_3	
@@ -510,7 +507,7 @@ BSP_LCD_Init(); //Ініціалізативна послідовність + с
 						
 						//День, місяц, рік, день тижня
 						concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
-						temp1[8] = 0x00;	//останній код для string повинен бути 0x00
+						temp1[10] = 0x00;	//останній код для string повинен бути 0x00
 						//Очистити прямокутник дати
 						//LCD_DrawFilledRectangle(x, y, 10*Font_Size.width, Font_Size.height, LCD_BLACK);
 						//Вивести дату
@@ -549,7 +546,26 @@ BSP_LCD_Init(); //Ініціалізативна послідовність + с
 						FontDef Font_Size = Font_11x18; //Для знаків ":"
 						uint16_t	LCD_WIDTH = ST7735_WIDTH;
 						uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
-						ST7789_Fill(HOUR_LCD_Coordinates[0], HOUR_LCD_Coordinates[1],  HOUR_LCD_Coordinates[2], HOUR_LCD_Coordinates[3], LCD_BLACK); 
+						concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
+						temp1[10] = 0x00;	//останній код для string повинен бути 0x00
+						//Очистити прямокутник дати
+						//LCD_DrawFilledRectangle(x, y, 10*Font_Size.width, Font_Size.height, LCD_BLACK);
+						//Вивести дату
+						int x = (LCD_WIDTH * 4) / 100;
+						int y = (LCD_HEIGHT * 5) / 100;
+						LCD_WriteString(x, y, temp1, Font_Size, LCD_WHITE, LCD_BLACK);	 //& "." & realmonth
+	
+						//Отримати день тижня
+						strweekday = get_WeekDay(sdatestructureget.WeekDay);
+						//Очистити прямокутник дня тижня
+						//LCD_DrawFilledRectangle(Weekday_LCD_Coordinates[0], Weekday_LCD_Coordinates[1], Weekday_LCD_Coordinates[2], Weekday_LCD_Coordinates[3], LCD_BLACK); 
+						//Вивести день тижня
+						GUI_Text_ukr(Weekday_LCD_Coordinates, strweekday, 8, 0);
+
+
+
+
+						//ST7789_Fill(HOUR_LCD_Coordinates[0], HOUR_LCD_Coordinates[1],  HOUR_LCD_Coordinates[2], HOUR_LCD_Coordinates[3], LCD_BLACK); 
 						//GUI_Text(TIME_LCD_Coordinates, (char *) realhours, 5);	//Годин, для огромных цифр, 
 						GUI_Text_ukr(HOUR_LCD_Coordinates, realhours, 8, 1); //Друкую великі цифри
 						xy_temp[0] = HOUR_LCD_Coordinates[2] + 2;		
@@ -568,11 +584,6 @@ BSP_LCD_Init(); //Ініціалізативна послідовність + с
 		#endif		
 	
 	}
-
-
-
-
-
 
 #ifdef TFT_LCD_7789
 	FontDef Font_Size = Font_16x26; //Заповнюю структуру малих фонтів структурою фонта Font_16x26
