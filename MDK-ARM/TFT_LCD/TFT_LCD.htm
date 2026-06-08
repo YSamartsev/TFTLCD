@@ -3,9 +3,9 @@
 <title>Static Call Graph - [TFT_LCD\TFT_LCD.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image TFT_LCD\TFT_LCD.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Fri Jun 05 11:44:55 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Mon Jun 08 16:07:25 2026
 <BR><P>
-<H3>Maximum Stack Usage =        512 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        592 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 main &rArr; RTC_DateShow &rArr; GUI_Text_ukr &rArr; PutChar &rArr; GetASCIICode
 <P>
@@ -477,7 +477,8 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PutChar
 <LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BSP_LCD_Clear
 </UL>
-<BR>[Called By]<UL><LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_TimeShow
+<BR>[Called By]<UL><LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_TimeShow
 </UL>
 
 <P><STRONG><a name="[73]"></a>GUI_Text_ukr</STRONG> (Thumb, 278 bytes, Stack size 48 bytes, stm32_adafruit_lcd.o(i.GUI_Text_ukr))
@@ -487,7 +488,8 @@ Global Symbols
 <LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PutChar
 <LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BSP_LCD_Clear
 </UL>
-<BR>[Called By]<UL><LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_DateShow
+<BR>[Called By]<UL><LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_DateShow
 </UL>
 
 <P><STRONG><a name="[75]"></a>GetASCIICode</STRONG> (Thumb, 382 bytes, Stack size 24 bytes, fonts.o(i.GetASCIICode))
@@ -1586,7 +1588,8 @@ Global Symbols
 <P><STRONG><a name="[cd]"></a>concat_date</STRONG> (Thumb, 52 bytes, Stack size 16 bytes, main.o(i.concat_date))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = concat_date
 </UL>
-<BR>[Called By]<UL><LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_DateShow
+<BR>[Called By]<UL><LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_DateShow
 </UL>
 
 <P><STRONG><a name="[d4]"></a>concat_time</STRONG> (Thumb, 46 bytes, Stack size 16 bytes, main.o(i.concat_time))
@@ -1603,11 +1606,12 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> printf8.o(i.__0printf$8)
 </UL>
 <P><STRONG><a name="[ce]"></a>get_WeekDay</STRONG> (Thumb, 50 bytes, Stack size 0 bytes, main.o(i.get_WeekDay))
-<BR><BR>[Called By]<UL><LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_DateShow
+<BR><BR>[Called By]<UL><LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_DateShow
 </UL>
 
-<P><STRONG><a name="[4c]"></a>main</STRONG> (Thumb, 1846 bytes, Stack size 64 bytes, main.o(i.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 512<LI>Call Chain = main &rArr; RTC_DateShow &rArr; GUI_Text_ukr &rArr; PutChar &rArr; GetASCIICode
+<P><STRONG><a name="[4c]"></a>main</STRONG> (Thumb, 2694 bytes, Stack size 144 bytes, main.o(i.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 592<LI>Call Chain = main &rArr; RTC_DateShow &rArr; GUI_Text_ukr &rArr; PutChar &rArr; GetASCIICode
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPIx_MspInit
 <LI><a href="#[d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPIx_Init
@@ -1625,9 +1629,13 @@ Global Symbols
 <LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PWR_EnableBkUpAccess
 <LI><a href="#[79]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Init
 <LI><a href="#[67]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
+<LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GUI_Text_ukr
+<LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GUI_Text
 <LI><a href="#[68]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BSP_LED_Init
 <LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BSP_LCD_Init
 <LI><a href="#[e8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;myExchange
+<LI><a href="#[ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_WeekDay
+<LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;concat_date
 <LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemClock_Config
 <LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_SECConfig
 <LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_Handler

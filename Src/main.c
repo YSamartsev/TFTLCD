@@ -398,50 +398,6 @@ int main(void)
 	__HAL_RCC_PWR_CLK_ENABLE();
 	HAL_PWR_EnableBkUpAccess(); //Відкриваю доступ до регістрів RTC і Backup
 
-	if (HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR1) != 0x1234) 
-	{
-		if (HAL_RTC_Init(&RtcHandle) != HAL_OK) //RtcHandle сконфігуровано на 01.01.2000
-		{
-			char *myError = "HAL_RTC_Init";
-			Error_Handler(myError);
-		} 
-		HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR1, 0x1234);
-
-	}else
-	{
-		if (HAL_RTC_WaitForSynchro(&RtcHandle) != HAL_OK)
-		{
-			/* Set RTC state */
-			RtcHandle.State = HAL_RTC_STATE_ERROR;
-			return HAL_ERROR;
-		}
-		//Визначаю покази таймера в момент запису дати_часу в BKP_DR2_DR3
-						uint32_t daytimeL = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR2); //Читаю time_t з Backup	
-						uint32_t daytimeH = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR3); //Читаю time_t з Backup	
-						daytime = (daytimeH << 16) + daytimeL;
-						struct tm *varL = localtime(&daytime); 
-		 //кількість секунд в TimeCounter, на момент запису в BKP_DR2_DR3				
-						tempTime = (varL->tm_hour * 3600) + (varL->tm_min * 60) + varL->tm_sec; 
-		//Читаю кількіст секунд в TimeCounter в поточний момент	
-						uint32_t curentTime = RTC_ReadTimeCounter(&RtcHandle);
-		//Значення поточного часу в секунда в форматі timer.h
-						time_t curent_daytime = 	daytime + (curentTime - tempTime);
-		//Заповнюю змінні hjre
-						struct tm *varM = localtime(&curent_daytime);
-						RtcHandle.DateToUpdate.Year  = varM->tm_year - 100; //RTC_Bcd2ToByte(sDate->Year); //Перевожу BCD в двійковий формат
-						RtcHandle.DateToUpdate.Month = varM->tm_mon + 1; // (sDate->Month);
-						RtcHandle.DateToUpdate.Date  = varM->tm_mday; //(sDate->Date);
-						RtcHandle.DateToUpdate.WeekDay = varM->tm_wday;
-		
-		
-		
-						/*sdatestructureget.WeekDay = varM->tm_wday;
-						sdatestructureget.Date = varM->tm_mday;
-						sdatestructureget.Month = varM->tm_mon;
-						sdatestructureget.Year = varM->tm_year; */
-	}
-
-
 /* -------------RTC End--------------*/
 
 
@@ -474,6 +430,149 @@ BSP_LCD_Init(); //Ініціалізативна послідовність + с
 	//ВАЖЛИВО!!!! ST7789_SetRotation(ST7789_ROTATION) впливаэ на очищення через зміну координат x=0, 	y=0	екрану !!!!!!
 	//Для 1.44 128x128  x=0, 	y=0 знаходиться навпроти роз'єму в кінці зліва. Це відповідає для st7789: #define ST7789_ROTATION 2	
 	//Але при #define ST7789_ROTATION 2	 точка  x=0, 	y=0	знаходиться біля роз'єму справа!! 
+
+	if (HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR1) != 0x1234) 
+	{
+		if (HAL_RTC_Init(&RtcHandle) != HAL_OK) //RtcHandle сконфігуровано на 01.01.2000
+		{
+			char *myError = "HAL_RTC_Init";
+			Error_Handler(myError);
+		} 
+		HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR1, 0x1234);
+
+	}else
+	{
+		if (HAL_RTC_WaitForSynchro(&RtcHandle) != HAL_OK)
+		{
+			/* Set RTC state */
+			RtcHandle.State = HAL_RTC_STATE_ERROR;
+			return HAL_ERROR;
+		}
+		//Визначаю покази таймера в момент запису дати_часу в BKP_DR2_DR3
+						
+		
+						char realhours[2];
+						char realminutes[2];
+						char realseconds[2];
+						char realdate[2]; //Це масив, а не string, тобто не закінчується \0
+						char realmonth[2];
+						char realyear[2];
+						char realweekday[2];
+						char *strweekday;
+						char temp1[9];
+					
+						uint32_t daytimeL = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR2); //Читаю time_t з Backup	
+						uint32_t daytimeH = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR3); //Читаю time_t з Backup	
+						daytime = (daytimeH << 16) + daytimeL;
+						struct tm *varL = localtime(&daytime); 
+		 //кількість секунд в TimeCounter, на момент запису в BKP_DR2_DR3				
+						tempTime = (varL->tm_hour * 3600) + (varL->tm_min * 60) + varL->tm_sec; 
+		//Читаю кількіст секунд в TimeCounter в поточний момент	
+						uint32_t curentTime = RTC_ReadTimeCounter(&RtcHandle);
+		//Значення поточного часу в секунда в форматі timer.h
+						time_t curent_daytime = 	daytime + (curentTime - tempTime);
+		//Заповнюю змінні hjre
+						struct tm *varM = localtime(&curent_daytime);
+						//RtcHandle.DateToUpdate.Year  = varM->tm_year - 100; //RTC_Bcd2ToByte(sDate->Year); //Перевожу BCD в двійковий формат
+						//RtcHandle.DateToUpdate.Month = varM->tm_mon + 1; // (sDate->Month);
+						//RtcHandle.DateToUpdate.Date  = varM->tm_mday; //(sDate->Date);
+						//RtcHandle.DateToUpdate.WeekDay = varM->tm_wday;
+//Існує ймовірність, що якщо один із показгників(наприклад, день, години, хвилини) співпаде з поточним, 
+//то він не буде висвітлений на LCD, поки поточний показник не зміниться.
+//тому тут треба вивести на табло всі показники, прочитані з BKP.
+//Вони будуть змінені зразу	в	RTC_DateShow і RTC_TimeShow 
+						sdatestructureget.WeekDay = varM->tm_wday;
+						sdatestructureget.Date = varM->tm_mday;
+						sdatestructureget.Month = varM->tm_mon;
+						sdatestructureget.Year = varM->tm_year;
+						
+						sprintf(realweekday, "%02d", sdatestructureget.WeekDay);
+						sprintf(realdate, "%02d", sdatestructureget.Date);
+						sprintf(realmonth, "%02d", sdatestructureget.Month);
+						sprintf(realyear, "%02d", sdatestructureget.Year);
+
+						stimestructureget.Hours = varM->tm_hour;
+						stimestructureget.Minutes = varM->tm_min;
+						stimestructureget.Seconds = varM->tm_sec;
+						
+						sprintf(realhours, "%02d", stimestructureget.Hours);
+						sprintf(realminutes, "%02d", stimestructureget.Minutes);
+						sprintf(realseconds, "%02d", stimestructureget.Seconds);
+						//char temp1[9];
+						//concat_time(temp1, realhours, realminutes, realseconds); //соединить строки -> *temp2
+						//temp1[8] = 0x00;
+
+						uint8_t xy_temp[2];
+		#ifdef TFT_LCD_1_3	
+						FontDef Font_Size = Font_16x26;
+						uint16_t	LCD_WIDTH = ST7789_WIDTH;
+						uint16_t	LCD_HEIGHT = ST7789_HEIGHT;	
+						
+						//День, місяц, рік, день тижня
+						concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
+						temp1[8] = 0x00;	//останній код для string повинен бути 0x00
+						//Очистити прямокутник дати
+						//LCD_DrawFilledRectangle(x, y, 10*Font_Size.width, Font_Size.height, LCD_BLACK);
+						//Вивести дату
+						int x = (LCD_WIDTH * 4) / 100;
+						int y = (LCD_HEIGHT * 5) / 100;
+						LCD_WriteString(x, y, temp1, Font_Size, LCD_WHITE, LCD_BLACK);	 //& "." & realmonth
+	
+						//Отримати день тижня
+						strweekday = get_WeekDay(sdatestructureget.WeekDay);
+						//Очистити прямокутник дня тижня
+						//LCD_DrawFilledRectangle(Weekday_LCD_Coordinates[0], Weekday_LCD_Coordinates[1], Weekday_LCD_Coordinates[2], Weekday_LCD_Coordinates[3], LCD_BLACK); 
+						//Вивести день тижня
+						GUI_Text_ukr(Weekday_LCD_Coordinates, strweekday, 8, 0);							
+//------------------------------		
+						//Час: годин, хвили, секунд
+						//Години
+						//ST7789_Fill(TIME_LCD_Coordinates[0], TIME_LCD_Coordinates[1], TIME_LCD_Coordinates[0] + 74,  TIME_LCD_Coordinates[1] + 56, LCD_BLACK);		
+						GUI_Text(TIME_LCD_Coordinates, (char *) realhours, 7);	//Годин, для огромных цифр, 
+						xy_temp[0] = *TIME_LCD_Coordinates +  (2*DrawProp.width);
+						xy_temp[1] = *(TIME_LCD_Coordinates + 1);
+						//показ ":"
+						LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp.height/3, ":", Font_Size, LCD_WHITE, LCD_BLACK);	// ":"
+						xy_temp[0] = TIME_LCD_Coordinates[0] + 74 + 16;
+						xy_temp[1] = TIME_LCD_Coordinates[1];		
+						//Хвилини
+						//Очистити хвилини
+						//ST7789_Fill(xy_temp[0], xy_temp[1], xy_temp[0] + 74,  xy_temp[1] + 56, LCD_BLACK);
+						GUI_Text(xy_temp, (char *) realminutes, 7);	//Хвилин, для огромных цифр, 
+						xy_temp[0] = xy_temp[0] +  (2*DrawProp.width);
+						LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp.height/3, ":", Font_Size, LCD_WHITE, LCD_BLACK);	
+						//Секунди
+						xy_temp[0] = TIME_LCD_Coordinates[0] + 74 + 16 + 74 + 16;
+						xy_temp[1] = TIME_LCD_Coordinates[1];	
+						LCD_WriteString(xy_temp[0], xy_temp[1], realseconds, Font_Size, LCD_WHITE, LCD_BLACK); //Секунди показую в кожному циклі маленьким шрифтом (16ч26)
+		#elif defined TFT_LCD_1_44	
+						FontDef Font_Size = Font_11x18; //Для знаків ":"
+						uint16_t	LCD_WIDTH = ST7735_WIDTH;
+						uint16_t	LCD_HEIGHT = ST7735_HEIGHT;
+						ST7789_Fill(HOUR_LCD_Coordinates[0], HOUR_LCD_Coordinates[1],  HOUR_LCD_Coordinates[2], HOUR_LCD_Coordinates[3], LCD_BLACK); 
+						//GUI_Text(TIME_LCD_Coordinates, (char *) realhours, 5);	//Годин, для огромных цифр, 
+						GUI_Text_ukr(HOUR_LCD_Coordinates, realhours, 8, 1); //Друкую великі цифри
+						xy_temp[0] = HOUR_LCD_Coordinates[2] + 2;		
+						xy_temp[1] = HOUR_LCD_Coordinates[1];
+						//показ ":"
+						LCD_WriteString(xy_temp[0], xy_temp[1] + DrawProp_Big_Digit.height/3, ":", Font_Size, LCD_WHITE, LCD_BLACK);	// ":"
+						//Хвилини
+						//Очистити хвилини
+						ST7789_Fill(MIN_LCD_Coordinates[0], MIN_LCD_Coordinates[1],  MIN_LCD_Coordinates[2], MIN_LCD_Coordinates[3], LCD_BLACK); 
+						//GUI_Text(TIME_LCD_Coordinates, (char *) realhours, 5);	//Годин, для огромных цифр, 
+						GUI_Text_ukr(MIN_LCD_Coordinates, realminutes, 8, 1); //Друкую великі цифри
+						//Секунди
+						xy_temp[0] = LCD_WIDTH - 1 - 2*Font_Size.width;		
+						xy_temp[1] = *(MIN_LCD_Coordinates + 1) - 1 - Font_Size.height;
+						LCD_WriteString(xy_temp[0], xy_temp[1], realseconds, Font_Size, LCD_WHITE, LCD_BLACK); //Секунди показую в кожному циклі маленьким шрифтом (16ч26)
+		#endif		
+	
+	}
+
+
+
+
+
 
 #ifdef TFT_LCD_7789
 	FontDef Font_Size = Font_16x26; //Заповнюю структуру малих фонтів структурою фонта Font_16x26
@@ -1185,7 +1284,7 @@ static void RTC_SECUpdate(void)
   stimestructureget.Minutes = RTC_Data_Update(8);
   stimestructureget.Seconds = RTC_Data_Update(10);
   
-  if(HAL_RTC_SetTime(&RtcHandle, &stimestructureget,RTC_FORMAT_BCD) != HAL_OK) //Запис Часу в лічильник часу RTC
+  if(HAL_RTC_SetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BCD) != HAL_OK) //Запис Часу в лічильник часу RTC
   {
     // Initialization Error 
     char *myError = "HAL_RTC_SetTime";
