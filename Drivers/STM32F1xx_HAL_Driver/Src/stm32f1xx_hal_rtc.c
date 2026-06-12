@@ -185,12 +185,35 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
-
+#include "main.h"
+#include <stdbool.h>
+#include "time.h"
 
 extern char aRxBuffer[14];
 extern RTC_DateTypeDef  sdatestructure;
 extern RTC_TimeTypeDef  stimestructure;
 extern FlagStatus DCF77_Status;
+extern GPIO_PinState sensorValue;
+extern GPIO_PinState prevSensorValue;
+extern int amountOne;
+extern int amountNull;
+extern bool bWork; //ознака находження в режимі від паузи до паузи
+extern int8_t DCF77_Fine;
+extern uint8_t lineDCF77[60];
+extern int iCycle;
+extern	char outString[61];
+extern	char outPoint[61];
+extern	char strNull;
+extern	char strOne;
+extern	char strPoint;
+extern	int amountOne;
+extern	int amountNull;
+extern	time_t daytime;
+extern	time_t curtime;
+extern	struct tm tstart; //задаю дату початку відліку через структуру
+extern	struct tm tstop; //задаю дату початку відліку через структуру
+extern char * pTemp;
+
 /** @addtogroup STM32F1xx_HAL_Driver
   * @{
   */
@@ -393,7 +416,128 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc)
 
       return HAL_ERROR;
     }
-    // Первое включение, настраиваем время и дату
+
+// Перше вмикання, конфыгурую час ы дату		
+#ifdef DCF77 
+					DCF77_Status = RESET;
+					if (DCF77_Status == RESET)
+					{
+						printf("0ms       100ms     200ms     300ms     400ms     500ms     600ms     700ms     800ms     900ms     1000ms    1100ms    1200ms\n\r");  
+						//LCD_WriteString((LCD_WIDTH * 4) / 100, (LCD_HEIGHT * 70) / 100, ". . . . . . .",Font_Size, LCD_GREEN, LCD_BLACK);	 
+						//Один рядок 1111111111111000000000000000000 це один період ШІМ
+						//           1111111110000000000000000000000
+						//           ---------
+            //                    |_____________________ логічний 0
+						//           або 
+						//           -------------
+						//                        |_________________ логічна 1
+					do {
+							//Частота прийому рівня sensorValue визначається HAL_Delay(10)
+							sensorValue =  BSP_DCF77_GetState(); //Прием рівня порта A01  
+							if (bWork == true){
+								if (sensorValue == 1) {
+									amountOne++; //нарощую кількість логічних 1
+									printf("%c", strOne);
+								}else {
+									amountNull++; //нарощую кількість логічних 0
+									printf("%c", strNull);
+								}
+								if (sensorValue == 1 && prevSensorValue == 0){
+									printf("amountNull = %d, amountOne = %d", amountNull, amountOne);
+									if (amountOne <= 28){
+										lineDCF77[iCycle] = 0x00;
+										printf(" DCF77 = %c\n\r", strNull);
+									}else{
+										lineDCF77[iCycle] = 0x01;
+										printf(" DCF77 = %c\n\r", strOne);
+									}
+									if(amountNull > 280){
+										printf("Preparing to receive a line of DCF77\n\r");
+										bWork = false; //Кінець прийому всіх рядків хвилини
+										printf("lineDCF77 = \n\r");
+										for (uint8_t i = 0; i < 60; ++i){
+											printf("%d", lineDCF77[i]);
+										}
+										printf("\n\r");					
+										if (checkDCF77(lineDCF77) == HAL_ERROR){ //Первіряється формат рядка хвилини і присвоюється дата час в форматі BCD
+											bWork = false;
+											DCF77_Status = RESET;
+										}else{
+											DCF77_Status = SET;
+										}
+										iCycle = 0;
+										//Обробка рядка хвилини
+									}
+									++iCycle;
+									amountNull = 0;
+									amountOne = 0;
+								}
+								BSP_LED_Toggle(LED_GREEN); //мигтіння світлодіодом
+								//Serial.print(sensorValue); //Результат інтервалу 10 мсек
+								prevSensorValue = sensorValue;
+								HAL_Delay(5);	
+							}
+							//холостий прогін потоку
+							if (sensorValue == 1) {
+								amountOne++; //нарощую кількість логічних 1
+								printf("%c", strOne);
+							}else {
+								amountNull++; //нарощую кількість логічних 0
+								printf("%c", strNull);
+							}
+							if (sensorValue == 1 && prevSensorValue == 0){
+								printf("amountNull = %d, amountOne = %d", amountNull, amountOne);
+								if (amountOne <= 28){
+									printf(" DCF77 = %c\n\r", strNull);
+								}else{
+									printf(" DCF77 = %c\n\r", strOne);
+								}
+								if(amountNull > 280){
+									bWork = true; //Остання секунда хвилини
+									printf("Start recording line of DCF77\n\r");
+								}
+								iCycle = 0;
+								amountNull = 0;
+								amountOne = 0;
+							}
+							BSP_LED_Toggle(LED_GREEN); //мигтіння світлодіодом
+							//Serial.print(sensorValue); //Результат інтервалу 10 мсек
+							prevSensorValue = sensorValue;
+							HAL_Delay(5);
+						}while (DCF77_Fine == 0x00); 
+				}
+
+				//Вирахоиую час в форматі time_t
+					tstart.tm_sec    = stimestructure.Seconds;
+					tstart.tm_min    = stimestructure.Minutes;
+					tstart.tm_hour   = stimestructure.Hours;
+					tstart.tm_mday   = sdatestructure.Date;
+					tstart.tm_mon    = sdatestructure.Month - 1;//місяць 0...11
+					tstart.tm_year   = sdatestructure.Year + 2000 - 1900; //Число років, починаючи з 1900 
+					//tstart.tm_wday   = RTC_WeekDayNum(tstart.tm_year, tstart.tm_mon, tstart.tm_mday); //День тижня
+					daytime = mktime(&tstart); //Перетворюю структуру в формат time_t
+					pTemp = asctime(&tstart); //претворюю структуру в рядок ascii
+					printf("Date of start %s\n", pTemp);	//друкую рядок дати
+			
+					/* Write time counter in RTC registers */
+					if (MSP_WriteTimeCounter(hrtc, daytime) != HAL_OK)
+					{
+				   	 /* Set RTC state */
+					   hrtc->State = HAL_RTC_STATE_ERROR;
+
+						 /* Process Unlocked */
+						__HAL_UNLOCK(hrtc);
+
+						return HAL_ERROR;
+					}
+						
+							uint16_t daytimeL = daytime & 0x0000FFFF;
+							uint16_t daytimeH = (daytime >> 16) & 0x0000FFFF;
+							HAL_RTCEx_BKUPWrite(hrtc, RTC_BKP_DR2, daytimeL); //Записую time_t у Backup	
+							HAL_RTCEx_BKUPWrite(hrtc, RTC_BKP_DR3, daytimeH); //Записую time_t у Backup		
+#else
+
+    // Перше вмикання, конфыгурую час ы дату
     /* Initialize date to 1st of January 2000 */
     hrtc->DateToUpdate.Year = 0x00U;
     hrtc->DateToUpdate.Month = RTC_MONTH_JANUARY;
@@ -411,6 +555,8 @@ HAL_StatusTypeDef HAL_RTC_Init(RTC_HandleTypeDef *hrtc)
 
     return HAL_ERROR;
   }
+#endif
+
 
     /* Set RTC state */
     hrtc->State = HAL_RTC_STATE_READY;
