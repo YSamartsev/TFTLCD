@@ -1422,7 +1422,7 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 	sprintf(realmonth, "%02d", sdatestructureget.Month);
 	sprintf(realyear, "%02d", sdatestructureget.Year); */
 
-	  /* Read the time counter*/
+/* Чтение текущего значения счетчика*/
   daytime = MSP_ReadTimeCounter(&RtcHandle);
 
   //daytime = 0x6A1D51FB;
@@ -1440,10 +1440,10 @@ static void RTC_DateShow(uint16_t x, uint16_t y) //Відображення Да
 //		time_t sdaytime = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR3) << 16; 
 //		sdaytime += HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR2);
 		
-	if (Date_temp != varL->tm_wday)
+	if (Date_temp != varL->tm_mday)
 	{
 		//Date_temp = (float)(sdatestructureget.Year * sdatestructureget.Month * sdatestructureget.Date);
-		Date_temp = varL->tm_wday;
+		Date_temp = varL->tm_mday;
 		
 		//printf("date = %s\n\r", temp1);
 		concat_date(temp1, realdate, realmonth, realyear); //соединить строки -> *temp2
