@@ -335,13 +335,13 @@ const uint16_t Font16x26 [] = {
 
 #ifdef TFT_LCD_1_3
 const uint8_t myFont_ukr[] = {  //Arial45x39[] = { //Сформовано з GLCD Font Creator
-   0x00,
-   0x00,
-   0x06,0x04,
-   0x85,0x04,
-   0x27,
-   0x00,
-   0x06,0x08,0x02,0x00,
+	 0x00, 			//Маркер формату
+   0x00, 			//Маркер формату
+	 0x06,0x04, //UNICODE код першого символу таблиці символів (1030)
+	 0x85,0x04, //UNICODE код останнього символу таблиці символів(1157)
+	 0x27, 			//Кількість вертикальних пікселів симола (39)
+	 0x00, 		  //Не використовується в обробленні
+	 0x06,0x08,0x02,0x00, //Ширина символа в пікселях (один байт, 6 пікселів), зміщення для символа від початку масива (молодший байт, старший 520), не використовую
    0x09,0x2F,0x02,0x00,
    0x0F,0x7D,0x02,0x00,
    0x24,0xCB,0x02,0x00,
@@ -997,7 +997,7 @@ if (myFont == 0)
 			byte_width = myFont_ukr[ASCII] / 8; //кількість байтів кратне 8 бітам
 		}
 		Pos_Symbol = (myFont_ukr[ASCII+3]<<16) + (myFont_ukr[ASCII+2]<<8) + myFont_ukr[ASCII+1]; // + 4; //індекс першого байту опису символа в масиві myFont_ukr
-		*pBuffer = byte_width; //максимум 27 рядків
+		*pBuffer = byte_width; //27 рядків
 		memcpy(pBuffer + 1, myFont_ukr + Pos_Symbol, byte_width * DrawProp_ukr.height);
 }else if (myFont == 1)
 {

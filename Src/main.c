@@ -509,6 +509,9 @@ if (HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR1) != 0x1234)
 						//Очистити прямокутник дня тижня
 						//LCD_DrawFilledRectangle(Weekday_LCD_Coordinates[0], Weekday_LCD_Coordinates[1], Weekday_LCD_Coordinates[2], Weekday_LCD_Coordinates[3], LCD_BLACK); 
 						//Вивести день тижня
+						//char *str1 = "П'ятниця";
+						//GUI_Text_ukr(Weekday_LCD_Coordinates, str1, 8, 0);
+						
 						GUI_Text_ukr(Weekday_LCD_Coordinates, strweekday, 8, 0);							
 //------------------------------		
 						//Час: годин, хвили, секунд
@@ -593,7 +596,7 @@ if (HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR1) != 0x1234)
 //Порівнюю LCD_* і BSP_LCD_*  функції
 //LCD_DrawFilledRectangle(50, 50, 50, 50, LCD_WHITE); //Малюю квадрат
 
-//Вивід символыв через *str = "А" відбувається в UTF 8
+//Вивід символів через *str = "А" відбувається в UTF 8
 //Наприклад UTF код кирилицкої "А" це 0xD0D9, а 0x0410 - номер символа "А" в таблиці UNICODE (UTF 8)
 //char *locale = setlocale(LC_ALL, "");
 //Кирилиця "А" 0xD090, Апостроф "҅" код 0xD285, 
@@ -606,7 +609,7 @@ if (HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR1) != 0x1234)
 */
 
 //   char *str1 = "П'ятниця";
-// 	 GUI_Text_ukr(Weekday_LCD_Coordinates, str1, 8, 0);
+//	 GUI_Text_ukr(Weekday_LCD_Coordinates, str1, 8, 0);
 
 	//Для TFT_LCD_1_44 Використовую шрифт  Arial36x33[]	 
 	//Для TFT_LCD_1_3 Використовую шрифт  Arial45x39[]	
